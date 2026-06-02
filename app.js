@@ -45,7 +45,7 @@ let GLOBAL_EARLYBIRD_ENABLED = true; // default: enabled
 
 // JSONBin settings — must match staff.html
 const _JSONBIN_BIN_ID  = '6a1e8f65f5f4af5e29abf2ff';
-const _JSONBIN_API_KEY = '$2a$10$xNqYASQmS/Gd1XO/fBQBOeDpxyobtbDKFByz5TouGaHS3RK2hZB7m';
+const _JSONBIN_API_KEY = '$2a$10$l/R8BGxkz/nlfuPduNbrQe7Vojq21Ta25o8eij5mNFVDeGw/3sdsm';
 const _JSONBIN_CONFIGURED = _JSONBIN_BIN_ID !== 'YOUR_BIN_ID_HERE' && _JSONBIN_API_KEY !== 'YOUR_API_KEY_HERE';
 
 async function fetchGlobalConfig() {
