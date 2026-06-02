@@ -207,13 +207,26 @@ function goTo(view) {
   }
 
   if (view === 'ticket')  {
-    // ดึงค่าการตั้งค่าและจำนวนที่นั่งจากโฮสต์กลางก่อนเรนเดอร์ตาราง เพื่อความแม่นยำสูงสุด
+    // 1. เรนเดอร์ตารางทันทีโดยใช้ข้อมูลแคชเดิม (โหลดปุ๊บ แสดงปั๊บ 0ms!)
+    renderSchedule();
+    
+    // 2. ดึงข้อมูลใหม่จากคลาวด์ในเบื้องหลัง (Background Fetch) และอัปเดตตัวเลขเมื่อเสร็จ
     fetchGlobalConfig().then(() => {
-      renderSchedule();
-    }).catch(e => {
-      console.warn('ดึงข้อมูลสต็อกและเงื่อนไขไม่สำเร็จ:', e);
-      renderSchedule();
-    });
+      // อัปเดตเฉพาะยอดที่นั่งคงเหลือและรอบเวลาบนหน้าจอแบบเงียบๆ ไม่กระตุก
+      if (document.querySelector('.view.active')?.id === 'view-ticket') {
+        const prevDateId = state.selectedDateId;
+        const prevSlot = state.selectedSlot;
+        const prevTypeId = state.selectedTypeId;
+        
+        renderSchedule();
+        
+        // กู้คืนสถานะการเลือกเดิมของผู้ใช้
+        state.selectedDateId = prevDateId;
+        state.selectedSlot = prevSlot;
+        state.selectedTypeId = prevTypeId;
+      }
+    }).catch(e => console.warn('Background stock sync failed:', e));
+    
     // When returning from info with everything already selected, scroll to summary so
     // the user can see their choice + the "ดำเนินการต่อ" button without manually scrolling
     if (state.selectedTypeId) {
@@ -961,9 +974,14 @@ function showToast(msg, type = '') {
 }
 
 // ─── INIT ─────────────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', async () => {
-  // Load global config (Early Bird setting shared across all devices)
-  await fetchGlobalConfig();
+document.addEventListener('DOMContentLoaded', () => {
+  // Load global config asynchronously in the background (Non-blocking page load!)
+  fetchGlobalConfig().then(() => {
+    // If the customer is on the ticket selection step, silently refresh numbers
+    if (document.querySelector('.view.active')?.id === 'view-ticket') {
+      renderSchedule();
+    }
+  }).catch(err => console.warn('Background config fetch failed:', err));
 
   // Poster
   const posterEl = document.getElementById('poster-img');
