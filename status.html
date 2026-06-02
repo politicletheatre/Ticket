@@ -37,7 +37,21 @@
       padding: 14px 20px;
       display: flex; align-items: center; justify-content: space-between;
     }
-    .header-logo { font-size: 1rem; font-weight: 700; color: var(--gold-light); }
+    .header-logo {
+      font-size: 1rem; font-weight: 700;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .logo-emoji {
+      -webkit-text-fill-color: initial !important;
+      background: none !important;
+      background-clip: initial !important;
+      -webkit-background-clip: initial !important;
+      display: inline-block;
+    }
+    .logo-text {
+      color: var(--gold-light);
+      display: inline-block;
+    }
     .logo-short { display: none; }
     .header-nav a {
       color: var(--muted); font-size: 0.85rem; text-decoration: none;
@@ -261,8 +275,9 @@
 
 <header class="status-header">
   <div class="header-logo">
-    <span class="logo-full">🎭 น่าจะรู้อย่างนี้ตั้งแต่ปี 2475</span>
-    <span class="logo-short">🎭 ปี 2475</span>
+    <span class="logo-emoji">🎭</span>
+    <span class="logo-text logo-full">น่าจะรู้อย่างนี้ตั้งแต่ปี 2475</span>
+    <span class="logo-text logo-short">ปี 2475</span>
   </div>
   <nav class="header-nav">
     <a href="index.html" style="display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border: 1px solid var(--border); border-radius: 50px; text-decoration: none; color: var(--text); background: var(--surface); transition: var(--transition); font-size: 0.85rem;">

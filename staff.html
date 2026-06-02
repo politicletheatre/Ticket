@@ -62,7 +62,21 @@
       border-bottom: 1px solid var(--border); padding: 14px 20px;
       display: flex; align-items: center; justify-content: space-between; gap: 12px;
     }
-    .staff-logo { font-size: 1rem; font-weight: 700; color: var(--gold-light); }
+    .staff-logo {
+      font-size: 1rem; font-weight: 700;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .logo-emoji {
+      -webkit-text-fill-color: initial !important;
+      background: none !important;
+      background-clip: initial !important;
+      -webkit-background-clip: initial !important;
+      display: inline-block;
+    }
+    .logo-text {
+      color: var(--gold-light);
+      display: inline-block;
+    }
     .logo-short { display: none; }
     .staff-badge { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; padding: 4px 12px; border-radius: 50px; font-size: 0.72rem; font-weight: 700; }
     .staff-link  { color: var(--muted); font-size: 0.82rem; text-decoration: none; padding: 6px 14px; border: 1px solid var(--border); border-radius: 50px; transition: var(--transition); }
@@ -614,8 +628,9 @@
 <!-- ══ HEADER ════════════════════════════════════════════════════════════════ -->
 <header class="staff-header">
   <div class="staff-logo">
-    <span class="logo-full">🎭 น่าจะรู้อย่างนี้ตั้งแต่ปี 2475</span>
-    <span class="logo-short">🎭 ปี 2475</span>
+    <span class="logo-emoji">🎭</span>
+    <span class="logo-text logo-full">น่าจะรู้อย่างนี้ตั้งแต่ปี 2475</span>
+    <span class="logo-text logo-short">ปี 2475</span>
   </div>
   <div id="sync-indicator" class="sync-badge off">
     <div class="sync-dot"></div><span>โหมดออฟไลน์</span>
