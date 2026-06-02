@@ -40,14 +40,32 @@ const CONFIG = {
   },
 };
 
-// ─── GLOBAL CONFIG (read from config.json on GitHub Pages) ───────────────
+// ─── GLOBAL CONFIG (Early Bird state shared across all devices) ───────────
 let GLOBAL_EARLYBIRD_ENABLED = true; // default: enabled
+
+// JSONBin settings — must match staff.html
+const _JSONBIN_BIN_ID  = 'YOUR_BIN_ID_HERE';
+const _JSONBIN_API_KEY = 'YOUR_API_KEY_HERE';
+const _JSONBIN_CONFIGURED = _JSONBIN_BIN_ID !== 'YOUR_BIN_ID_HERE' && _JSONBIN_API_KEY !== 'YOUR_API_KEY_HERE';
 
 async function fetchGlobalConfig() {
   try {
-    const res = await fetch('./config.json?t=' + Date.now());
-    if (res.ok) {
-      const cfg = await res.json();
+    if (_JSONBIN_CONFIGURED) {
+      const res = await fetch(`https://api.jsonbin.io/v3/b/${_JSONBIN_BIN_ID}/latest`, {
+        headers: { 'X-Master-Key': _JSONBIN_API_KEY }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (typeof data.record?.earlybird_enabled === 'boolean') {
+          GLOBAL_EARLYBIRD_ENABLED = data.record.earlybird_enabled;
+          return;
+        }
+      }
+    }
+    // Fallback: read from config.json (static file on GitHub Pages)
+    const res2 = await fetch('./config.json?t=' + Date.now());
+    if (res2.ok) {
+      const cfg = await res2.json();
       if (typeof cfg.earlybird_enabled === 'boolean') {
         GLOBAL_EARLYBIRD_ENABLED = cfg.earlybird_enabled;
       }

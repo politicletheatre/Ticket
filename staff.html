@@ -825,6 +825,16 @@ function loadFallbackQR() {
 const APPS_SCRIPT_URL = 'YOUR_APPS_SCRIPT_URL_HERE';
 const STAFF_PIN       = '002406';
 
+// ── JSONBin config (global Early Bird toggle) ────────────────────────────
+// ไปเปิด https://jsonbin.io → สมัครฟรี → สร้าง Bin → ใส่ {"earlybird_enabled":true}
+// แล้ว copy Bin ID และ API Key มาใส่ตรงนี้
+const JSONBIN_BIN_ID  = 'YOUR_BIN_ID_HERE';
+const JSONBIN_API_KEY = 'YOUR_API_KEY_HERE';
+const JSONBIN_CONFIGURED = JSONBIN_BIN_ID !== 'YOUR_BIN_ID_HERE' && JSONBIN_API_KEY !== 'YOUR_API_KEY_HERE';
+const JSONBIN_READ_URL  = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`;
+const JSONBIN_WRITE_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
+
+
 const TICKET_TYPES = {
   'QT SPON': 0,
   'QT FREE': 0,
@@ -966,46 +976,77 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 
-let _pendingEarlybirdEnabled = true;
+let _earlybirdEnabled = true;
 
 async function initSettings() {
-  const toggle = document.getElementById('toggle-earlybird');
-  const statusText = document.getElementById('earlybird-status-text');
+  const toggle      = document.getElementById('toggle-earlybird');
+  const statusText  = document.getElementById('earlybird-status-text');
+  const setupNotice = document.getElementById('jsonbin-setup-notice');
   if (!toggle) return;
-  try {
-    const res = await fetch('../config.json?t=' + Date.now());
-    if (res.ok) {
-      const cfg = await res.json();
-      _pendingEarlybirdEnabled = cfg.earlybird_enabled !== false;
-    }
-  } catch (e) { /* offline: default true */ }
-  toggle.checked = _pendingEarlybirdEnabled;
-  if (statusText) {
-    statusText.textContent = _pendingEarlybirdEnabled ? '✅ เปิดอยู่' : '🚫 ปิดอยู่';
-    statusText.style.color = _pendingEarlybirdEnabled ? '#86efac' : '#fca5a5';
+
+  if (!JSONBIN_CONFIGURED) {
+    if (setupNotice) setupNotice.style.display = 'block';
+    // Fallback: read from config.json (static file)
+    try {
+      const res = await fetch('../config.json?t=' + Date.now());
+      if (res.ok) { const cfg = await res.json(); _earlybirdEnabled = cfg.earlybird_enabled !== false; }
+    } catch (e) { /* offline */ }
+  } else {
+    // Read live from JSONBin
+    try {
+      const res = await fetch(JSONBIN_READ_URL, { headers: { 'X-Master-Key': JSONBIN_API_KEY } });
+      if (res.ok) { const data = await res.json(); _earlybirdEnabled = data.record?.earlybird_enabled !== false; }
+    } catch (e) { /* offline */ }
   }
+
+  toggle.checked = _earlybirdEnabled;
+  _refreshEarlybirdStatus(false);
 }
 
-function toggleEarlyBirdSale(enabled) {
-  _pendingEarlybirdEnabled = enabled;
+function _refreshEarlybirdStatus(saving) {
   const statusText = document.getElementById('earlybird-status-text');
-  const notice = document.getElementById('earlybird-push-notice');
-  if (statusText) {
-    statusText.textContent = enabled ? '✅ เปิดอยู่ (ยังไม่ได้บันทึก)' : '🚫 ปิดอยู่ (ยังไม่ได้บันทึก)';
-    statusText.style.color = '#f59e0b';
+  if (!statusText) return;
+  if (saving) {
+    statusText.textContent = '⏳ กำลังบันทึก...';
+    statusText.style.color = '#94a3b8';
+  } else if (_earlybirdEnabled) {
+    statusText.textContent = JSONBIN_CONFIGURED ? '✅ เปิดอยู่ — ทุกเครื่องเห็นเหมือนกัน' : '✅ เปิดอยู่ (เฉพาะเครื่องนี้)';
+    statusText.style.color = '#86efac';
+  } else {
+    statusText.textContent = JSONBIN_CONFIGURED ? '🚫 ปิดอยู่ — ทุกเครื่องเห็นเหมือนกัน' : '🚫 ปิดอยู่ (เฉพาะเครื่องนี้)';
+    statusText.style.color = '#fca5a5';
   }
-  if (notice) notice.style.display = 'block';
-  showToastStaff(enabled ? '✅ เปลี่ยนเป็นเปิด — ดาวน์โหลด config.json แล้ว git push' : '🚫 เปลี่ยนเป็นปิด — ดาวน์โหลด config.json แล้ว git push');
 }
 
-function downloadConfig() {
-  const cfg = JSON.stringify({ earlybird_enabled: _pendingEarlybirdEnabled }, null, 2);
-  const blob = new Blob([cfg], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'config.json';
-  a.click();
-  showToastStaff('⬇️ ดาวน์โหลดแล้ว — นำไปวางทับไฟล์เดิมในโฟลเดอร์โปรเจกต์ แล้ว git push');
+async function toggleEarlyBirdSale(enabled) {
+  _earlybirdEnabled = enabled;
+  _refreshEarlybirdStatus(JSONBIN_CONFIGURED);
+
+  if (!JSONBIN_CONFIGURED) {
+    localStorage.setItem('theater_disable_earlybird', (!enabled).toString());
+    _refreshEarlybirdStatus(false);
+    showToastStaff(enabled ? '✅ เปิด (เฉพาะเครื่องนี้)' : '🚫 ปิด (เฉพาะเครื่องนี้)');
+    return;
+  }
+
+  try {
+    const res = await fetch(JSONBIN_WRITE_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_API_KEY, 'X-Bin-Versioning': 'false' },
+      body: JSON.stringify({ earlybird_enabled: enabled }),
+    });
+    if (res.ok) {
+      _refreshEarlybirdStatus(false);
+      showToastStaff(enabled ? '✅ เปิด Early Bird — ทุกเครื่องเห็นแล้ว!' : '🚫 ปิด Early Bird — ทุกเครื่องเห็นแล้ว!');
+    } else {
+      throw new Error('HTTP ' + res.status);
+    }
+  } catch (err) {
+    _earlybirdEnabled = !enabled; // revert UI
+    document.getElementById('toggle-earlybird').checked = _earlybirdEnabled;
+    _refreshEarlybirdStatus(false);
+    showToastStaff('❌ บันทึกไม่สำเร็จ: ' + err.message);
+  }
 }
 
 
