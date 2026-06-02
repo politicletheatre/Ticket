@@ -267,6 +267,19 @@
     .error-msg { color: #fca5a5; font-size: 0.85rem; margin-top: 8px; display: none; }
     .error-msg.show { display: block; }
 
+    /* ── TOAST ── */
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px);
+      background: rgba(30, 20, 50, 0.95); border: 1px solid rgba(255,255,255,0.12);
+      color: var(--text); padding: 12px 24px; border-radius: 50px; font-size: 0.85rem;
+      font-weight: 500; z-index: 9999; backdrop-filter: blur(20px);
+      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.3s; opacity: 0;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4); white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .toast.success { border-color: rgba(34,197,94,0.4); }
+    .toast.error { border-color: rgba(239,68,68,0.4); }
+
     /* ── FOOTER ── */
     .status-footer { text-align: center; padding: 20px; font-size: 0.8rem; color: var(--muted); }
   </style>
@@ -753,7 +766,15 @@ function regenerateSingleQR(ticketId) {
   });
 
   makeQR(`qr-status-${ticketId}`, qrData, 170);
-  alert('🔄 ระบบได้ทำการสร้าง QR Code บัตรใบนี้ใหม่อีกครั้งแล้วครับ!');
+  showToast('🔄 สร้าง QR Code บัตรใบนี้ใหม่อีกครั้งแล้วครับ!', 'success');
+}
+
+function showToast(msg, type = '') {
+  const toast = document.getElementById('toast');
+  if (!toast) return;
+  toast.textContent = msg;
+  toast.className   = `toast ${type} show`;
+  setTimeout(() => { toast.className = 'toast'; }, 3500);
 }
 
 /* ── ESCAPE HTML ── */
@@ -774,5 +795,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 </script>
+<!-- ===================== TOAST ===================== -->
+<div id="toast" class="toast"></div>
 </body>
 </html>
