@@ -669,8 +669,11 @@ function makeQR(elementId, text, size) {
   el.innerHTML = '';
   try {
     new QRCode(el, {
-      text, width: size, height: size,
-      colorDark: '#1a0d2e', colorLight: '#ffffff',
+      text: unescape(encodeURIComponent(text)),
+      width: size,
+      height: size,
+      colorDark: '#1a0d2e',
+      colorLight: '#ffffff',
       correctLevel: QRCode.CorrectLevel.M,
     });
     const canvas = el.querySelector('canvas');
