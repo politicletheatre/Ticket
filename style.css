@@ -104,7 +104,7 @@ body {
   background-clip: text;
   display: inline-block;
 }
-.logo-short { display: none; }
+.logo-short, .nav-short { display: none; }
 
 .header-nav { display: flex; gap: 24px; align-items: center; }
 .header-nav a { color: var(--text-secondary); text-decoration: none; font-weight: 500; transition: var(--transition); }
@@ -1426,13 +1426,13 @@ body {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 8px;
+    padding: 16px 8px 10px 8px;
   }
   .header-logo {
     font-size: 0.95rem;
   }
-  .logo-full { display: none; }
-  .logo-short { display: inline; }
+  .logo-full, .nav-full { display: none; }
+  .logo-short, .nav-short { display: inline; }
   .header-nav {
     gap: 6px;
     font-size: 0.72rem;

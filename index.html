@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet" />
   <script src="assets/qrcodejs.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=1.4" />
+  <link rel="stylesheet" href="style.css?v=1.5" />
 </head>
 <body>
 
@@ -43,8 +43,14 @@
       <span class="logo-text logo-short">ปี 2475</span>
     </div>
     <nav class="header-nav">
-      <a href="#show-info">รายละเอียด</a>
-      <a href="status.html" class="status-nav-link">🎫 ตรวจสอบบัตร</a>
+      <a href="#show-info">
+        <span class="nav-full">รายละเอียด</span>
+        <span class="nav-short">ข้อมูล</span>
+      </a>
+      <a href="status.html" class="status-nav-link">
+        <span class="nav-full">🎫 ตรวจสอบบัตร</span>
+        <span class="nav-short">🎫 เช็คบัตร</span>
+      </a>
       <a href="staff.html" class="staff-nav-link">🔐 Staff</a>
       <a href="#" onclick="event.preventDefault();goTo('ticket')" class="btn-nav">จองบัตร</a>
     </nav>
