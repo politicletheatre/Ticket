@@ -65,6 +65,11 @@
     .staff-logo {
       font-size: 1rem; font-weight: 700;
       display: inline-flex; align-items: center; gap: 6px;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      white-space: nowrap;
     }
     .logo-emoji {
       -webkit-text-fill-color: initial !important;
@@ -83,10 +88,23 @@
     .staff-link:hover { color: var(--text); border-color: var(--purple-light); }
 
     @media (max-width: 600px) {
-      .staff-header { padding: 10px 10px; gap: 8px; }
-      .staff-logo { font-size: 0.9rem; }
-      .logo-full { display: none; }
-      .logo-short { display: inline; }
+      .staff-header {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        padding: 12px 10px;
+        position: relative;
+      }
+      .staff-logo {
+        grid-column: 1 / -1;
+        justify-content: center;
+        position: static;
+        transform: none;
+        font-size: 1.05rem;
+        margin-bottom: 2px;
+      }
+      .logo-full { display: inline !important; }
+      .logo-short { display: none !important; }
       .staff-link { font-size: 0.75rem; padding: 4px 10px; }
       .staff-badge { font-size: 0.65rem; padding: 2px 8px; }
       .sync-badge span { display: none; }
