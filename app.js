@@ -40,6 +40,23 @@ const CONFIG = {
   },
 };
 
+// ─── GLOBAL CONFIG (read from config.json on GitHub Pages) ───────────────
+let GLOBAL_EARLYBIRD_ENABLED = true; // default: enabled
+
+async function fetchGlobalConfig() {
+  try {
+    const res = await fetch('./config.json?t=' + Date.now());
+    if (res.ok) {
+      const cfg = await res.json();
+      if (typeof cfg.earlybird_enabled === 'boolean') {
+        GLOBAL_EARLYBIRD_ENABLED = cfg.earlybird_enabled;
+      }
+    }
+  } catch (e) {
+    // offline: keep default true
+  }
+}
+
 // ─── STATE ────────────────────────────────────────────────────────────────
 const state = {
   selectedDateId: null,
@@ -289,7 +306,7 @@ function renderTicketTypes() {
     ? getRemainingSeats(state.selectedDateId, state.selectedSlot)
     : CONFIG.slotCapacity;
 
-  const isEarlyBirdDisabled = localStorage.getItem('theater_disable_earlybird') === 'true';
+  const isEarlyBirdDisabled = !GLOBAL_EARLYBIRD_ENABLED;
 
   container.innerHTML = CONFIG.ticketTypes
     .filter(t => t.available && !(t.id === 'earlybird' && isEarlyBirdDisabled))
@@ -849,7 +866,10 @@ function showToast(msg, type = '') {
 }
 
 // ─── INIT ─────────────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  // Load global config (Early Bird setting shared across all devices)
+  await fetchGlobalConfig();
+
   // Poster
   const posterEl = document.getElementById('poster-img');
   if (window.POSTER_BASE64) {

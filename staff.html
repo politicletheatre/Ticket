@@ -698,17 +698,28 @@
     <div class="card-header">
       <span class="card-title">⚙️ ตั้งค่าการขายบัตร</span>
     </div>
-    <div style="padding: 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
-      <div>
-        <h4 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 4px;">ขายบัตร Early Bird</h4>
-        <p style="font-size: 0.8rem; color: var(--muted);">เปิดหรือปิดการขายบัตร Early Bird ในหน้าจองสำหรับลูกค้าทั่วไป</p>
+    <div style="padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+        <div>
+          <h4 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 4px;">ขายบัตร Early Bird</h4>
+          <p style="font-size: 0.8rem; color: var(--muted);">เปิดหรือปิดการขายบัตร Early Bird ในหน้าจองสำหรับลูกค้าทั่วไป</p>
+          <p id="earlybird-status-text" style="font-size: 0.8rem; margin-top: 4px; font-weight: 600;"></p>
+        </div>
+        <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 26px;">
+          <input type="checkbox" id="toggle-earlybird" onchange="toggleEarlyBirdSale(this.checked)" style="opacity: 0; width: 0; height: 0;">
+          <span class="slider" style="position: absolute; cursor: pointer; inset: 0; background-color: rgba(255,255,255,0.06); border: 1.5px solid var(--border); border-radius: 34px; transition: .4s;"></span>
+        </label>
       </div>
-      <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 26px;">
-        <input type="checkbox" id="toggle-earlybird" onchange="toggleEarlyBirdSale(this.checked)" style="opacity: 0; width: 0; height: 0;">
-        <span class="slider" style="position: absolute; cursor: pointer; inset: 0; background-color: rgba(255,255,255,0.06); border: 1.5px solid var(--border); border-radius: 34px; transition: .4s;"></span>
-      </label>
+      <div id="earlybird-push-notice" style="display:none; background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.3); border-radius: 12px; padding: 12px 14px; font-size: 0.82rem; color: #fde68a; line-height: 1.6;">
+        ⚠️ เปลี่ยนค่าแล้ว กรุณากดปุ่มด้านล่างเพื่อดาวน์โหลดไฟล์ config.json และนำไปวางทับเดิมในโฟลเดอร์โปรเจกต์ แล้ว git push เพื่อให้ทุกเครื่องแสดงค่าล่าสุด
+        <br><br>
+        <button onclick="downloadConfig()" style="background: rgba(245,158,11,0.2); border: 1px solid rgba(245,158,11,0.5); color: #fde68a; padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 0.8rem;">
+          ⬇️ ดาวน์โหลด config.json
+        </button>
+      </div>
     </div>
   </div>
+
 
   <!-- QUOTA BOOKING -->
   <div class="card">
@@ -944,28 +955,59 @@ let editMode             = false;
 // ═══════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   // PIN is always required on every page load — no session bypass
   updateStats();
   renderLog();
   renderStockTable();
   updateSyncBadge();
   populateQuotaBookingSelect();
-  initSettings();
+  await initSettings();
 });
 
-function initSettings() {
+
+let _pendingEarlybirdEnabled = true;
+
+async function initSettings() {
   const toggle = document.getElementById('toggle-earlybird');
-  if (toggle) {
-    const isEarlyBirdDisabled = localStorage.getItem('theater_disable_earlybird') === 'true';
-    toggle.checked = !isEarlyBirdDisabled;
+  const statusText = document.getElementById('earlybird-status-text');
+  if (!toggle) return;
+  try {
+    const res = await fetch('../config.json?t=' + Date.now());
+    if (res.ok) {
+      const cfg = await res.json();
+      _pendingEarlybirdEnabled = cfg.earlybird_enabled !== false;
+    }
+  } catch (e) { /* offline: default true */ }
+  toggle.checked = _pendingEarlybirdEnabled;
+  if (statusText) {
+    statusText.textContent = _pendingEarlybirdEnabled ? '✅ เปิดอยู่' : '🚫 ปิดอยู่';
+    statusText.style.color = _pendingEarlybirdEnabled ? '#86efac' : '#fca5a5';
   }
 }
 
 function toggleEarlyBirdSale(enabled) {
-  localStorage.setItem('theater_disable_earlybird', (!enabled).toString());
-  showToastStaff(enabled ? '✅ เปิดการขายบัตร Early Bird แล้ว' : '🚫 ปิดการขายบัตร Early Bird แล้ว');
+  _pendingEarlybirdEnabled = enabled;
+  const statusText = document.getElementById('earlybird-status-text');
+  const notice = document.getElementById('earlybird-push-notice');
+  if (statusText) {
+    statusText.textContent = enabled ? '✅ เปิดอยู่ (ยังไม่ได้บันทึก)' : '🚫 ปิดอยู่ (ยังไม่ได้บันทึก)';
+    statusText.style.color = '#f59e0b';
+  }
+  if (notice) notice.style.display = 'block';
+  showToastStaff(enabled ? '✅ เปลี่ยนเป็นเปิด — ดาวน์โหลด config.json แล้ว git push' : '🚫 เปลี่ยนเป็นปิด — ดาวน์โหลด config.json แล้ว git push');
 }
+
+function downloadConfig() {
+  const cfg = JSON.stringify({ earlybird_enabled: _pendingEarlybirdEnabled }, null, 2);
+  const blob = new Blob([cfg], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'config.json';
+  a.click();
+  showToastStaff('⬇️ ดาวน์โหลดแล้ว — นำไปวางทับไฟล์เดิมในโฟลเดอร์โปรเจกต์ แล้ว git push');
+}
+
 
 function updateSyncBadge() {
   const el = document.getElementById('sync-indicator');
