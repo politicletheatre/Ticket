@@ -335,6 +335,9 @@
 </footer>
 
 <script>
+// ⚠️ ใส่ URL ของ Google Apps Script ของคุณที่นี่ (ตรงกับใน app.js และ staff.html)
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwpP4SkfoKoCCDXD6y7p4Tb7s2MHXMD68cLV-yBWYC1hebpg4fCHzUiEEHJB0qTHa5Z/exec';
+
 let currentTab = 'phone';
 
 /* ── TAB SWITCH ── */
@@ -352,7 +355,7 @@ function switchTab(tab) {
 }
 
 /* ── SEARCH ── */
-function doSearch() {
+async function doSearch() {
   const errEl = document.getElementById('error-msg');
   errEl.classList.remove('show');
 
@@ -371,34 +374,77 @@ function doSearch() {
     }
   }
 
-  const allTickets = JSON.parse(localStorage.getItem('theater_tickets') || '{}');
-  const allOrders  = JSON.parse(localStorage.getItem('theater_orders')  || '[]');
-
-  // Collect matched orderIds
-  const matchedOrderIds = new Set();
-  if (currentTab === 'phone') {
-    Object.values(allTickets).forEach(t => {
-      if ((t.phone || '').replace(/\D/g,'') === query.replace(/\D/g,''))
-        matchedOrderIds.add(t.orderId);
-    });
-  } else {
-    Object.values(allTickets).forEach(t => {
-      if ((t.orderId || '').toUpperCase().includes(query))
-        matchedOrderIds.add(t.orderId);
-    });
-  }
-
   const resultEl = document.getElementById('result-section');
   resultEl.style.display = 'block';
+  resultEl.innerHTML = `
+    <div style="text-align:center; padding:48px 24px; background:var(--surface); border:1px solid var(--border); border-radius:16px;">
+      <div style="font-size:2.5rem; margin-bottom:12px; animation: spin 1.5s linear infinite;">⏳</div>
+      <h3 style="font-size:1.1rem; font-weight:700; margin-bottom:8px;">กำลังค้นหาตั๋วของคุณ...</h3>
+      <p style="font-size:0.85rem; color:var(--muted);">โปรดรอสักครู่ ระบบกำลังค้นหาข้อมูลความปลอดภัยบนคลาวด์</p>
+    </div>
+    <style>
+      @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+  `;
+
+  let allTickets = JSON.parse(localStorage.getItem('theater_tickets') || '{}');
+  let allOrders  = JSON.parse(localStorage.getItem('theater_orders')  || '[]');
+
+  // ฟังก์ชันสแกนหาใน localStorage ท้องถิ่น
+  function findLocalMatchedIds() {
+    const ids = new Set();
+    if (currentTab === 'phone') {
+      Object.values(allTickets).forEach(t => {
+        if ((t.phone || '').replace(/\D/g,'') === query.replace(/\D/g,''))
+          ids.add(t.orderId);
+      });
+    } else {
+      Object.values(allTickets).forEach(t => {
+        if ((t.orderId || '').toUpperCase().includes(query))
+          ids.add(t.orderId);
+      });
+    }
+    return ids;
+  }
+
+  let matchedOrderIds = findLocalMatchedIds();
+
+  // หากค้นไม่พบบนเครื่อง และมีคลาวด์บอร์ดเชื่อมต่ออยู่ ให้ลองดึงข้อมูลจาก Sheets แบบ Real-time
+  if (matchedOrderIds.size === 0 && typeof APPS_SCRIPT_URL !== 'undefined' && APPS_SCRIPT_URL && APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
+    try {
+      const res = await fetch(`${APPS_SCRIPT_URL}?action=searchOrder&query=${encodeURIComponent(query)}&type=${currentTab}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.orders && data.orders.length > 0) {
+          // บันทึกแคชตั๋วรายใบ
+          Object.assign(allTickets, data.tickets);
+          localStorage.setItem('theater_tickets', JSON.stringify(allTickets));
+
+          // บันทึกแคชคำสั่งซื้อ
+          data.orders.forEach(newO => {
+            const idx = allOrders.findIndex(o => o.orderId === newO.orderId);
+            if (idx >= 0) allOrders[idx] = newO;
+            else allOrders.push(newO);
+          });
+          localStorage.setItem('theater_orders', JSON.stringify(allOrders));
+
+          // ดึงผลลัพธ์มาแมปอีกครั้ง
+          matchedOrderIds = findLocalMatchedIds();
+        }
+      }
+    } catch (e) {
+      console.warn('ดึงข้อมูลตั๋วผ่านคลาวด์ Sheets ไม่สำเร็จ:', e);
+    }
+  }
 
   if (matchedOrderIds.size === 0) {
     resultEl.innerHTML = `
       <div class="not-found">
         <div class="nf-icon">🔍</div>
         <h3>ไม่พบข้อมูลบัตร</h3>
-        <p>ไม่พบบัตรที่ตรงกับข้อมูลที่กรอก<br/>
-        กรุณาตรวจสอบว่าใช้เบราว์เซอร์เดิมที่จองบัตร<br/>
-        หรือลองค้นหาด้วยรหัสคำสั่งซื้อ</p>
+        <p>ไม่พบบัตรที่ตรงกับข้อมูลที่กรอกในระบบ<br/>
+        กรุณาตรวจสอบเบอร์โทรศัพท์/รหัสสั่งซื้ออีกครั้ง<br/>
+        หรือหากโอนเงินแล้ว กรุณาติดต่อทีมงานเพื่อตรวจสอบครับ</p>
       </div>`;
     return;
   }

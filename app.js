@@ -12,7 +12,7 @@ const CONFIG = {
   slotCapacity: 50, // ← จำนวนที่นั่งสูงสุดต่อรอบ
 
   // ⬇️ ใส่ URL ของ Google Apps Script ที่ deploy แล้วตรงนี้
-  APPS_SCRIPT_URL: 'YOUR_APPS_SCRIPT_URL_HERE',
+  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwpP4SkfoKoCCDXD6y7p4Tb7s2MHXMD68cLV-yBWYC1hebpg4fCHzUiEEHJB0qTHa5Z/exec',
 
   // ── ตารางรอบการแสดง ──
   schedule: [
@@ -50,6 +50,19 @@ const _JSONBIN_CONFIGURED = _JSONBIN_BIN_ID !== 'YOUR_BIN_ID_HERE' && _JSONBIN_A
 
 async function fetchGlobalConfig() {
   try {
+    // 1. ลองดึงสถานะจาก Google Apps Script ก่อน (เป็น API ส่วนกลางที่อัปเดตทันที)
+    if (CONFIG.APPS_SCRIPT_URL && CONFIG.APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
+      const res = await fetch(`${CONFIG.APPS_SCRIPT_URL}?action=getSettings`);
+      if (res.ok) {
+        const data = await res.json();
+        if (typeof data.earlybird_enabled === 'boolean') {
+          GLOBAL_EARLYBIRD_ENABLED = data.earlybird_enabled;
+          return;
+        }
+      }
+    }
+
+    // 2. Fallback: ถ้าไม่ได้ตั้งค่า Apps Script ให้ลองดึงจาก JSONBin (กรณีใช้งานระบบเดิม)
     if (_JSONBIN_CONFIGURED) {
       const res = await fetch(`https://api.jsonbin.io/v3/b/${_JSONBIN_BIN_ID}/latest`, {
         headers: { 'X-Master-Key': _JSONBIN_API_KEY }
@@ -62,7 +75,8 @@ async function fetchGlobalConfig() {
         }
       }
     }
-    // Fallback: read from config.json (static file on GitHub Pages)
+
+    // 3. Fallback สุดท้าย: ดึงจากไฟล์ config.json แบบสแตติกในเครื่อง
     const res2 = await fetch('./config.json?t=' + Date.now());
     if (res2.ok) {
       const cfg = await res2.json();
@@ -71,7 +85,7 @@ async function fetchGlobalConfig() {
       }
     }
   } catch (e) {
-    // offline: keep default true
+    // ออฟไลน์: ใช้ค่าเริ่มต้นที่เป็น true
   }
 }
 

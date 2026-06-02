@@ -632,8 +632,13 @@
     <span class="logo-text logo-full">น่าจะรู้อย่างนี้ตั้งแต่ปี 2475</span>
     <span class="logo-text logo-short">ปี 2475</span>
   </div>
-  <div id="sync-indicator" class="sync-badge off">
-    <div class="sync-dot"></div><span>โหมดออฟไลน์</span>
+  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+    <button id="btn-cloud-sync" onclick="syncAllFromSheets()" class="staff-link" style="background:rgba(107,53,176,0.25); border:1px solid rgba(155,93,229,0.35); color:#fff; display:inline-flex; align-items:center; gap:6px; cursor:pointer; font-family:inherit; padding:5px 12px; border-radius:50px; font-size:0.8rem; font-weight:600; transition:all 0.2s">
+      🔄 ซิงค์ข้อมูล Sheets
+    </button>
+    <div id="sync-indicator" class="sync-badge off">
+      <div class="sync-dot"></div><span>โหมดออฟไลน์</span>
+    </div>
   </div>
   <div style="display:flex;gap:8px;align-items:center">
     <a href="index.html" class="staff-link">🏠 กลับหน้าหลัก</a>
@@ -822,7 +827,7 @@ function loadFallbackQR() {
 // ═══════════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════════
-const APPS_SCRIPT_URL = 'YOUR_APPS_SCRIPT_URL_HERE';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwpP4SkfoKoCCDXD6y7p4Tb7s2MHXMD68cLV-yBWYC1hebpg4fCHzUiEEHJB0qTHa5Z/exec';
 const STAFF_PIN       = '002406';
 
 // ── JSONBin config (global Early Bird toggle) ────────────────────────────
@@ -973,6 +978,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   updateSyncBadge();
   populateQuotaBookingSelect();
   await initSettings();
+  
+  // ซิงค์คลาวด์อัตโนมัติเมื่อเข้าหน้าเว็บ
+  syncAllFromSheets(true);
+  
+  // ตั้งเวลาซิงค์อัตโนมัติทุกๆ 30 วินาทีแบบเงียบ
+  setInterval(() => {
+    syncAllFromSheets(true);
+  }, 30000);
 });
 
 
@@ -984,19 +997,37 @@ async function initSettings() {
   const setupNotice = document.getElementById('jsonbin-setup-notice');
   if (!toggle) return;
 
-  if (!JSONBIN_CONFIGURED) {
-    if (setupNotice) setupNotice.style.display = 'block';
-    // Fallback: read from config.json (static file)
+  let loaded = false;
+  // 1. ลองโหลดผ่าน Google Sheets APPS_SCRIPT_URL
+  if (typeof APPS_SCRIPT_URL !== 'undefined' && APPS_SCRIPT_URL && APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
     try {
-      const res = await fetch('../config.json?t=' + Date.now());
-      if (res.ok) { const cfg = await res.json(); _earlybirdEnabled = cfg.earlybird_enabled !== false; }
+      const res = await fetch(`${APPS_SCRIPT_URL}?action=getSettings`);
+      if (res.ok) {
+        const data = await res.json();
+        if (typeof data.earlybird_enabled === 'boolean') {
+          _earlybirdEnabled = data.earlybird_enabled;
+          loaded = true;
+        }
+      }
     } catch (e) { /* offline */ }
-  } else {
-    // Read live from JSONBin
-    try {
-      const res = await fetch(JSONBIN_READ_URL, { headers: { 'X-Master-Key': JSONBIN_API_KEY } });
-      if (res.ok) { const data = await res.json(); _earlybirdEnabled = data.record?.earlybird_enabled !== false; }
-    } catch (e) { /* offline */ }
+  }
+
+  // 2. Fallback: ดึงจากแหล่งสำรองเดิม
+  if (!loaded) {
+    if (!JSONBIN_CONFIGURED) {
+      if (setupNotice) setupNotice.style.display = 'block';
+      // Fallback: read from config.json (static file)
+      try {
+        const res = await fetch('../config.json?t=' + Date.now());
+        if (res.ok) { const cfg = await res.json(); _earlybirdEnabled = cfg.earlybird_enabled !== false; }
+      } catch (e) { /* offline */ }
+    } else {
+      // Read live from JSONBin
+      try {
+        const res = await fetch(JSONBIN_READ_URL, { headers: { 'X-Master-Key': JSONBIN_API_KEY } });
+        if (res.ok) { const data = await res.json(); _earlybirdEnabled = data.record?.earlybird_enabled !== false; }
+      } catch (e) { /* offline */ }
+    }
   }
 
   toggle.checked = _earlybirdEnabled;
@@ -1006,22 +1037,45 @@ async function initSettings() {
 function _refreshEarlybirdStatus(saving) {
   const statusText = document.getElementById('earlybird-status-text');
   if (!statusText) return;
+  
+  const ok = (JSONBIN_CONFIGURED || (typeof APPS_SCRIPT_URL !== 'undefined' && APPS_SCRIPT_URL && APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_HERE'));
+
   if (saving) {
     statusText.textContent = '⏳ กำลังบันทึก...';
     statusText.style.color = '#94a3b8';
   } else if (_earlybirdEnabled) {
-    statusText.textContent = JSONBIN_CONFIGURED ? '✅ เปิดอยู่ — ทุกเครื่องเห็นเหมือนกัน' : '✅ เปิดอยู่ (เฉพาะเครื่องนี้)';
+    statusText.textContent = ok ? '✅ เปิดอยู่ — ทุกเครื่องเห็นเหมือนกัน' : '✅ เปิดอยู่ (เฉพาะเครื่องนี้)';
     statusText.style.color = '#86efac';
   } else {
-    statusText.textContent = JSONBIN_CONFIGURED ? '🚫 ปิดอยู่ — ทุกเครื่องเห็นเหมือนกัน' : '🚫 ปิดอยู่ (เฉพาะเครื่องนี้)';
+    statusText.textContent = ok ? '🚫 ปิดอยู่ — ทุกเครื่องเห็นเหมือนกัน' : '🚫 ปิดอยู่ (เฉพาะเครื่องนี้)';
     statusText.style.color = '#fca5a5';
   }
 }
 
 async function toggleEarlyBirdSale(enabled) {
   _earlybirdEnabled = enabled;
-  _refreshEarlybirdStatus(JSONBIN_CONFIGURED);
+  
+  const hasAppScript = typeof APPS_SCRIPT_URL !== 'undefined' && APPS_SCRIPT_URL && APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_HERE';
+  _refreshEarlybirdStatus(hasAppScript || JSONBIN_CONFIGURED);
 
+  // 1. ลองบันทึกผ่าน Google Sheets
+  if (hasAppScript) {
+    try {
+      await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'updateSetting', key: 'earlybird_enabled', value: enabled }),
+      });
+      _refreshEarlybirdStatus(false);
+      showToastStaff(enabled ? '✅ เปิด Early Bird — ทุกเครื่องเห็นแล้ว (Sheets)!' : '🚫 ปิด Early Bird — ทุกเครื่องเห็นแล้ว (Sheets)!');
+      return;
+    } catch (err) {
+      console.warn('Apps Script update setting failed:', err);
+    }
+  }
+
+  // 2. สำรองเดิม: บันทึกผ่าน JSONBin หรือ localStorage ท้องถิ่น
   if (!JSONBIN_CONFIGURED) {
     localStorage.setItem('theater_disable_earlybird', (!enabled).toString());
     _refreshEarlybirdStatus(false);
@@ -1414,6 +1468,20 @@ function saveCustomerEdit() {
     ? ` (ย้ายรอบ → ${newShowDate})` : '';
   showToastStaff(`✅ บันทึกเรียบร้อย${stockMsg}`);
   openDetailModal(currentDetailTicketId); // re-render view mode
+
+  // ซิงค์ข้อมูลการแก้ไขขึ้น Sheets
+  const updatedOrder = orders.find(o => o.orderId === orderId) || {};
+  syncAction('saveEdit', {
+    orderId: orderId,
+    name: newName,
+    phone: newPhone,
+    email: newEmail,
+    note: newNote,
+    type: newType,
+    pricePerTicket: newPrice,
+    total: newPrice * (updatedOrder.qty || 1),
+    showDate: newShowDate
+  });
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1527,6 +1595,73 @@ function processQR(rawText) {
 // ═══════════════════════════════════════════════════════════════
 // SYNC
 // ═══════════════════════════════════════════════════════════════
+let isSyncing = false;
+
+async function syncAllFromSheets(silent = false) {
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+    if (!silent) alert('⚠️ กรุณากรอก APPS_SCRIPT_URL เพื่อเปิดใช้งานการซิงค์คลาวด์');
+    return;
+  }
+  if (isSyncing) return;
+  isSyncing = true;
+
+  const btn = document.getElementById('btn-cloud-sync');
+  const originalText = btn ? btn.textContent : '🔄 ซิงค์ข้อมูล Sheets';
+  if (btn && !silent) {
+    btn.disabled = true;
+    btn.textContent = '⏳ กำลังซิงค์...';
+    btn.style.opacity = '0.7';
+  }
+
+  try {
+    const res = await fetch(`${APPS_SCRIPT_URL}?action=getAll`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data.success) {
+        // อัปเดตตั๋วและประวัติสั่งซื้อใน localStorage
+        localStorage.setItem('theater_tickets', JSON.stringify(data.tickets || {}));
+        localStorage.setItem('theater_orders', JSON.stringify(data.orders || []));
+        
+        // อัปเดตสถานะ Early Bird ใน UI
+        if (typeof data.earlybird_enabled === 'boolean') {
+          _earlybirdEnabled = data.earlybird_enabled;
+          const toggle = document.getElementById('toggle-earlybird');
+          if (toggle) toggle.checked = _earlybirdEnabled;
+          _refreshEarlybirdStatus(false);
+        }
+
+        // รีเฟรช UI ส่วนต่างๆ หลังบ้าน
+        allTicketsCache = data.tickets || {};
+        updateStats();
+        renderStockTable();
+        renderLog();
+        
+        // สลักเวลาการประสานข้อมูล
+        const lastSyncTime = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        if (btn) {
+          btn.textContent = `🔄 ซิงค์เมื่อ ${lastSyncTime}`;
+          btn.title = 'ซิงค์ข้อมูลล่าสุดจาก Google Sheets';
+        }
+        if (!silent) showToastStaff('🔄 ประสานข้อมูลกับ Google Sheets ล่าสุดสำเร็จ!');
+      } else {
+        throw new Error(data.error || 'เซิร์ฟเวอร์ตอบกลับไม่ถูกต้อง');
+      }
+    } else {
+      throw new Error('HTTP ' + res.status);
+    }
+  } catch (err) {
+    console.error('Cloud Sync failed:', err);
+    if (!silent) showToastStaff('❌ ซิงค์ข้อมูลล้มเหลว: ' + err.message);
+    if (btn) btn.textContent = originalText;
+  } finally {
+    isSyncing = false;
+    if (btn) {
+      btn.disabled = false;
+      btn.style.opacity = '1';
+    }
+  }
+}
+
 async function syncCheckin(ticket) {
   if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') return;
   try {
@@ -1538,6 +1673,20 @@ async function syncCheckin(ticket) {
         checkInTime:new Date().toLocaleString('th-TH',{timeZone:'Asia/Bangkok'}) }),
     });
   } catch(e) { console.warn('Sync failed:',e); }
+}
+
+async function syncAction(action, data) {
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') return;
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action, ...data }),
+    });
+  } catch (e) {
+    console.warn(`Sync action ${action} failed:`, e);
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1656,11 +1805,17 @@ function ticketAction(action, ticketId) {
     t.checkInTime = now;
     showToastStaff(`✅ เช็คอิน ${ticketId} สำเร็จ`);
     addLog('ok', ticketId, t.name, t.type, 'เข้างานแล้ว');
+    
+    // ซิงค์การเช็คอินขึ้น Google Sheets
+    syncAction('checkin', { ticketId: ticketId, name: t.name, phone: t.phone, type: t.type, checkInTime: now });
   } else if (action === 'undo') {
     if (!t.checkedIn) { showToastStaff('⚠️ บัตรนี้ยังไม่ได้เช็คอิน'); return; }
     t.checkedIn   = false;
     t.checkInTime = null;
     showToastStaff(`↩️ ยกเลิกเช็คอิน ${ticketId} แล้ว`);
+    
+    // ซิงค์การยกเลิกเช็คอินขึ้น Google Sheets
+    syncAction('undoCheckin', { ticketId: ticketId });
   } else if (action === 'cancel') {
     if (t.cancelled) { showToastStaff('⚠️ บัตรนี้ถูกยกเลิกแล้ว'); return; }
     if (!confirm(`❗ ยืนยันการยกเลิกบัตรใบนี้\n${ticketId}\n\nStock จะคืน 1 ที่นั่ง`)) return;
@@ -1669,11 +1824,17 @@ function ticketAction(action, ticketId) {
     t.checkedIn   = false;
     t.checkInTime = null;
     showToastStaff(`🚫 ยกเลิกบัตร ${ticketId} แล้ว`);
+    
+    // ซิงค์การยกเลิกบัตรขึ้น Google Sheets
+    syncAction('cancelTicket', { ticketId: ticketId });
   } else if (action === 'restore') {
     if (!t.cancelled) { showToastStaff('⚠️ บัตรนี้ยังใช้งานอยู่'); return; }
     t.cancelled   = false;
     t.cancelledAt = null;
     showToastStaff(`♻️ กู้คืนบัตร ${ticketId} แล้ว`);
+    
+    // ซิงค์การกู้คืนบัตรขึ้น Google Sheets
+    syncAction('restoreTicket', { ticketId: ticketId });
   }
 
   allTickets[ticketId] = t;
@@ -1725,6 +1886,9 @@ function cancelOrder(orderId) {
   updateStats(); renderStockTable();
   openDetailModal(currentDetailTicketId);
   showToastStaff(`🚫 ยกเลิกตั๋ว ${qty} ใบของ "${rep.name}" — Stock คืนแล้ว`);
+  
+  // ซิงค์การยกเลิกออร์เดอร์ขึ้น Sheets
+  syncAction('cancelOrder', { orderId });
 }
 
 function confirmRestoreOrder() {
@@ -1763,6 +1927,9 @@ function restoreOrder(orderId) {
   updateStats(); renderStockTable();
   openDetailModal(currentDetailTicketId);
   showToastStaff(`♻️ กู้คืนออร์เดอร์ ${qty} ใบของ "${rep.name}" แล้ว`);
+  
+  // ซิงค์การกู้คืนออร์เดอร์ขึ้น Sheets
+  syncAction('restoreOrder', { orderId });
 }
 
 // ═══════════════════════════════════════════════════════════════
