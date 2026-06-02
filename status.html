@@ -38,12 +38,21 @@
       display: flex; align-items: center; justify-content: space-between;
     }
     .header-logo { font-size: 1rem; font-weight: 700; color: var(--gold-light); }
+    .logo-short { display: none; }
     .header-nav a {
       color: var(--muted); font-size: 0.85rem; text-decoration: none;
       padding: 6px 14px; border: 1px solid var(--border); border-radius: 50px;
       transition: var(--transition);
     }
     .header-nav a:hover { color: var(--text); border-color: var(--purple-light); }
+
+    @media (max-width: 600px) {
+      .status-header { padding: 10px 10px; }
+      .header-logo { font-size: 0.9rem; }
+      .logo-full { display: none; }
+      .logo-short { display: inline; }
+      .header-nav a { font-size: 0.75rem; padding: 4px 10px; }
+    }
 
     /* ── MAIN ── */
     .status-main { max-width: 600px; margin: 0 auto; padding: 32px 16px 80px; }
@@ -251,7 +260,10 @@
 <body>
 
 <header class="status-header">
-  <div class="header-logo">🎭 น่าจะรู้อย่างนี้ตั้งแต่ปี 2475</div>
+  <div class="header-logo">
+    <span class="logo-full">🎭 น่าจะรู้อย่างนี้ตั้งแต่ปี 2475</span>
+    <span class="logo-short">🎭 ปี 2475</span>
+  </div>
   <nav class="header-nav">
     <a href="index.html" style="display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border: 1px solid var(--border); border-radius: 50px; text-decoration: none; color: var(--text); background: var(--surface); transition: var(--transition); font-size: 0.85rem;">
       🏠 กลับหน้าหลัก
