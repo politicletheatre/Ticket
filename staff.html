@@ -1387,14 +1387,15 @@ function cancelEdit() { showDetailViewMode(); }
 // Save edits
 function saveCustomerEdit() {
   const newName     = document.getElementById('edit-name').value.trim();
-  const newPhone    = document.getElementById('edit-phone').value.trim();
+  const rawPhone    = document.getElementById('edit-phone').value.trim();
+  const newPhone    = cleanThaiPhone(rawPhone);
   const newEmail    = document.getElementById('edit-email').value.trim();
   const newNote     = document.getElementById('edit-note').value.trim();
   const newType     = document.getElementById('edit-type').value;
   const newShowDate = document.getElementById('edit-showdate').value;
 
   if (!newName)  { alert('กรุณากรอกชื่อ'); return; }
-  if (!newPhone) { alert('กรุณากรอกเบอร์โทร'); return; }
+  if (!newPhone || !/^0\d{9}$/.test(newPhone)) { alert('กรุณากรอกเบอร์โทรศัพท์มือถือ 10 หลัก (เช่น 0812345678)'); return; }
 
   const allTickets = JSON.parse(localStorage.getItem('theater_tickets') || '{}');
   const rep        = allTickets[currentDetailTicketId];
@@ -1628,6 +1629,18 @@ async function syncAllFromSheets(silent = false) {
           const toggle = document.getElementById('toggle-earlybird');
           if (toggle) toggle.checked = _earlybirdEnabled;
           _refreshEarlybirdStatus(false);
+        }
+
+        // อัปเดตค่า Capacity ที่แอดมินหรือสตาฟแก้ออนไลน์
+        if (data.settings) {
+          const stock = JSON.parse(localStorage.getItem('theater_stock') || '{}');
+          Object.keys(data.settings).forEach(key => {
+            if (key.startsWith('capacity|')) {
+              const slotKey = key.replace('capacity|', '');
+              stock[slotKey] = Number(data.settings[key]);
+            }
+          });
+          localStorage.setItem('theater_stock', JSON.stringify(stock));
         }
 
         // รีเฟรช UI ส่วนต่างๆ หลังบ้าน
@@ -2087,7 +2100,7 @@ function renderStockTable() {
     </table>`;
 }
 
-function adjustCapacity(key, delta) {
+async function adjustCapacity(key, delta) {
   const stock   = JSON.parse(localStorage.getItem('theater_stock') || '{}');
   const current = getSlotCapacity(key);
   // Cannot go below current sold count
@@ -2099,9 +2112,23 @@ function adjustCapacity(key, delta) {
   localStorage.setItem('theater_stock', JSON.stringify(stock));
   renderStockTable();
   showToastStaff(`✅ เปลี่ยน Capacity เป็น ${newVal}`);
+
+  // ซิงค์การปรับ Capacity ขึ้น Sheets ทันที
+  if (typeof APPS_SCRIPT_URL !== 'undefined' && APPS_SCRIPT_URL && APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
+    try {
+      await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'updateSetting', key: 'capacity|' + key, value: String(newVal) }),
+      });
+    } catch (e) {
+      console.warn('ซิงค์ Capacity ลง Sheets ไม่สำเร็จ:', e);
+    }
+  }
 }
 
-function setCapacity(key, val) {
+async function setCapacity(key, val) {
   const num = parseInt(val, 10);
   if (isNaN(num) || num < 0) { renderStockTable(); return; }
   const [dateId, slot] = key.split('|');
@@ -2112,6 +2139,20 @@ function setCapacity(key, val) {
   localStorage.setItem('theater_stock', JSON.stringify(stock));
   renderStockTable();
   showToastStaff(`✅ อัพเดต Stock เรียบร้อย`);
+
+  // ซิงค์การปรับ Capacity ขึ้น Sheets ทันที
+  if (typeof APPS_SCRIPT_URL !== 'undefined' && APPS_SCRIPT_URL && APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
+    try {
+      await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'updateSetting', key: 'capacity|' + key, value: String(capped) }),
+      });
+    } catch (e) {
+      console.warn('ซิงค์ Capacity ลง Sheets ไม่สำเร็จ:', e);
+    }
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -2119,6 +2160,17 @@ function setCapacity(key, val) {
 // ═══════════════════════════════════════════════════════════════
 function escHtml(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function cleanThaiPhone(p) {
+  let s = String(p || '').trim().replace(/\D/g, '');
+  if (s.startsWith('66')) {
+    s = '0' + s.substring(2);
+  }
+  if (s.length === 9 && !s.startsWith('0')) {
+    s = '0' + s;
+  }
+  return s;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -2172,7 +2224,8 @@ async function submitQuotaBooking() {
   if (!nameEl || !phoneEl || !showdateEl || !typeEl || !qtyEl) return;
 
   const name  = nameEl.value.trim();
-  const phone = phoneEl.value.trim();
+  const rawPhone = phoneEl.value.trim();
+  const phone = cleanThaiPhone(rawPhone);
   const email = emailEl.value.trim();
   const showDateLabel = showdateEl.value;
   const ticketType = typeEl.value;
@@ -2180,7 +2233,7 @@ async function submitQuotaBooking() {
   const note  = noteEl.value.trim();
 
   if (!name) { alert('❌ กรุณากรอกชื่อ-นามสกุลผู้ซื้อ'); nameEl.focus(); return; }
-  if (!phone || !/^\d{9,10}$/.test(phone)) { alert('❌ กรุณากรอกเบอร์โทรศัพท์ 9-10 หลัก'); phoneEl.focus(); return; }
+  if (!phone || !/^0\d{9}$/.test(phone)) { alert('❌ กรุณากรอกเบอร์โทรศัพท์มือถือที่ถูกต้อง (เช่น 0812345678)'); phoneEl.focus(); return; }
 
   // 1. Resolve dateId and slot
   const { dateId, slot } = findSlotByLabel(showDateLabel);

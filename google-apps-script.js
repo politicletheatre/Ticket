@@ -383,6 +383,7 @@ function doGet(e) {
       return output({
         success: true,
         earlybird_enabled: settings.earlybird_enabled !== false,
+        settings: settings,
         tickets: tickets,
         orders: orders
       });
@@ -683,11 +684,14 @@ function getColumnIndex(sheet, headerName) {
   return newCol;
 }
 
-// บังคับแปลงเป็น Text โดยการเพิ่มสัญญลักษณ์ ' นำหน้า ป้องกันเลข 0 ด้านหน้าหายบน Sheets
+// บังคับแปลงเป็น Text โดยการเพิ่มสัญลักษณ์ ' นำหน้า ป้องกันเลข 0 ด้านหน้าหายบน Sheets
 function formatPhoneToWrite(p) {
-  const s = String(p || '').trim().replace(/\D/g, '');
-  if (s.length === 9 && (s.startsWith('8') || s.startsWith('9') || s.startsWith('6'))) {
-    return "'0" + s;
+  let s = String(p || '').trim().replace(/\D/g, '');
+  if (s.startsWith('66')) {
+    s = '0' + s.substring(2);
+  }
+  if (s.length === 9 && !s.startsWith('0')) {
+    s = '0' + s;
   }
   return "'" + s;
 }
@@ -695,7 +699,10 @@ function formatPhoneToWrite(p) {
 // ล้างรูปแบบเบอร์โทรและเติม 0 ด้านหน้าในกรณีที่ดึงมาจากชีทเลข 0 หายไป
 function readCleanPhone(p) {
   let s = String(p || '').trim().replace(/\D/g, '');
-  if (s.length === 9 && (s.startsWith('8') || s.startsWith('9') || s.startsWith('6'))) {
+  if (s.startsWith('66')) {
+    s = '0' + s.substring(2);
+  }
+  if (s.length === 9 && !s.startsWith('0')) {
     s = '0' + s;
   }
   return s;

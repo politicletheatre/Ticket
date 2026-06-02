@@ -61,6 +61,15 @@ async function fetchGlobalConfig() {
           if (data.soldCounts) {
             localStorage.setItem('theater_sold_counts', JSON.stringify(data.soldCounts));
           }
+          // บันทึกค่า Capacity ที่ปรับปรุงจาก Sheets ลงใน localStorage 'theater_stock'
+          const stockOverride = {};
+          Object.keys(data).forEach(key => {
+            if (key.startsWith('capacity|')) {
+              const slotKey = key.replace('capacity|', '');
+              stockOverride[slotKey] = Number(data[key]);
+            }
+          });
+          localStorage.setItem('theater_stock', JSON.stringify(stockOverride));
           return;
         }
       }
@@ -198,7 +207,13 @@ function goTo(view) {
   }
 
   if (view === 'ticket')  {
-    renderSchedule();
+    // ดึงค่าการตั้งค่าและจำนวนที่นั่งจากโฮสต์กลางก่อนเรนเดอร์ตาราง เพื่อความแม่นยำสูงสุด
+    fetchGlobalConfig().then(() => {
+      renderSchedule();
+    }).catch(e => {
+      console.warn('ดึงข้อมูลสต็อกและเงื่อนไขไม่สำเร็จ:', e);
+      renderSchedule();
+    });
     // When returning from info with everything already selected, scroll to summary so
     // the user can see their choice + the "ดำเนินการต่อ" button without manually scrolling
     if (state.selectedTypeId) {
@@ -547,8 +562,14 @@ function makeQR(elementId, text, size = 160) {
     });
     const canvas = el.querySelector('canvas');
     const img    = el.querySelector('img');
-    if (canvas) { canvas.style.borderRadius = '8px'; canvas.style.border = '3px solid white'; canvas.style.display = 'block'; }
-    if (img)    img.style.display = 'none';
+    if (canvas) { 
+      canvas.style.borderRadius = '8px'; 
+      canvas.style.border = '3px solid white'; 
+    }
+    if (img) { 
+      img.style.borderRadius = '8px'; 
+      img.style.border = '3px solid white'; 
+    }
   } catch(e) {
     console.error('QR generation failed:', e);
     el.innerHTML = `<div style="width:${size}px;height:${size}px;background:#2d1654;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#9b5de5;font-size:12px;text-align:center;padding:8px">❌ QR Error</div>`;
@@ -578,7 +599,7 @@ async function submitOrder(event) {
   event.preventDefault();
 
   const name  = document.getElementById('f-name').value.trim();
-  const phone = document.getElementById('f-phone').value.trim();
+  const phone = cleanThaiPhone(document.getElementById('f-phone').value.trim());
   const email = document.getElementById('f-email').value.trim();
   const note  = document.getElementById('f-note').value.trim();
   const type  = CONFIG.ticketTypes.find(t => t.id === state.selectedTypeId);
@@ -895,6 +916,17 @@ function saveOrderLocally(order) {
 // ─── UTILITIES ────────────────────────────────────────────────────────────
 function fmt(n) {
   return n.toLocaleString('th-TH');
+}
+
+function cleanThaiPhone(p) {
+  let s = String(p || '').trim().replace(/\D/g, '');
+  if (s.startsWith('66')) {
+    s = '0' + s.substring(2);
+  }
+  if (s.length === 9 && !s.startsWith('0')) {
+    s = '0' + s;
+  }
+  return s;
 }
 
 function generateOrderId() {

@@ -361,9 +361,10 @@ async function doSearch() {
 
   let query = '';
   if (currentTab === 'phone') {
-    query = document.getElementById('input-phone').value.trim();
-    if (!query || !/^\d{9,10}$/.test(query)) {
-      errEl.textContent = '❌ กรุณากรอกเบอร์โทรศัพท์ 9-10 หลัก';
+    const rawVal = document.getElementById('input-phone').value.trim();
+    query = cleanThaiPhone(rawVal);
+    if (!query || !/^0\d{9}$/.test(query)) {
+      errEl.textContent = '❌ กรุณากรอกเบอร์โทรศัพท์มือถือที่ถูกต้อง (เช่น 0812345678)';
       errEl.classList.add('show'); return;
     }
   } else {
@@ -390,10 +391,13 @@ async function doSearch() {
   let allTickets = JSON.parse(localStorage.getItem('theater_tickets') || '{}');
   let allOrders  = JSON.parse(localStorage.getItem('theater_orders')  || '[]');
 
-  // ฟังก์ชันล้างฟอร์แมตเบอร์โทรศัพท์ (เติม 0 นำหน้าหากเลข 0 หายไปจากการเก็บบน Google Sheet)
-  function cleanPhone(p) {
+  // ฟังก์ชันล้างฟอร์แมตเบอร์โทรศัพท์ (ตัด 66 แทนที่ด้วย 0, เติม 0 ให้ครบ 10 หลักอัตโนมัติ)
+  function cleanThaiPhone(p) {
     let s = String(p || '').trim().replace(/\D/g, '');
-    if (s.length === 9 && (s.startsWith('8') || s.startsWith('9') || s.startsWith('6'))) {
+    if (s.startsWith('66')) {
+      s = '0' + s.substring(2);
+    }
+    if (s.length === 9 && !s.startsWith('0')) {
       s = '0' + s;
     }
     return s;
@@ -403,9 +407,9 @@ async function doSearch() {
   function findLocalMatchedIds() {
     const ids = new Set();
     if (currentTab === 'phone') {
-      const qClean = cleanPhone(query);
+      const qClean = cleanThaiPhone(query);
       Object.values(allTickets).forEach(t => {
-        if (cleanPhone(t.phone) === qClean)
+        if (cleanThaiPhone(t.phone) === qClean)
           ids.add(t.orderId);
       });
     } else {
@@ -417,10 +421,10 @@ async function doSearch() {
     return ids;
   }
 
-  let matchedOrderIds = findLocalMatchedIds();
+  let matchedOrderIds = new Set();
 
-  // หากค้นไม่พบบนเครื่อง และมีคลาวด์บอร์ดเชื่อมต่ออยู่ ให้ลองดึงข้อมูลจาก Sheets แบบ Real-time
-  if (matchedOrderIds.size === 0 && typeof APPS_SCRIPT_URL !== 'undefined' && APPS_SCRIPT_URL && APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
+  // พยายามดึงข้อมูลจาก Sheets แบบ Real-time ตลอดเวลาหากมีการเชื่อมต่อคลาวด์ เพื่อความสอดคล้องสูงสุดข้ามอุปกรณ์
+  if (typeof APPS_SCRIPT_URL !== 'undefined' && APPS_SCRIPT_URL && APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
     try {
       const res = await fetch(`${APPS_SCRIPT_URL}?action=searchOrder&query=${encodeURIComponent(query)}&type=${currentTab}`);
       if (res.ok) {
@@ -437,15 +441,15 @@ async function doSearch() {
             else allOrders.push(newO);
           });
           localStorage.setItem('theater_orders', JSON.stringify(allOrders));
-
-          // ดึงผลลัพธ์มาแมปอีกครั้ง
-          matchedOrderIds = findLocalMatchedIds();
         }
       }
     } catch (e) {
-      console.warn('ดึงข้อมูลตั๋วผ่านคลาวด์ Sheets ไม่สำเร็จ:', e);
+      console.warn('ดึงข้อมูลตั๋วผ่านคลาวด์ Sheets ไม่สำเร็จ (กำลังใช้ข้อมูลในเครื่องแทน):', e);
     }
   }
+
+  // ค้นหาในโลคัลแคชหลังดึงข้อมูล (หรือเมื่อการเชื่อมต่อล้มเหลว)
+  matchedOrderIds = findLocalMatchedIds();
 
   if (matchedOrderIds.size === 0) {
     resultEl.innerHTML = `
@@ -670,8 +674,14 @@ function makeQR(elementId, text, size) {
     });
     const canvas = el.querySelector('canvas');
     const img    = el.querySelector('img');
-    if (canvas) { canvas.style.borderRadius = '8px'; canvas.style.display = 'block'; }
-    if (img)    img.style.display = 'none';
+    if (canvas) { 
+      canvas.style.borderRadius = '8px'; 
+      canvas.style.display = 'block'; 
+    }
+    if (img) { 
+      img.style.borderRadius = '8px'; 
+      img.style.display = 'block'; 
+    }
   } catch(e) {
     el.innerHTML = `<div style="width:${size}px;height:${size}px;background:#f3f4f6;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#6b7280;font-size:12px">QR Error</div>`;
   }
