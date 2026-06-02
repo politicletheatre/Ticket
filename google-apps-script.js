@@ -1,6 +1,6 @@
 /**
  * ============================================================
- * Google Apps Script — ฝันในม่านหมอก Theater Ticket Backend (Updated)
+ * Google Apps Script — ฝันในม่านหมอก Theater Ticket Backend (Updated & Optimized)
  * ============================================================
  *
  * วิธีติดตั้ง:
@@ -40,6 +40,11 @@ function doPost(e) {
     const output = (resObj) => ContentService
       .createTextOutput(JSON.stringify(resObj))
       .setMimeType(ContentService.MimeType.JSON);
+
+    // ป้องกันปัญหาเบอร์โทรเลข 0 หายเมื่อบันทึก: เพิ่มเครื่องหมาย ' นำหน้า
+    if (data.phone) {
+      data.phone = formatPhoneToWrite(data.phone);
+    }
 
     // 1. จัดการอัปเดตการตั้งค่าส่วนกลาง (เช่น เปิด/ปิด Early Bird)
     if (data.action === 'updateSetting') {
@@ -96,7 +101,7 @@ function doPost(e) {
           checkinsSheet.appendRow([
             ticketId,
             data.name || '',
-            data.phone || '',
+            formatPhoneToWrite(data.phone),
             data.type || '',
             timeVal
           ]);
@@ -152,6 +157,7 @@ function doPost(e) {
       const ordersSheet = getOrCreateSheet(ss, SHEET_ORDERS, []);
       const ticketsSheet = getOrCreateSheet(ss, SHEET_TICKETS, []);
       const orderId = data.orderId;
+      const cleanPhoneVal = formatPhoneToWrite(data.phone);
       
       // อัปเดตใน Orders sheet
       const oData = ordersSheet.getDataRange().getValues();
@@ -170,7 +176,7 @@ function doPost(e) {
         if (oData[i][idxOId - 1] === orderId) {
           const rowNum = i + 1;
           ordersSheet.getRange(rowNum, idxOName).setValue(data.name);
-          ordersSheet.getRange(rowNum, idxOPhone).setValue(data.phone);
+          ordersSheet.getRange(rowNum, idxOPhone).setValue(cleanPhoneVal);
           if (idxOEmail) ordersSheet.getRange(rowNum, idxOEmail).setValue(data.email || '');
           ordersSheet.getRange(rowNum, idxOType).setValue(data.type);
           if (idxOPrice) ordersSheet.getRange(rowNum, idxOPrice).setValue(data.pricePerTicket);
@@ -194,7 +200,7 @@ function doPost(e) {
         if (tData[i][idxTOId - 1] === orderId) {
           const rowNum = i + 1;
           ticketsSheet.getRange(rowNum, idxTName).setValue(data.name);
-          ticketsSheet.getRange(rowNum, idxTPhone).setValue(data.phone);
+          ticketsSheet.getRange(rowNum, idxTPhone).setValue(cleanPhoneVal);
           ticketsSheet.getRange(rowNum, idxTType).setValue(data.type);
           if (idxTShowDate) ticketsSheet.getRange(rowNum, idxTShowDate).setValue(data.showDate || '');
         }
@@ -223,7 +229,7 @@ function doGet(e) {
     const action = e.parameter.action;
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
 
-    // 1. ดึงเฉพาะการตั้งค่าส่วนกลาง (เช่น เช็คสถานะ Early Bird ในหน้าจองลูกค้า)
+    // 1. ดึงเฉพาะการตั้งค่าส่วนกลาง (เช่น เช็คสถานะ Early Bird ในหน้าจองลูกค้า + ยอดจองกลางเพื่อคำนวณที่นั่งเหลือ)
     if (action === 'getSettings') {
       const settingsSheet = getOrCreateSettings(ss);
       const data = settingsSheet.getDataRange().getValues();
@@ -235,6 +241,25 @@ function doGet(e) {
         if (val === 'false') val = false;
         settings[key] = val;
       }
+
+      // ดึงยอดขายสะสมเพื่อคืนกลับไปให้ฝั่งผู้ซื้อคำนวณที่นั่งคงเหลือตรงกัน (Central Stock)
+      const ticketsSheet = getOrCreateSheet(ss, SHEET_TICKETS, []);
+      const tData = ticketsSheet.getDataRange().getValues();
+      const tHeaders = tData[0] || [];
+      const idxTStatus = tHeaders.indexOf('สถานะเช็คอิน') + 1;
+      const idxTShowDate = tHeaders.indexOf('รอบการแสดง') + 1;
+
+      const soldCounts = {};
+      for (let i = 1; i < tData.length; i++) {
+        const row = tData[i];
+        const status = row[idxTStatus - 1];
+        const showDate = row[idxTShowDate - 1];
+        if (showDate && status !== 'ยกเลิกแล้ว') {
+          soldCounts[showDate] = (soldCounts[showDate] || 0) + 1;
+        }
+      }
+      settings["soldCounts"] = soldCounts;
+
       return output(settings);
     }
     
@@ -295,7 +320,7 @@ function doGet(e) {
           orderId: row[idxOId - 1],
           timestamp: row[idxOTs - 1],
           name: row[idxOName - 1],
-          phone: row[idxOPhone - 1],
+          phone: readCleanPhone(row[idxOPhone - 1]),
           email: idxOEmail ? row[idxOEmail - 1] : '',
           typeName: row[idxOType - 1],
           qty: Number(row[idxOQty - 1] || 0),
@@ -332,7 +357,7 @@ function doGet(e) {
           ticketNum: ticketNum,
           orderId: oId,
           name: row[idxTName - 1] || parentOrder.name || '',
-          phone: row[idxTPhone - 1] || parentOrder.phone || '',
+          phone: readCleanPhone(row[idxTPhone - 1]) || parentOrder.phone || '',
           email: parentOrder.email || '',
           note: parentOrder.note || '',
           type: row[idxTType - 1] || parentOrder.typeName || '',
@@ -375,14 +400,15 @@ function doGet(e) {
       const idxOPhone = oHeaders.indexOf('เบอร์โทร') + 1;
 
       const matchedOrderIds = [];
-      const qClean = (query || '').replace(/\D/g, '');
+      const qClean = readCleanPhone(query);
 
       for (let i = 1; i < oData.length; i++) {
         const oId = oData[i][idxOId - 1];
+        if (!oId) continue;
         const phone = oData[i][idxOPhone - 1];
         if (type === 'phone') {
-          const pClean = String(phone || '').replace(/\D/g, '');
-          if (pClean === qClean && oId) matchedOrderIds.push(oId);
+          const pClean = readCleanPhone(phone);
+          if (pClean === qClean) matchedOrderIds.push(oId);
         } else {
           if (String(oId || '').toUpperCase().indexOf(query.toUpperCase()) >= 0) {
             matchedOrderIds.push(oId);
@@ -427,7 +453,7 @@ function doGet(e) {
             orderId: oId,
             timestamp: row[idxOTs - 1],
             name: row[idxOName - 1],
-            phone: row[idxOPhone - 1],
+            phone: readCleanPhone(row[idxOPhone - 1]),
             email: idxOEmail ? row[idxOEmail - 1] : '',
             typeName: row[idxOType - 1],
             qty: Number(row[idxOQty - 1] || 0),
@@ -444,11 +470,14 @@ function doGet(e) {
         }
       }
 
+      const matchedOrderIdsSet = new Set(matchedOrderIds);
+
       for (let i = 1; i < tData.length; i++) {
         const row = tData[i];
         const oId = row[idxTOId - 1];
-        if (matchedOrderIds.indexOf(oId) >= 0) {
+        if (oId && matchedOrderIdsSet.has(oId)) {
           const tId = row[idxTId - 1];
+          if (!tId) continue;
           const parentOrder = ordersMap[oId] || {};
           const status = row[idxTStatus - 1];
           const isCancelled = status === 'ยกเลิกแล้ว';
@@ -463,7 +492,7 @@ function doGet(e) {
             ticketNum: ticketNum,
             orderId: oId,
             name: row[idxTName - 1] || parentOrder.name || '',
-            phone: row[idxTPhone - 1] || parentOrder.phone || '',
+            phone: readCleanPhone(row[idxTPhone - 1]) || parentOrder.phone || '',
             email: parentOrder.email || '',
             note: parentOrder.note || '',
             type: row[idxTType - 1] || parentOrder.typeName || '',
@@ -526,6 +555,9 @@ function handleNewOrder(data) {
     slipUrl = data.slipImage;
   }
 
+  // ป้องกันเบอร์โทรเลข 0 หายเมื่อสั่งจองใหม่
+  const cleanPhoneVal = formatPhoneToWrite(data.phone);
+
   // ── บันทึกแถวข้อมูลลง Orders ──
   const ordersSheet = getOrCreateSheet(ss, SHEET_ORDERS, [
     'เลขที่คำสั่งซื้อ',
@@ -548,7 +580,7 @@ function handleNewOrder(data) {
   rowData[oHeaders.indexOf('เลขที่คำสั่งซื้อ')] = data.orderId;
   rowData[oHeaders.indexOf('วันเวลา')] = data.timestamp;
   rowData[oHeaders.indexOf('ชื่อ-นามสกุล')] = data.name;
-  rowData[oHeaders.indexOf('เบอร์โทร')] = data.phone;
+  rowData[oHeaders.indexOf('เบอร์โทร')] = cleanPhoneVal;
   rowData[oHeaders.indexOf('อีเมล')] = data.email || '—';
   rowData[oHeaders.indexOf('ประเภทบัตร')] = data.ticketType;
   rowData[oHeaders.indexOf('จำนวนใบ')] = data.qty;
@@ -584,7 +616,7 @@ function handleNewOrder(data) {
     tRowData[tHeaders.indexOf('รหัสบัตร')] = tid;
     tRowData[tHeaders.indexOf('เลขที่คำสั่งซื้อ')] = data.orderId;
     tRowData[tHeaders.indexOf('ชื่อ-นามสกุล')] = data.name;
-    tRowData[tHeaders.indexOf('เบอร์โทร')] = data.phone;
+    tRowData[tHeaders.indexOf('เบอร์โทร')] = cleanPhoneVal;
     tRowData[tHeaders.indexOf('ประเภทบัตร')] = data.ticketType;
     tRowData[tHeaders.indexOf('รอบการแสดง')] = data.showDate || '—';
     tRowData[tHeaders.indexOf('สถานะเช็คอิน')] = 'ยังไม่เช็คอิน';
@@ -649,4 +681,22 @@ function getColumnIndex(sheet, headerName) {
   sheet.getRange(1, newCol).setValue(headerName);
   sheet.getRange(1, newCol).setBackground('#4a2080').setFontColor('#ffffff').setFontWeight('bold');
   return newCol;
+}
+
+// บังคับแปลงเป็น Text โดยการเพิ่มสัญญลักษณ์ ' นำหน้า ป้องกันเลข 0 ด้านหน้าหายบน Sheets
+function formatPhoneToWrite(p) {
+  const s = String(p || '').trim().replace(/\D/g, '');
+  if (s.length === 9 && (s.startsWith('8') || s.startsWith('9') || s.startsWith('6'))) {
+    return "'0" + s;
+  }
+  return "'" + s;
+}
+
+// ล้างรูปแบบเบอร์โทรและเติม 0 ด้านหน้าในกรณีที่ดึงมาจากชีทเลข 0 หายไป
+function readCleanPhone(p) {
+  let s = String(p || '').trim().replace(/\D/g, '');
+  if (s.length === 9 && (s.startsWith('8') || s.startsWith('9') || s.startsWith('6'))) {
+    s = '0' + s;
+  }
+  return s;
 }

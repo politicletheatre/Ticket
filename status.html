@@ -390,12 +390,22 @@ async function doSearch() {
   let allTickets = JSON.parse(localStorage.getItem('theater_tickets') || '{}');
   let allOrders  = JSON.parse(localStorage.getItem('theater_orders')  || '[]');
 
+  // ฟังก์ชันล้างฟอร์แมตเบอร์โทรศัพท์ (เติม 0 นำหน้าหากเลข 0 หายไปจากการเก็บบน Google Sheet)
+  function cleanPhone(p) {
+    let s = String(p || '').trim().replace(/\D/g, '');
+    if (s.length === 9 && (s.startsWith('8') || s.startsWith('9') || s.startsWith('6'))) {
+      s = '0' + s;
+    }
+    return s;
+  }
+
   // ฟังก์ชันสแกนหาใน localStorage ท้องถิ่น
   function findLocalMatchedIds() {
     const ids = new Set();
     if (currentTab === 'phone') {
+      const qClean = cleanPhone(query);
       Object.values(allTickets).forEach(t => {
-        if ((t.phone || '').replace(/\D/g,'') === query.replace(/\D/g,''))
+        if (cleanPhone(t.phone) === qClean)
           ids.add(t.orderId);
       });
     } else {
@@ -517,14 +527,14 @@ async function doSearch() {
           <div class="ticket-card-body">
             ${isCancelled
               ? `<div style="color:#fca5a5;font-size:0.9rem;text-align:center">บัตรใบนี้ถูกยกเลิกโดยทีมงาน<br/>กรุณาติดต่อเจ้าหน้าที่</div>`
-              : `<div class="qr-wrap" id="qr-status-${orderId}-${idx}"></div>
+              : `<div class="qr-wrap" id="qr-status-${ticket.ticketId}"></div>
                  <div class="ticket-detail-rows">
                    <div class="ticket-info-row"><span class="tl">การแสดง</span><span class="tv">${esc(ticket.show || 'น่าจะรู้อย่างนี้ตั้งแต่ปี 2475')}</span></div>
                    <div class="ticket-info-row"><span class="tl">รอบแสดง</span><span class="tv">${esc(ticket.showDate || '—')}</span></div>
                    <div class="ticket-info-row"><span class="tl">ประเภทบัตร</span><span class="tv">${esc(ticket.type || '—')}</span></div>
                    <div class="ticket-info-row"><span class="tl">ผู้ถือบัตร</span><span class="tv">${esc(ticket.name || '—')}</span></div>
                  </div>
-                 <button class="btn-download-qr" onclick="downloadQR('${orderId}','${idx}','${esc(ticket.ticketId)}')">📥 ดาวน์โหลด QR Code</button>`
+                 <button class="btn-download-qr" onclick="downloadQR('${esc(ticket.ticketId)}')">📥 ดาวน์โหลด QR Code</button>`
             }
           </div>
         </div>`;
@@ -638,7 +648,7 @@ function toggleTickets(orderIdx, orderId) {
           num:   ticket.ticketNum,
           total: orderTickets.length,
         });
-        setTimeout(() => makeQR(`qr-status-${orderId}-${idx}`, qrData, 170), idx * 60);
+        setTimeout(() => makeQR(`qr-status-${ticket.ticketId}`, qrData, 170), idx * 60);
       });
     }
 
@@ -668,12 +678,12 @@ function makeQR(elementId, text, size) {
 }
 
 /* ── DOWNLOAD QR ── */
-function downloadQR(orderId, idx, ticketId) {
+function downloadQR(ticketId) {
   const allTickets = JSON.parse(localStorage.getItem('theater_tickets') || '{}');
   const ticket = Object.values(allTickets).find(t => t.ticketId === ticketId);
   if (!ticket) return;
 
-  const qrEl     = document.getElementById(`qr-status-${orderId}-${idx}`);
+  const qrEl     = document.getElementById(`qr-status-${ticketId}`);
   const qrCanvas = qrEl?.querySelector('canvas');
 
   const tc  = document.createElement('canvas');

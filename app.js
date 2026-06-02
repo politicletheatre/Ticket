@@ -57,6 +57,10 @@ async function fetchGlobalConfig() {
         const data = await res.json();
         if (typeof data.earlybird_enabled === 'boolean') {
           GLOBAL_EARLYBIRD_ENABLED = data.earlybird_enabled;
+          // บันทึกยอดจองกลาง (Central Stock) ลงเครื่องเพื่อใช้คำนวณที่นั่งเหลือจริง
+          if (data.soldCounts) {
+            localStorage.setItem('theater_sold_counts', JSON.stringify(data.soldCounts));
+          }
           return;
         }
       }
@@ -114,10 +118,20 @@ function getSlotCapacity(dateId, slot) {
 }
 
 function getSoldCountForSlot(dateId, slot) {
-  const tickets = JSON.parse(localStorage.getItem('theater_tickets') || '{}');
-  return Object.values(tickets).filter(t =>
+  const dateObj = CONFIG.schedule.find(d => d.id === dateId);
+  if (!dateObj) return 0;
+  const showDateLabel = `${dateObj.dateLabel} · ${slot} น.`;
+  const syncedSold = JSON.parse(localStorage.getItem('theater_sold_counts') || '{}');
+  
+  // ดึงยอดจองบนเครื่องของลูกค้าเองมาร่วมคำนวณด้วยเพื่อความแม่นยำ
+  const localTickets = JSON.parse(localStorage.getItem('theater_tickets') || '{}');
+  const localSold = Object.values(localTickets).filter(t =>
     t.showDateId === dateId && t.showSlot === slot && !t.cancelled
   ).length;
+
+  // ใช้ยอดจากส่วนกลาง (Sheets) เป็นหลัก หรือใช้ยอดจากเครื่องหากส่วนกลางยังไม่ได้ประสานข้อมูล
+  const centralSold = typeof syncedSold[showDateLabel] === 'number' ? syncedSold[showDateLabel] : 0;
+  return Math.max(localSold, centralSold);
 }
 
 function getRemainingSeats(dateId, slot) {
