@@ -1429,6 +1429,11 @@ body {
   .btn-nav {
     padding: 5px 10px;
   }
+  .info-card {
+    max-width: 450px;
+    margin: 0 auto;
+    width: 100%;
+  }
   .hero {
     grid-template-columns: 1fr;
     padding: 120px 16px 40px;
