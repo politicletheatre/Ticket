@@ -463,8 +463,8 @@ body {
 }
 
 @keyframes fadeSlideIn {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .section-label {
@@ -521,6 +521,9 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  height: 100%;
+  box-sizing: border-box;
   gap: 4px;
   padding: 14px 8px;
   border-radius: var(--radius-md);
@@ -599,9 +602,10 @@ body {
 
 /* ── Slot Grid ──────────────────────────────────────────── */
 .slot-grid {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
   gap: 12px;
-  flex-wrap: wrap;
+  width: 100%;
 }
 
 .slot-btn {
@@ -609,14 +613,14 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  padding: 16px 28px;
+  padding: 14px 16px;
   border-radius: var(--radius-md);
   border: 2px solid var(--glass-border);
   background: rgba(255,255,255,0.03);
   cursor: pointer;
   transition: var(--transition);
-  flex: 1;
-  min-width: 120px;
+  width: 100%;
+  box-sizing: border-box;
 }
 .slot-btn:hover {
   border-color: var(--purple-400);
@@ -1404,11 +1408,52 @@ body {
 }
 
 @media (max-width: 600px) {
-  .site-header { padding: 14px 20px; }
+  .site-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    padding: 12px 16px;
+  }
+  .header-logo {
+    font-size: 1.1rem;
+  }
+  .header-nav {
+    gap: 12px;
+    font-size: 0.82rem;
+    width: 100%;
+    justify-content: center;
+  }
+  .btn-nav {
+    padding: 6px 14px;
+  }
+  .hero {
+    grid-template-columns: 1fr;
+    padding: 120px 16px 40px;
+    gap: 24px;
+    text-align: center;
+  }
+  .hero-content { align-items: center; }
+  .hero-title {
+    font-size: clamp(1.15rem, 5.5vw, 1.8rem);
+  }
   .payment-box { flex-direction: column; align-items: center; }
   .tickets-grid { grid-template-columns: repeat(2, 1fr); }
+  .ticket-container { padding: 16px 12px 80px; gap: 16px; }
+  .ticket-section { padding: 16px; border-radius: var(--radius-md); }
+  .progress-bar { padding: 12px 16px; }
+  .page-header { padding: 12px 16px; }
+  .btn-back { padding: 6px 12px; font-size: 0.8rem; }
+  .hero-meta { padding: 8px 12px; gap: 6px; }
+  .meta-item { font-size: 0.8rem; }
 }
 
 @media (max-width: 400px) {
+  .header-nav {
+    gap: 8px;
+    font-size: 0.78rem;
+  }
   .tickets-grid { grid-template-columns: 1fr; }
+  .date-grid { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .date-card { padding: 10px 4px; }
+  .date-card-day { font-size: 1rem; }
 }
