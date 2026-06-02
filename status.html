@@ -229,8 +229,22 @@
 
     .ticket-card-body { padding: 16px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
     .qr-wrap {
-      background: white; border-radius: 12px; padding: 10px;
-      display: inline-flex; align-items: center; justify-content: center;
+      background: #ffffff !important;
+      border-radius: 12px;
+      padding: 14px !important;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      filter: none !important;
+      color-scheme: light !important;
+    }
+    .qr-wrap canvas,
+    .qr-wrap img {
+      vertical-align: middle;
+      background: #ffffff !important;
+      filter: none !important;
+      color-scheme: light !important;
     }
     .ticket-detail-rows { width: 100%; }
     .ticket-info-row { display: flex; justify-content: space-between;
@@ -658,15 +672,7 @@ function toggleTickets(orderIdx, orderId) {
         .sort((a, b) => a.ticketNum - b.ticketNum);
 
       orderTickets.forEach((ticket, idx) => {
-        const qrData = JSON.stringify({
-          id:    ticket.ticketId,
-          name:  ticket.name,
-          phone: ticket.phone,
-          type:  ticket.type,
-          num:   ticket.ticketNum,
-          total: orderTickets.length,
-        });
-        setTimeout(() => makeQR(`qr-status-${ticket.ticketId}`, qrData, 170), idx * 60);
+        setTimeout(() => makeQR(`qr-status-${ticket.ticketId}`, ticket.ticketId, 170), idx * 60);
       });
     }
 
@@ -683,19 +689,23 @@ function makeQR(elementId, text, size) {
   try {
     new QRCode(el, {
       text,
-      width: size,
-      height: size,
-      colorDark: '#1a0d2e',
+      width: size * 2,
+      height: size * 2,
+      colorDark: '#000000',
       colorLight: '#ffffff',
       correctLevel: QRCode.CorrectLevel.M,
     });
     const canvas = el.querySelector('canvas');
     const img    = el.querySelector('img');
     if (canvas) { 
-      canvas.style.borderRadius = '8px'; 
+      canvas.style.borderRadius = '4px'; 
+      canvas.style.width = size + 'px';
+      canvas.style.height = size + 'px';
     }
     if (img) { 
-      img.style.borderRadius = '8px'; 
+      img.style.borderRadius = '4px'; 
+      img.style.width = size + 'px';
+      img.style.height = size + 'px';
     }
   } catch(e) {
     el.innerHTML = `<div style="width:${size}px;height:${size}px;background:#f3f4f6;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#6b7280;font-size:12px">QR Error</div>`;
@@ -753,19 +763,7 @@ function regenerateSingleQR(ticketId) {
   const ticket = Object.values(allTickets).find(t => t.ticketId === ticketId);
   if (!ticket) return;
 
-  const orderTickets = Object.values(allTickets)
-    .filter(t => t.orderId === ticket.orderId && !t.cancelled);
-
-  const qrData = JSON.stringify({
-    id:    ticket.ticketId,
-    name:  ticket.name,
-    phone: ticket.phone,
-    type:  ticket.type,
-    num:   ticket.ticketNum,
-    total: orderTickets.length || 1,
-  });
-
-  makeQR(`qr-status-${ticketId}`, qrData, 170);
+  makeQR(`qr-status-${ticketId}`, ticketId, 170);
   showToast('🔄 สร้าง QR Code บัตรใบนี้ใหม่อีกครั้งแล้วครับ!', 'success');
 }
 

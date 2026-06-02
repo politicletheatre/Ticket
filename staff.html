@@ -1562,7 +1562,7 @@ function manualCheck() {
 // ═══════════════════════════════════════════════════════════════
 // PROCESS QR
 // ═══════════════════════════════════════════════════════════════
-function processQR(rawText) {
+async function processQR(rawText) {
   let data;
   try { data = JSON.parse(rawText); }
   catch { data = { id: rawText.trim() }; }
@@ -1571,7 +1571,43 @@ function processQR(rawText) {
   if (!ticketId) { showResult('err','❌','QR Code ไม่ถูกต้อง', null); return; }
 
   const allTickets = JSON.parse(localStorage.getItem('theater_tickets') || '{}');
-  const ticket     = allTickets[ticketId];
+  let ticket     = allTickets[ticketId];
+
+  if (!ticket) {
+    // พยายามดึงข้อมูลจาก Cloud Sheets ในกรณีที่สตาฟยังไม่ได้กดซิงค์ข้อมูลล่าสุด
+    if (typeof APPS_SCRIPT_URL !== 'undefined' && APPS_SCRIPT_URL && APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
+      const orderId = ticketId.includes('-T') ? ticketId.split('-T')[0] : ticketId;
+      try {
+        showToastStaff('🔍 ค้นหาข้อมูลบัตรจากคลาวด์ Sheets...');
+        const res = await fetch(`${APPS_SCRIPT_URL}?action=searchOrder&query=${encodeURIComponent(orderId)}&type=order`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && data.tickets && data.tickets[ticketId]) {
+            Object.assign(allTickets, data.tickets);
+            localStorage.setItem('theater_tickets', JSON.stringify(allTickets));
+            
+            const allOrders = JSON.parse(localStorage.getItem('theater_orders') || '[]');
+            if (data.orders) {
+              data.orders.forEach(newO => {
+                const idx = allOrders.findIndex(o => o.orderId === newO.orderId);
+                if (idx >= 0) allOrders[idx] = newO;
+                else allOrders.push(newO);
+              });
+              localStorage.setItem('theater_orders', JSON.stringify(allOrders));
+            }
+            
+            ticket = allTickets[ticketId];
+            showToastStaff('☁️ ซิงค์ข้อมูลบัตรจากคลาวด์สำเร็จ!');
+            allTicketsCache = allTickets;
+            updateStats();
+            renderStockTable();
+          }
+        }
+      } catch (e) {
+        console.warn('Real-time Cloud fetch failed:', e);
+      }
+    }
+  }
 
   if (!ticket) {
     showResult('err','❌','ไม่พบบัตรในระบบ', { id: ticketId });

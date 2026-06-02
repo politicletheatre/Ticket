@@ -567,21 +567,23 @@ function makeQR(elementId, text, size = 160) {
   try {
     new QRCode(el, {
       text,
-      width:  size,
-      height: size,
-      colorDark:  '#1a0d2e',
+      width:  size * 2,
+      height: size * 2,
+      colorDark:  '#000000',
       colorLight: '#ffffff',
       correctLevel: QRCode.CorrectLevel.M,
     });
     const canvas = el.querySelector('canvas');
     const img    = el.querySelector('img');
     if (canvas) { 
-      canvas.style.borderRadius = '8px'; 
-      canvas.style.border = '3px solid white'; 
+      canvas.style.borderRadius = '4px'; 
+      canvas.style.width = size + 'px';
+      canvas.style.height = size + 'px';
     }
     if (img) { 
-      img.style.borderRadius = '8px'; 
-      img.style.border = '3px solid white'; 
+      img.style.borderRadius = '4px'; 
+      img.style.width = size + 'px';
+      img.style.height = size + 'px';
     }
   } catch(e) {
     console.error('QR generation failed:', e);
@@ -797,15 +799,7 @@ function renderConfirmation() {
     `;
     carousel.appendChild(card);
 
-    const qrData = JSON.stringify({
-      id:    ticket.ticketId,
-      name:  ticket.name,
-      phone: ticket.phone,
-      type:  ticket.type,
-      num:   ticket.ticketNum,
-      total: o.qty,
-    });
-    setTimeout(() => makeQR(`qr-ticket-${idx}`, qrData, 180), 50 * idx);
+    setTimeout(() => makeQR(`qr-ticket-${idx}`, ticket.ticketId, 180), 50 * idx);
   });
 
   updateCarouselUI();
@@ -901,15 +895,7 @@ function regenerateConfirmationQR(idx) {
   const o = state.currentOrder;
   if (!o || !o.tickets[idx]) return;
   const ticket = o.tickets[idx];
-  const qrData = JSON.stringify({
-    id:    ticket.ticketId,
-    name:  ticket.name,
-    phone: ticket.phone,
-    type:  ticket.type,
-    num:   ticket.ticketNum,
-    total: o.qty,
-  });
-  makeQR(`qr-ticket-${idx}`, qrData, 180);
+  makeQR(`qr-ticket-${idx}`, ticket.ticketId, 180);
   showToast('🔄 สร้าง QR Code ใหม่เรียบร้อย');
 }
 
