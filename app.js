@@ -780,6 +780,7 @@ function renderConfirmation() {
       <div class="ticket-card-type">${ticket.type}</div>
       <div class="ticket-card-id">${ticket.ticketId}</div>
       <button class="btn-download-ticket" onclick="downloadTicket(${idx})">📥 ดาวน์โหลดใบนี้</button>
+      <button class="btn-download-ticket" style="margin-top:6px;background:rgba(212,160,23,0.1);border-color:rgba(212,160,23,0.25);color:var(--gold-light)" onclick="regenerateConfirmationQR(${idx})">🔄 เจน QR Code อีกครั้ง</button>
     `;
     carousel.appendChild(card);
 
@@ -881,6 +882,22 @@ function downloadTicket(idx) {
   link.download = `ticket-${ticket.ticketId}.png`;
   link.href     = tc.toDataURL('image/png');
   link.click();
+}
+
+function regenerateConfirmationQR(idx) {
+  const o = state.currentOrder;
+  if (!o || !o.tickets[idx]) return;
+  const ticket = o.tickets[idx];
+  const qrData = JSON.stringify({
+    id:    ticket.ticketId,
+    name:  ticket.name,
+    phone: ticket.phone,
+    type:  ticket.type,
+    num:   ticket.ticketNum,
+    total: o.qty,
+  });
+  makeQR(`qr-ticket-${idx}`, qrData, 180);
+  showToast('🔄 สร้าง QR Code ใหม่เรียบร้อย');
 }
 
 // ─── LOCAL STORAGE ────────────────────────────────────────────────────────

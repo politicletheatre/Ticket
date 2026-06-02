@@ -873,9 +873,14 @@ function getSlotCapacity(key) {
 
 function getStaffSoldCount(dateId, slot) {
   const tickets = JSON.parse(localStorage.getItem('theater_tickets') || '{}');
-  return Object.values(tickets).filter(t =>
-    t.showDateId === dateId && t.showSlot === slot && !t.cancelled
-  ).length;
+  const targetLabel = makeShowDateLabel(SCHEDULE.find(d => d.id === dateId)?.dateLabel, slot);
+  return Object.values(tickets).filter(t => {
+    if (t.cancelled) return false;
+    if (t.showDateId && t.showSlot) {
+      return t.showDateId === dateId && t.showSlot === slot;
+    }
+    return t.showDate === targetLabel;
+  }).length;
 }
 
 function makeShowDateLabel(dateLabel, slot) {
@@ -1619,8 +1624,22 @@ async function syncAllFromSheets(silent = false) {
     if (res.ok) {
       const data = await res.json();
       if (data.success) {
+        // ทำความสะอาดและแปลโจทย์รอบวันแสดงให้ตั๋วแต่ละใบเพื่อให้ระบบจัดเก็บคีย์ตรงกัน
+        const normalizedTickets = {};
+        if (data.tickets) {
+          Object.keys(data.tickets).forEach(tId => {
+            const t = data.tickets[tId];
+            const resolved = findSlotByLabel(t.showDate);
+            normalizedTickets[tId] = {
+              ...t,
+              showDateId: resolved.dateId || t.showDateId || '',
+              showSlot: resolved.slot || t.showSlot || '',
+            };
+          });
+        }
+
         // อัปเดตตั๋วและประวัติสั่งซื้อใน localStorage
-        localStorage.setItem('theater_tickets', JSON.stringify(data.tickets || {}));
+        localStorage.setItem('theater_tickets', JSON.stringify(normalizedTickets));
         localStorage.setItem('theater_orders', JSON.stringify(data.orders || []));
         
         // อัปเดตสถานะ Early Bird ใน UI
@@ -1644,7 +1663,7 @@ async function syncAllFromSheets(silent = false) {
         }
 
         // รีเฟรช UI ส่วนต่างๆ หลังบ้าน
-        allTicketsCache = data.tickets || {};
+        allTicketsCache = normalizedTickets;
         updateStats();
         renderStockTable();
         renderLog();

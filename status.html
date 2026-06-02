@@ -538,7 +538,8 @@ async function doSearch() {
                    <div class="ticket-info-row"><span class="tl">ประเภทบัตร</span><span class="tv">${esc(ticket.type || '—')}</span></div>
                    <div class="ticket-info-row"><span class="tl">ผู้ถือบัตร</span><span class="tv">${esc(ticket.name || '—')}</span></div>
                  </div>
-                 <button class="btn-download-qr" onclick="downloadQR('${esc(ticket.ticketId)}')">📥 ดาวน์โหลด QR Code</button>`
+                  <button class="btn-download-qr" onclick="downloadQR('${esc(ticket.ticketId)}')">📥 ดาวน์โหลด QR Code</button>
+                  <button class="btn-download-qr" style="margin-top:6px;background:rgba(212,160,23,0.1);border-color:rgba(212,160,23,0.25);color:var(--gold-light)" onclick="regenerateSingleQR('${esc(ticket.ticketId)}')">🔄 เจน QR Code อีกครั้ง</button>`
             }
           </div>
         </div>`;
@@ -731,6 +732,27 @@ function downloadQR(ticketId) {
   link.download = `ticket-${ticketId}.png`;
   link.href = tc.toDataURL('image/png');
   link.click();
+}
+
+function regenerateSingleQR(ticketId) {
+  const allTickets = JSON.parse(localStorage.getItem('theater_tickets') || '{}');
+  const ticket = Object.values(allTickets).find(t => t.ticketId === ticketId);
+  if (!ticket) return;
+
+  const orderTickets = Object.values(allTickets)
+    .filter(t => t.orderId === ticket.orderId && !t.cancelled);
+
+  const qrData = JSON.stringify({
+    id:    ticket.ticketId,
+    name:  ticket.name,
+    phone: ticket.phone,
+    type:  ticket.type,
+    num:   ticket.ticketNum,
+    total: orderTickets.length || 1,
+  });
+
+  makeQR(`qr-status-${ticketId}`, qrData, 170);
+  alert('🔄 ระบบได้ทำการสร้าง QR Code บัตรใบนี้ใหม่อีกครั้งแล้วครับ!');
 }
 
 /* ── ESCAPE HTML ── */
