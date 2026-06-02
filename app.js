@@ -12,7 +12,7 @@ const CONFIG = {
   slotCapacity: 50, // ← จำนวนที่นั่งสูงสุดต่อรอบ
 
   // ⬇️ ใส่ URL ของ Google Apps Script ที่ deploy แล้วตรงนี้
-  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwpP4SkfoKoCCDXD6y7p4Tb7s2MHXMD68cLV-yBWYC1hebpg4fCHzUiEEHJB0qTHa5Z/exec',
+  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbw8J0UW5pBkFVGfaRKh0THmaHjUqVIQgCTQATUUNGjhZ1h6525M1Gad-Jn2zUi9Oyc1/exec',
 
   // ── ตารางรอบการแสดง ──
   schedule: [
