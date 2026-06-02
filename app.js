@@ -566,7 +566,7 @@ function makeQR(elementId, text, size = 160) {
   el.innerHTML = '';
   try {
     new QRCode(el, {
-      text: unescape(encodeURIComponent(text)),
+      text,
       width:  size,
       height: size,
       colorDark:  '#1a0d2e',
