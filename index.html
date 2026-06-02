@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>น่าจะรู้อย่างนี้ตั้งแต่ปี 2475 — จองบัตรออนไลน์</title>
+  <meta name="description" content="จองบัตรละครเวที น่าจะรู้อย่างนี้ตั้งแต่ปี 2475 What I Wish I Knew When I was back in 1932 — Political Theatre KINJAI CONTEMPORARY 16–25 ตุลาคม 2569" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet" />
+  <script src="assets/qrcodejs.min.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ===================== PROGRESS BAR ===================== -->
+<div id="progress-bar" class="progress-bar" style="display:none">
+  <div class="progress-steps">
+    <div class="progress-step active" id="ps-1">
+      <div class="ps-dot">1</div><span>เลือกบัตร</span>
+    </div>
+    <div class="progress-line" id="pl-1"></div>
+    <div class="progress-step" id="ps-2">
+      <div class="ps-dot">2</div><span>ข้อมูล</span>
+    </div>
+    <div class="progress-line" id="pl-2"></div>
+    <div class="progress-step" id="ps-3">
+      <div class="ps-dot">3</div><span>ยืนยัน</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== VIEW: LANDING ===================== -->
+<div id="view-landing" class="view active">
+  <div class="landing-bg"></div>
+  <header class="site-header">
+    <div class="header-logo">🎭 น่าจะรู้อย่างนี้ตั้งแต่ปี 2475</div>
+    <nav class="header-nav">
+      <a href="#show-info">รายละเอียด</a>
+      <a href="status.html" class="status-nav-link">🎫 ตรวจสอบบัตร</a>
+      <a href="staff.html" class="staff-nav-link">🔐 Staff</a>
+      <a href="#" onclick="event.preventDefault();goTo('ticket')" class="btn-nav">จองบัตร</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">✨ Political Theatre</div>
+      <h1 class="hero-title">น่าจะรู้อย่างนี้ตั้งแต่ปี 2475</h1>
+      <p class="hero-subtitle">What I Wish I Knew When I was back in 1932</p>
+      <div class="hero-meta">
+        <span class="meta-item">📅 16–25 ตุลาคม 2569</span>
+        <span class="meta-divider">|</span>
+        <span class="meta-item">🕖 ศ. 19:00 / ส. อา. 14:00 & 19:00</span>
+        <span class="meta-divider">|</span>
+        <span class="meta-item">📍 KINJAI CONTEMPORARY</span>
+      </div>
+      <button id="btn-buy-hero" class="btn-primary btn-lg" onclick="goTo('ticket')">
+        <span>🎫 จองบัตรเลย</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+      <p class="hero-note">บัตรมีจำนวนจำกัด · ชำระผ่านการโอนธนาคาร</p>
+    </div>
+    <div class="hero-poster">
+      <div class="poster-glow"></div>
+      <img id="poster-img" src="" alt="โปสเตอร์ ฝันในม่านหมอก" class="poster-img" />
+    </div>
+  </section>
+
+  <section id="show-info" class="show-info">
+    <div class="container">
+      <h2 class="section-title">เกี่ยวกับการแสดง</h2>
+      <div class="info-grid">
+        <div class="info-card">
+          <div class="info-icon">🎭</div>
+          <h3>บทละคร</h3>
+          <p>การแสดงมิวสิคัลระดับโลก ผสมผสานศิลปะการร่ายรำไทยกับดนตรีสากลอย่างลงตัว สะท้อนเรื่องราวความรักและความฝันอันเป็นนิรันดร์</p>
+        </div>
+        <div class="info-card">
+          <div class="info-icon">⏱️</div>
+          <h3>ระยะเวลา</h3>
+          <p>ประมาณ 2 ชั่วโมง 30 นาที<br/>พักครึ่ง 15 นาที<br/>อายุผู้ชม 7 ปีขึ้นไป</p>
+        </div>
+        <div class="info-card">
+          <div class="info-icon">📍</div>
+          <h3>สถานที่</h3>
+          <p>KINJAI CONTEMPORARY<br/>ถนนราชวิถี แขวงบางยี่ขัน<br/>กรุงเทพมหานคร</p>
+        </div>
+      </div>
+      <div class="cta-bottom">
+        <button id="btn-buy-bottom" class="btn-primary btn-lg" onclick="goTo('ticket')">🎫 จองบัตรทันที</button>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <p>© 2026 Politicle Theatre. All rights reserved.</p>
+  </footer>
+</div>
+
+<!-- ===================== VIEW: TICKET ===================== -->
+<div id="view-ticket" class="view">
+  <div class="page-header">
+    <div></div>
+    <h2 class="page-title">🎫 เลือกบัตร</h2>
+    <button class="btn-back" onclick="goTo('landing')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      กลับหน้าหลัก
+    </button>
+  </div>
+
+  <div class="ticket-container">
+
+    <!-- ── STEP 1: เลือกรอบการแสดง ── -->
+    <div class="ticket-section">
+      <h3 class="section-label">📅 เลือกวันแสดง</h3>
+      <div id="date-grid" class="date-grid">
+        <!-- generated by JS -->
+      </div>
+    </div>
+
+    <!-- ── STEP 2: เลือกเวลารอบ (แสดงหลังเลือกวัน) ── -->
+    <div class="ticket-section" id="slot-section" style="display:none">
+      <div class="section-label-row">
+        <h3 class="section-label">🕐 เลือกรอบเวลา</h3>
+        <button class="btn-step-back" id="back-to-date" onclick="backToDate()">← เปลี่ยนวัน</button>
+      </div>
+      <div id="slot-grid" class="slot-grid">
+        <!-- generated by JS -->
+      </div>
+    </div>
+
+    <!-- ── STEP 3: เลือกประเภทบัตร ── -->
+    <div class="ticket-section" id="type-section" style="display:none">
+      <div class="section-label-row">
+        <h3 class="section-label">🎭 ประเภทบัตร</h3>
+        <button class="btn-step-back" id="back-to-slot" onclick="backToSlot()">← เปลี่ยนรอบ</button>
+      </div>
+      <div id="ticket-types" class="ticket-type-grid">
+        <!-- generated by JS -->
+      </div>
+    </div>
+
+    <!-- Quantity -->
+    <div class="ticket-section" id="quantity-section" style="display:none">
+      <div class="section-label-row">
+        <h3 class="section-label">จำนวนบัตร</h3>
+        <button class="btn-step-back" id="back-to-type" onclick="backToType()">← เปลี่ยนประเภท</button>
+      </div>
+      <div class="quantity-box">
+        <button class="qty-btn" id="qty-minus" onclick="changeQty(-1)">−</button>
+        <span id="qty-display" class="qty-num">1</span>
+        <button class="qty-btn" id="qty-plus" onclick="changeQty(1)">+</button>
+      </div>
+      <p class="qty-limit" id="qty-limit-text">สูงสุด 10 ใบต่อครั้ง</p>
+    </div>
+
+    <!-- Summary -->
+    <div class="ticket-section price-summary" id="price-summary" style="display:none">
+      <div class="summary-row">
+        <span class="summary-label">รอบแสดง</span>
+        <span class="summary-val" id="sum-show">—</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">ประเภท</span>
+        <span class="summary-val" id="sum-type">—</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">ราคาต่อใบ</span>
+        <span class="summary-val" id="sum-price">—</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">จำนวน</span>
+        <span class="summary-val" id="sum-qty">—</span>
+      </div>
+      <div class="summary-row total-row">
+        <span class="summary-label">ราคารวม</span>
+        <span class="summary-val total-price" id="sum-total">—</span>
+      </div>
+    </div>
+
+    <!-- Payment QR -->
+    <div class="ticket-section" id="payment-section" style="display:none">
+      <h3 class="section-label">ชำระเงินผ่านการโอนธนาคาร</h3>
+      <div class="payment-box">
+        <div class="payment-qr-wrap">
+          <div id="payment-qr-container" class="payment-qr-inner"></div>
+          <div class="payment-qr-label">สแกนเพื่อโอนเงิน</div>
+        </div>
+        <div class="payment-info">
+          <div class="bank-info-row">
+            <span class="bank-logo">🏦</span>
+            <div>
+              <div class="bank-name">ธนาคารกสิกรไทย (KBank)</div>
+              <div class="bank-acc">xxx-x-xxxxx-x</div>
+              <div class="bank-holder">บจก. น่าจะรู้อย่างนี้ตั้งแต่ปี 2475 โปรดักชั่น</div>
+            </div>
+          </div>
+          <div class="payment-note">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+            กรุณาโอนให้ครบตามจำนวนที่แสดง แล้วกดดำเนินการต่อเพื่อกรอกข้อมูล
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button id="btn-to-info" class="btn-primary btn-full" style="display:none" onclick="goTo('info')">
+      ดำเนินการต่อ — กรอกข้อมูล
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+</div>
+
+
+<!-- ===================== VIEW: INFO ===================== -->
+<div id="view-info" class="view">
+  <div class="page-header">
+    <button class="btn-back" onclick="goTo('ticket')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      ย้อนกลับ
+    </button>
+    <h2 class="page-title">📝 ข้อมูลผู้ซื้อ</h2>
+    <button class="btn-back" onclick="goTo('landing')" style="border-color: rgba(255, 255, 255, 0.15)">
+      🏠 กลับหน้าหลัก
+    </button>
+  </div>
+
+  <div class="info-container">
+    <div class="order-recap">
+      <div class="recap-main-row">
+        <span id="recap-type" class="recap-badge">—</span>
+        <span id="recap-qty" class="recap-detail">—</span>
+        <span class="recap-sep">·</span>
+        <span id="recap-total" class="recap-total">—</span>
+      </div>
+      <div class="recap-edit-row">
+        <span class="recap-edit-hint">ยังไม่ใช่สิ่งที่ต้องการ?</span>
+        <button class="btn-recap-edit" id="btn-edit-slot" onclick="goToEditSlot()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          แก้ไขรอบ
+        </button>
+        <button class="btn-recap-edit" id="btn-edit-qty" onclick="goToEditQty()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          จำนวนบัตร
+        </button>
+      </div>
+    </div>
+
+    <form id="customer-form" class="customer-form" onsubmit="submitOrder(event)">
+      <div class="form-group">
+        <label for="f-name">ชื่อ–นามสกุล <span class="required">*</span></label>
+        <input type="text" id="f-name" placeholder="เช่น สมชาย ใจดี" required />
+      </div>
+      <div class="form-group">
+        <label for="f-phone">เบอร์โทรศัพท์ <span class="required">*</span></label>
+        <input type="tel" id="f-phone" placeholder="0812345678" pattern="[0-9]{9,10}" required />
+      </div>
+      <div class="form-group">
+        <label for="f-email">อีเมล (ไม่บังคับ)</label>
+        <input type="email" id="f-email" placeholder="example@email.com" />
+      </div>
+      <div class="form-group">
+        <label for="f-note">หมายเหตุเพิ่มเติม</label>
+        <textarea id="f-note" placeholder="เช่น ต้องการที่นั่งริมทาง, แพ้อาหาร ฯลฯ" rows="3"></textarea>
+      </div>
+
+      <!-- Slip Upload -->
+      <div class="form-group">
+        <label for="f-slip">หลักฐานการโอนเงิน (สลิป) <span class="required">*</span></label>
+        <div class="slip-upload-area" id="slip-upload-area" onclick="document.getElementById('f-slip').click()">
+          <input type="file" id="f-slip" accept="image/*" style="display:none" onchange="handleSlipUpload(event)" required />
+          <div id="slip-placeholder" class="slip-placeholder">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            <p>แตะเพื่อแนบรูปสลิป</p>
+            <span>รองรับ JPG, PNG, HEIC</span>
+          </div>
+          <div id="slip-preview-wrap" style="display:none" class="slip-preview-wrap">
+            <img id="slip-preview" src="" alt="slip preview" />
+            <button type="button" class="slip-remove-btn" onclick="removeSlip(event)">✕ เปลี่ยนรูป</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="consent-box">
+        <input type="checkbox" id="f-consent" required />
+        <label for="f-consent">ฉันยืนยันว่าได้โอนชำระเงินเรียบร้อยแล้ว และยอมรับเงื่อนไขการซื้อบัตร</label>
+      </div>
+
+      <button type="submit" id="btn-submit" class="btn-primary btn-full">
+        <span id="submit-text">✅ ยืนยันการสั่งซื้อ</span>
+        <div id="submit-spinner" class="spinner" style="display:none"></div>
+      </button>
+
+      <div class="form-back-row">
+        <button type="button" class="btn-form-back" onclick="goTo('ticket')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          ย้อนกลับขั้นที่ 1
+        </button>
+        <span class="form-back-hint">แก้ไขรอบหรือจำนวนบัตร</span>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===================== VIEW: CONFIRMATION ===================== -->
+<div id="view-confirm" class="view">
+  <div class="page-header no-back">
+    <div></div>
+    <h2 class="page-title">✅ สำเร็จแล้ว!</h2>
+    <button class="btn-back" onclick="location.reload()">
+      🏠 กลับหน้าหลัก
+    </button>
+  </div>
+
+  <div class="confirm-container">
+    <div class="confirm-hero">
+      <div class="confirm-icon">🎭</div>
+      <h2 class="confirm-title">การจองสำเร็จ</h2>
+      <p class="confirm-sub">บัตรของคุณพร้อมแล้ว กรุณาบันทึก QR Code ทุกใบ</p>
+    </div>
+
+    <div class="order-detail-card">
+      <div class="detail-row"><span>เลขที่คำสั่งซื้อ</span><strong id="conf-order-id">—</strong></div>
+      <div class="detail-row"><span>ชื่อผู้ซื้อ</span><strong id="conf-name">—</strong></div>
+      <div class="detail-row"><span>รอบการแสดง</span><strong id="conf-show">—</strong></div>
+      <div class="detail-row"><span>ประเภทบัตร</span><strong id="conf-type">—</strong></div>
+      <div class="detail-row"><span>จำนวน</span><strong id="conf-qty">—</strong></div>
+      <div class="detail-row"><span>ราคารวม</span><strong id="conf-total">—</strong></div>
+    </div>
+
+    <h3 class="tickets-heading">🎫 บัตรของคุณ</h3>
+
+    <!-- Ticket Carousel -->
+    <div class="ticket-carousel-wrap">
+      <div class="ticket-carousel" id="tickets-carousel">
+        <!-- QR cards generated by JS -->
+      </div>
+      <div class="carousel-controls">
+        <button class="carousel-btn" id="carousel-prev" onclick="carouselPrev()" disabled>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div class="carousel-dots" id="carousel-dots"></div>
+        <button class="carousel-btn" id="carousel-next" onclick="carouselNext()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+      </div>
+      <div class="carousel-counter">ใบที่ <span id="carousel-cur">1</span> / <span id="carousel-total">1</span></div>
+    </div>
+
+    <div class="confirm-actions">
+      <button class="btn-outline" onclick="window.print()">🖨️ พิมพ์บัตรทั้งหมด</button>
+      <a class="btn-outline" href="status.html" id="btn-check-status" style="text-decoration:none">🔍 ตรวจสอบสถานะบัตร</a>
+      <button class="btn-primary" onclick="location.reload()">🏠 กลับหน้าแรก</button>
+    </div>
+
+    <div class="confirm-note">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+      กรุณาแสดง QR Code ที่หน้างานเพื่อเช็คอินเข้าร่วมกิจกรรม ทีมงานจะตรวจสอบและประทับตราบัตร
+    </div>
+  </div>
+</div>
+
+<!-- ===================== TOAST ===================== -->
+<div id="toast" class="toast"></div>
+
+<script src="assets/poster-data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

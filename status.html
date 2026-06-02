@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🎫 ตรวจสอบสถานะบัตร — น่าจะรู้อย่างนี้ตั้งแต่ปี 2475</title>
+  <meta name="description" content="ตรวจสอบสถานะบัตรและ QR Code ของคุณสำหรับการแสดง น่าจะรู้อย่างนี้ตั้งแต่ปี 2475" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="assets/qrcodejs.min.js"></script>
+  <style>
+    :root {
+      --bg: #0d0718; --surface: rgba(255,255,255,0.06); --border: rgba(255,255,255,0.12);
+      --purple: #6b35b0; --purple-light: #9b5de5; --gold: #d4a017; --gold-light: #fde68a;
+      --success: #22c55e; --error: #ef4444;
+      --text: #f8f4ff; --muted: #7c6fa8; --radius: 16px;
+      --transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Sarabun', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      background-image: radial-gradient(ellipse at top, #1a0933 0%, #0d0718 60%);
+    }
+
+    /* ── HEADER ── */
+    .status-header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(13,7,24,0.96); backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .header-logo { font-size: 1rem; font-weight: 700; color: var(--gold-light); }
+    .header-nav a {
+      color: var(--muted); font-size: 0.85rem; text-decoration: none;
+      padding: 6px 14px; border: 1px solid var(--border); border-radius: 50px;
+      transition: var(--transition);
+    }
+    .header-nav a:hover { color: var(--text); border-color: var(--purple-light); }
+
+    /* ── MAIN ── */
+    .status-main { max-width: 600px; margin: 0 auto; padding: 32px 16px 80px; }
+
+    /* ── HERO ── */
+    .status-hero { text-align: center; margin-bottom: 32px; }
+    .status-hero-icon { font-size: 3.5rem; margin-bottom: 12px; }
+    .status-hero h1 { font-size: 1.6rem; font-weight: 700; color: var(--gold-light); margin-bottom: 8px; }
+    .status-hero p { font-size: 0.9rem; color: var(--muted); line-height: 1.6; }
+
+    /* ── SEARCH BOX ── */
+    .search-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 20px; padding: 24px; backdrop-filter: blur(10px);
+      margin-bottom: 24px;
+    }
+    .search-title { font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1.5px; color: var(--muted); margin-bottom: 16px; }
+    .search-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+    .search-tab {
+      flex: 1; padding: 10px; border-radius: 10px; border: 1.5px solid var(--border);
+      background: transparent; color: var(--muted); font-family: inherit;
+      font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: var(--transition);
+    }
+    .search-tab.active {
+      background: rgba(107,53,176,0.2); border-color: var(--purple-light); color: var(--text);
+    }
+    .search-input-wrap { position: relative; }
+    .search-input-wrap input {
+      width: 100%; background: rgba(255,255,255,0.05); border: 1.5px solid var(--border);
+      border-radius: 12px; padding: 13px 16px; color: var(--text);
+      font-family: inherit; font-size: 1rem; outline: none; transition: var(--transition);
+    }
+    .search-input-wrap input:focus { border-color: var(--purple-light); box-shadow: 0 0 0 3px rgba(155,93,229,0.15); }
+    .search-input-wrap input::placeholder { color: var(--muted); }
+    .btn-search {
+      width: 100%; margin-top: 12px;
+      background: linear-gradient(135deg, var(--purple), var(--purple-light));
+      color: white; border: none; border-radius: 12px;
+      padding: 13px; font-family: inherit; font-size: 1rem; font-weight: 700;
+      cursor: pointer; transition: var(--transition);
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-search:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(107,53,176,0.4); }
+    .btn-search:active { transform: scale(0.98); }
+
+    /* ── RESULT SECTION ── */
+    #result-section { display: none; animation: fadeUp 0.35s ease; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
+
+    /* ── ORDER CARD (collapsed) ── */
+    .order-card {
+      background: linear-gradient(135deg, rgba(107,53,176,0.12), rgba(45,22,84,0.2));
+      border: 1px solid rgba(155,93,229,0.25);
+      border-radius: 20px;
+      margin-bottom: 16px;
+      overflow: hidden;
+      transition: var(--transition);
+    }
+    .order-card:hover { border-color: rgba(155,93,229,0.45); }
+
+    .order-card-header {
+      padding: 18px 20px;
+      cursor: default;
+    }
+
+    .order-card-top {
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+      margin-bottom: 14px;
+    }
+    .order-card-id {
+      font-family: monospace; font-size: 0.78rem;
+      background: rgba(255,255,255,0.08); color: var(--purple-light);
+      padding: 3px 10px; border-radius: 6px; letter-spacing: 0.5px;
+    }
+    .order-card-date {
+      font-size: 0.75rem; color: var(--muted); margin-top: 4px;
+    }
+    .order-ticket-count {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: rgba(212,160,23,0.12); border: 1px solid rgba(212,160,23,0.25);
+      color: var(--gold-light); border-radius: 50px;
+      font-size: 0.78rem; font-weight: 700; padding: 4px 12px;
+      white-space: nowrap; flex-shrink: 0;
+    }
+
+    .order-card-rows {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px;
+    }
+    .order-info-item { font-size: 0.82rem; }
+    .order-info-item .oi-label { color: var(--muted); font-size: 0.72rem; margin-bottom: 1px; }
+    .order-info-item .oi-val { font-weight: 600; }
+
+    .order-card-footer {
+      padding: 0 20px 18px;
+    }
+
+    /* Expand button */
+    .btn-expand-tickets {
+      width: 100%;
+      background: rgba(107,53,176,0.15);
+      border: 1px solid rgba(107,53,176,0.3);
+      border-radius: 12px;
+      color: var(--purple-light);
+      font-family: inherit; font-size: 0.9rem; font-weight: 700;
+      padding: 11px 16px;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-expand-tickets:hover {
+      background: rgba(107,53,176,0.28);
+      border-color: var(--purple-light);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+    .btn-expand-tickets .expand-arrow {
+      transition: transform 0.3s ease;
+      display: inline-block;
+    }
+    .btn-expand-tickets.open .expand-arrow { transform: rotate(180deg); }
+
+    /* ── TICKETS PANEL (expandable) ── */
+    .tickets-panel {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s cubic-bezier(0.4,0,0.2,1);
+    }
+    .tickets-panel.open { max-height: 9999px; }
+    .tickets-panel-inner { padding: 0 16px 16px; }
+
+    .tickets-panel-label {
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1.5px; color: var(--muted);
+      margin-bottom: 10px; padding-top: 4px;
+    }
+
+    /* ── INDIVIDUAL TICKET CARD ── */
+    .ticket-status-card {
+      background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+      border-radius: 14px; overflow: hidden; margin-bottom: 10px;
+    }
+    .ticket-status-card:last-child { margin-bottom: 0; }
+
+    .ticket-card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .ticket-num-label { font-size: 0.78rem; color: var(--muted); }
+    .ticket-id-code { font-family: monospace; font-size: 0.72rem; color: var(--purple-light); margin-top: 2px; }
+
+    .ticket-status-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 12px; border-radius: 50px; font-size: 0.73rem; font-weight: 700;
+      white-space: nowrap;
+    }
+    .badge-checked   { background: rgba(34,197,94,0.15);  color: #86efac;   border: 1px solid rgba(34,197,94,0.3); }
+    .badge-pending   { background: rgba(253,230,138,0.1);  color: var(--gold-light); border: 1px solid rgba(253,230,138,0.2); }
+    .badge-cancelled { background: rgba(239,68,68,0.1);    color: #fca5a5;   border: 1px solid rgba(239,68,68,0.25); }
+
+    .ticket-card-body { padding: 16px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+    .qr-wrap {
+      background: white; border-radius: 12px; padding: 10px;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .ticket-detail-rows { width: 100%; }
+    .ticket-info-row { display: flex; justify-content: space-between;
+      font-size: 0.82rem; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .ticket-info-row:last-child { border-bottom: none; }
+    .ticket-info-row .tl { color: var(--muted); }
+    .ticket-info-row .tv { font-weight: 500; text-align: right; }
+
+    .btn-download-qr {
+      width: 100%; background: rgba(107,53,176,0.12); border: 1px solid rgba(107,53,176,0.28);
+      color: var(--purple-light); border-radius: 10px; padding: 9px;
+      font-family: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer;
+      transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .btn-download-qr:hover { background: rgba(107,53,176,0.25); }
+
+    /* ── NOT FOUND ── */
+    .not-found {
+      text-align: center; padding: 48px 24px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+    }
+    .not-found .nf-icon { font-size: 3rem; margin-bottom: 12px; }
+    .not-found h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; color: #fca5a5; }
+    .not-found p { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+
+    /* ── NOTE ── */
+    .status-note {
+      background: rgba(107,53,176,0.08); border: 1px solid rgba(107,53,176,0.2);
+      border-radius: 12px; padding: 14px 18px; font-size: 0.82rem; color: var(--muted);
+      line-height: 1.6; display: flex; gap: 10px; align-items: flex-start; margin-top: 20px;
+    }
+
+    /* ── ERROR ── */
+    .error-msg { color: #fca5a5; font-size: 0.85rem; margin-top: 8px; display: none; }
+    .error-msg.show { display: block; }
+
+    /* ── FOOTER ── */
+    .status-footer { text-align: center; padding: 20px; font-size: 0.8rem; color: var(--muted); }
+  </style>
+</head>
+<body>
+
+<header class="status-header">
+  <div class="header-logo">🎭 น่าจะรู้อย่างนี้ตั้งแต่ปี 2475</div>
+  <nav class="header-nav">
+    <a href="index.html" style="display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border: 1px solid var(--border); border-radius: 50px; text-decoration: none; color: var(--text); background: var(--surface); transition: var(--transition); font-size: 0.85rem;">
+      🏠 กลับหน้าหลัก
+    </a>
+  </nav>
+</header>
+
+<main class="status-main">
+
+  <!-- HERO -->
+  <div class="status-hero">
+    <div class="status-hero-icon">🎫</div>
+    <h1>ตรวจสอบสถานะบัตร</h1>
+    <p>กรอกเบอร์โทรศัพท์หรือรหัสคำสั่งซื้อ<br/>เพื่อดูรายการสั่งซื้อและ QR Code บัตรของคุณ</p>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="search-card">
+    <div class="search-title">🔍 ค้นหาบัตรของคุณ</div>
+    <div class="search-tabs">
+      <button class="search-tab active" id="tab-phone" onclick="switchTab('phone')">📞 เบอร์โทรศัพท์</button>
+      <button class="search-tab" id="tab-order" onclick="switchTab('order')">📋 รหัสคำสั่งซื้อ</button>
+    </div>
+    <div class="search-input-wrap">
+      <input type="tel" id="input-phone" placeholder="กรอกเบอร์โทรศัพท์ เช่น 0812345678"
+             inputmode="numeric" onkeydown="if(event.key==='Enter') doSearch()" />
+      <input type="text" id="input-order" placeholder="กรอกรหัส เช่น FNH-20241206-XXXXX"
+             style="display:none;text-transform:uppercase"
+             onkeydown="if(event.key==='Enter') doSearch()" />
+    </div>
+    <div class="error-msg" id="error-msg">❌ กรุณากรอกข้อมูลให้ถูกต้อง</div>
+    <button class="btn-search" onclick="doSearch()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+      </svg>
+      ค้นหาบัตร
+    </button>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-section"></div>
+
+  <!-- NOTE -->
+  <div class="status-note">
+    <span>ℹ️</span>
+    <span>หากไม่พบข้อมูลบัตร กรุณาติดต่อทีมงานที่ @fandreams หรือโทร 02-XXX-XXXX
+    ข้อมูลบัตรจัดเก็บในเบราว์เซอร์ที่ใช้สั่งซื้อ หากใช้เบราว์เซอร์อื่นอาจไม่พบข้อมูล</span>
+  </div>
+
+</main>
+
+<footer class="status-footer">
+  © 2026 Politicle Theatre. All rights reserved.
+</footer>
+
+<script>
+let currentTab = 'phone';
+
+/* ── TAB SWITCH ── */
+function switchTab(tab) {
+  currentTab = tab;
+  document.getElementById('tab-phone').classList.toggle('active', tab === 'phone');
+  document.getElementById('tab-order').classList.toggle('active', tab === 'order');
+  document.getElementById('input-phone').style.display = tab === 'phone' ? 'block' : 'none';
+  document.getElementById('input-order').style.display = tab === 'order' ? 'block' : 'none';
+  document.getElementById('error-msg').classList.remove('show');
+  document.getElementById('result-section').style.display = 'none';
+  setTimeout(() => (tab === 'phone'
+    ? document.getElementById('input-phone')
+    : document.getElementById('input-order')).focus(), 50);
+}
+
+/* ── SEARCH ── */
+function doSearch() {
+  const errEl = document.getElementById('error-msg');
+  errEl.classList.remove('show');
+
+  let query = '';
+  if (currentTab === 'phone') {
+    query = document.getElementById('input-phone').value.trim();
+    if (!query || !/^\d{9,10}$/.test(query)) {
+      errEl.textContent = '❌ กรุณากรอกเบอร์โทรศัพท์ 9-10 หลัก';
+      errEl.classList.add('show'); return;
+    }
+  } else {
+    query = document.getElementById('input-order').value.trim().toUpperCase();
+    if (!query) {
+      errEl.textContent = '❌ กรุณากรอกรหัสคำสั่งซื้อ';
+      errEl.classList.add('show'); return;
+    }
+  }
+
+  const allTickets = JSON.parse(localStorage.getItem('theater_tickets') || '{}');
+  const allOrders  = JSON.parse(localStorage.getItem('theater_orders')  || '[]');
+
+  // Collect matched orderIds
+  const matchedOrderIds = new Set();
+  if (currentTab === 'phone') {
+    Object.values(allTickets).forEach(t => {
+      if ((t.phone || '').replace(/\D/g,'') === query.replace(/\D/g,''))
+        matchedOrderIds.add(t.orderId);
+    });
+  } else {
+    Object.values(allTickets).forEach(t => {
+      if ((t.orderId || '').toUpperCase().includes(query))
+        matchedOrderIds.add(t.orderId);
+    });
+  }
+
+  const resultEl = document.getElementById('result-section');
+  resultEl.style.display = 'block';
+
+  if (matchedOrderIds.size === 0) {
+    resultEl.innerHTML = `
+      <div class="not-found">
+        <div class="nf-icon">🔍</div>
+        <h3>ไม่พบข้อมูลบัตร</h3>
+        <p>ไม่พบบัตรที่ตรงกับข้อมูลที่กรอก<br/>
+        กรุณาตรวจสอบว่าใช้เบราว์เซอร์เดิมที่จองบัตร<br/>
+        หรือลองค้นหาด้วยรหัสคำสั่งซื้อ</p>
+      </div>`;
+    return;
+  }
+
+  // Sort orders newest first
+  const sortedOrderIds = [...matchedOrderIds].sort((a, b) => {
+    const tA = allOrders.find(o => o.orderId === a)?.timestamp || '';
+    const tB = allOrders.find(o => o.orderId === b)?.timestamp || '';
+    return tB.localeCompare(tA);
+  });
+
+  // Count results label
+  const countLabel = sortedOrderIds.length === 1
+    ? 'พบ 1 รายการสั่งซื้อ'
+    : `พบ ${sortedOrderIds.length} รายการสั่งซื้อ`;
+
+  let html = `<div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:12px;">${countLabel}</div>`;
+
+  sortedOrderIds.forEach((orderId, orderIdx) => {
+    const order = allOrders.find(o => o.orderId === orderId);
+    const orderTickets = Object.values(allTickets)
+      .filter(t => t.orderId === orderId)
+      .sort((a, b) => a.ticketNum - b.ticketNum);
+
+    if (!orderTickets.length) return;
+    const rep = orderTickets[0];
+
+    const totalAmt = rep.pricePerTicket
+      ? rep.pricePerTicket * orderTickets.length
+      : (order?.total || 0);
+
+    const tsLabel = order?.timestamp
+      ? new Date(order.timestamp).toLocaleDateString('th-TH', {
+          year: 'numeric', month: 'long', day: 'numeric',
+          hour: '2-digit', minute: '2-digit'
+        })
+      : '—';
+
+    // Check-in status summary
+    const checkedCount   = orderTickets.filter(t => t.checkedIn && !t.cancelled).length;
+    const cancelledCount = orderTickets.filter(t => t.cancelled).length;
+    const pendingCount   = orderTickets.length - checkedCount - cancelledCount;
+
+    // Build inner ticket cards HTML (hidden initially)
+    let ticketsHtml = '';
+    orderTickets.forEach((ticket, idx) => {
+      const isCancelled = !!ticket.cancelled;
+      const isChecked   = !!ticket.checkedIn && !isCancelled;
+      let badgeClass, badgeText;
+      if (isCancelled)    { badgeClass = 'badge-cancelled'; badgeText = '🚫 ยกเลิกแล้ว'; }
+      else if (isChecked) { badgeClass = 'badge-checked';   badgeText = '✅ เข้างานแล้ว'; }
+      else                { badgeClass = 'badge-pending';   badgeText = '⏳ ยังไม่ได้ใช้'; }
+
+      const checkTimeStr = ticket.checkInTime
+        ? new Date(ticket.checkInTime).toLocaleString('th-TH', {
+            timeZone: 'Asia/Bangkok', hour: '2-digit', minute: '2-digit',
+            day: '2-digit', month: 'short'
+          })
+        : '';
+
+      ticketsHtml += `
+        <div class="ticket-status-card" id="tsc-${orderId}-${idx}">
+          <div class="ticket-card-header">
+            <div>
+              <div class="ticket-num-label">ใบที่ ${ticket.ticketNum} / ${orderTickets.length}</div>
+              <div class="ticket-id-code">${esc(ticket.ticketId)}</div>
+            </div>
+            <span class="ticket-status-badge ${badgeClass}">${badgeText}${checkTimeStr ? ' · ' + checkTimeStr : ''}</span>
+          </div>
+          <div class="ticket-card-body">
+            ${isCancelled
+              ? `<div style="color:#fca5a5;font-size:0.9rem;text-align:center">บัตรใบนี้ถูกยกเลิกโดยทีมงาน<br/>กรุณาติดต่อเจ้าหน้าที่</div>`
+              : `<div class="qr-wrap" id="qr-status-${orderId}-${idx}"></div>
+                 <div class="ticket-detail-rows">
+                   <div class="ticket-info-row"><span class="tl">การแสดง</span><span class="tv">${esc(ticket.show || 'น่าจะรู้อย่างนี้ตั้งแต่ปี 2475')}</span></div>
+                   <div class="ticket-info-row"><span class="tl">รอบแสดง</span><span class="tv">${esc(ticket.showDate || '—')}</span></div>
+                   <div class="ticket-info-row"><span class="tl">ประเภทบัตร</span><span class="tv">${esc(ticket.type || '—')}</span></div>
+                   <div class="ticket-info-row"><span class="tl">ผู้ถือบัตร</span><span class="tv">${esc(ticket.name || '—')}</span></div>
+                 </div>
+                 <button class="btn-download-qr" onclick="downloadQR('${orderId}','${idx}','${esc(ticket.ticketId)}')">📥 ดาวน์โหลด QR Code</button>`
+            }
+          </div>
+        </div>`;
+    });
+
+    // Status summary pills
+    let statusPills = '';
+    if (checkedCount)   statusPills += `<span class="badge-checked ticket-status-badge" style="font-size:0.7rem;padding:2px 8px;">✅ เข้างานแล้ว ${checkedCount}</span> `;
+    if (pendingCount)   statusPills += `<span class="badge-pending ticket-status-badge" style="font-size:0.7rem;padding:2px 8px;">⏳ ยังไม่ได้ใช้ ${pendingCount}</span> `;
+    if (cancelledCount) statusPills += `<span class="badge-cancelled ticket-status-badge" style="font-size:0.7rem;padding:2px 8px;">🚫 ยกเลิก ${cancelledCount}</span> `;
+
+    html += `
+      <div class="order-card" id="order-card-${orderIdx}">
+
+        <!-- Order summary (always visible) -->
+        <div class="order-card-header">
+          <div class="order-card-top">
+            <div>
+              <div class="order-card-id">${esc(orderId)}</div>
+              <div class="order-card-date">จองเมื่อ ${tsLabel}</div>
+            </div>
+            <div class="order-ticket-count">🎫 ${orderTickets.length} ใบ</div>
+          </div>
+
+          <div class="order-card-rows">
+            <div class="order-info-item">
+              <div class="oi-label">ชื่อผู้ซื้อ</div>
+              <div class="oi-val">${esc(rep.name || '—')}</div>
+            </div>
+            <div class="order-info-item">
+              <div class="oi-label">เบอร์โทร</div>
+              <div class="oi-val">${esc(rep.phone || '—')}</div>
+            </div>
+            <div class="order-info-item">
+              <div class="oi-label">ประเภทบัตร</div>
+              <div class="oi-val">${esc(rep.type || '—')}</div>
+            </div>
+            <div class="order-info-item">
+              <div class="oi-label">ราคารวม</div>
+              <div class="oi-val">${totalAmt ? totalAmt.toLocaleString('th-TH') + ' บาท' : '—'}</div>
+            </div>
+            <div class="order-info-item" style="grid-column: 1 / -1;">
+              <div class="oi-label">รอบแสดง</div>
+              <div class="oi-val">${esc(rep.showDate || '—')}</div>
+            </div>
+          </div>
+
+          ${statusPills ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;">${statusPills}</div>` : ''}
+        </div>
+
+        <!-- Expand button -->
+        <div class="order-card-footer">
+          <button class="btn-expand-tickets" id="expand-btn-${orderIdx}"
+                  onclick="toggleTickets(${orderIdx}, '${orderId}')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+            </svg>
+            ดูบัตร ${orderTickets.length} ใบ
+            <span class="expand-arrow">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+            </span>
+          </button>
+        </div>
+
+        <!-- Tickets panel (expandable) -->
+        <div class="tickets-panel" id="tickets-panel-${orderIdx}">
+          <div class="tickets-panel-inner">
+            <div class="tickets-panel-label">🎫 บัตรในรายการนี้ (${orderTickets.length} ใบ)</div>
+            ${ticketsHtml}
+          </div>
+        </div>
+
+      </div>`;
+  });
+
+  resultEl.innerHTML = html;
+  resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+/* ── TOGGLE TICKETS PANEL ── */
+function toggleTickets(orderIdx, orderId) {
+  const panel  = document.getElementById(`tickets-panel-${orderIdx}`);
+  const btn    = document.getElementById(`expand-btn-${orderIdx}`);
+  const isOpen = panel.classList.contains('open');
+
+  if (isOpen) {
+    panel.classList.remove('open');
+    btn.classList.remove('open');
+    btn.querySelector('span:last-child').innerHTML =
+      `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>`;
+  } else {
+    panel.classList.add('open');
+    btn.classList.add('open');
+    btn.querySelector('span:last-child').innerHTML =
+      `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 15l-6-6-6 6"/></svg>`;
+
+    // Generate QR codes only when first opened
+    if (!panel.dataset.rendered) {
+      panel.dataset.rendered = '1';
+      const allTickets = JSON.parse(localStorage.getItem('theater_tickets') || '{}');
+      const orderTickets = Object.values(allTickets)
+        .filter(t => t.orderId === orderId && !t.cancelled)
+        .sort((a, b) => a.ticketNum - b.ticketNum);
+
+      orderTickets.forEach((ticket, idx) => {
+        const qrData = JSON.stringify({
+          id:    ticket.ticketId,
+          name:  ticket.name,
+          phone: ticket.phone,
+          type:  ticket.type,
+          num:   ticket.ticketNum,
+          total: orderTickets.length,
+        });
+        setTimeout(() => makeQR(`qr-status-${orderId}-${idx}`, qrData, 170), idx * 60);
+      });
+    }
+
+    // Scroll to panel
+    setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 80);
+  }
+}
+
+/* ── QR GENERATOR ── */
+function makeQR(elementId, text, size) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  el.innerHTML = '';
+  try {
+    new QRCode(el, {
+      text, width: size, height: size,
+      colorDark: '#1a0d2e', colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.M,
+    });
+    const canvas = el.querySelector('canvas');
+    const img    = el.querySelector('img');
+    if (canvas) { canvas.style.borderRadius = '8px'; canvas.style.display = 'block'; }
+    if (img)    img.style.display = 'none';
+  } catch(e) {
+    el.innerHTML = `<div style="width:${size}px;height:${size}px;background:#f3f4f6;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#6b7280;font-size:12px">QR Error</div>`;
+  }
+}
+
+/* ── DOWNLOAD QR ── */
+function downloadQR(orderId, idx, ticketId) {
+  const allTickets = JSON.parse(localStorage.getItem('theater_tickets') || '{}');
+  const ticket = Object.values(allTickets).find(t => t.ticketId === ticketId);
+  if (!ticket) return;
+
+  const qrEl     = document.getElementById(`qr-status-${orderId}-${idx}`);
+  const qrCanvas = qrEl?.querySelector('canvas');
+
+  const tc  = document.createElement('canvas');
+  tc.width  = 400; tc.height = 520;
+  const ctx = tc.getContext('2d');
+
+  ctx.fillStyle = '#1a0d2e';
+  ctx.fillRect(0, 0, tc.width, tc.height);
+  ctx.strokeStyle = '#d4a017'; ctx.lineWidth = 3;
+  ctx.strokeRect(12, 12, tc.width - 24, tc.height - 24);
+
+  ctx.fillStyle = '#fde68a'; ctx.font = 'bold 18px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText('น่าจะรู้อย่างนี้ตั้งแต่ปี 2475', tc.width / 2, 58);
+  ctx.fillStyle = '#c4b5fd'; ctx.font = '12px sans-serif';
+  ctx.fillText('What I Wish I Knew When I was back in 1932', tc.width / 2, 82);
+
+  if (qrCanvas) {
+    const qrSize = 200;
+    ctx.drawImage(qrCanvas, (tc.width - qrSize) / 2, 104, qrSize, qrSize);
+  }
+
+  ctx.fillStyle = '#ffffff'; ctx.font = 'bold 15px sans-serif';
+  ctx.fillText(ticket.name || '', tc.width / 2, 335);
+  ctx.fillStyle = '#c4b5fd'; ctx.font = '13px sans-serif';
+  ctx.fillText(`ประเภท: ${ticket.type}`, tc.width / 2, 360);
+  ctx.fillText(`ใบที่ ${ticket.ticketNum}`, tc.width / 2, 382);
+  if (ticket.showDate) {
+    ctx.fillStyle = '#d4a017'; ctx.font = 'bold 11px sans-serif';
+    ctx.fillText(ticket.showDate, tc.width / 2, 408);
+  }
+  ctx.fillStyle = '#6b7280'; ctx.font = '10px monospace';
+  ctx.fillText(ticketId, tc.width / 2, 440);
+
+  const link = document.createElement('a');
+  link.download = `ticket-${ticketId}.png`;
+  link.href = tc.toDataURL('image/png');
+  link.click();
+}
+
+/* ── ESCAPE HTML ── */
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ── AUTO-SEARCH from URL param ── */
+document.addEventListener('DOMContentLoaded', () => {
+  const params  = new URLSearchParams(window.location.search);
+  const orderId = params.get('order');
+  if (orderId) {
+    switchTab('order');
+    document.getElementById('input-order').value = orderId;
+    doSearch();
+  } else {
+    document.getElementById('input-phone').focus();
+  }
+});
+</script>
+</body>
+</html>

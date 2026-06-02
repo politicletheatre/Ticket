@@ -1,0 +1,2043 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🔐 Staff Check-in — น่าจะรู้อย่างนี้ตั้งแต่ปี 2475</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="assets/qrcodejs.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #0d0718; --surface: rgba(255,255,255,0.06); --border: rgba(255,255,255,0.12);
+      --purple: #6b35b0; --purple-light: #9b5de5; --gold: #d4a017; --gold-light: #fde68a;
+      --success: #22c55e; --warning: #f59e0b; --error: #ef4444;
+      --text: #f8f4ff; --muted: #7c6fa8; --radius: 16px;
+      --transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* ══ PIN OVERLAY ══════════════════════════════════════════════ */
+    #pin-overlay {
+      position: fixed; inset: 0; z-index: 9999;
+      background: radial-gradient(ellipse at top, #1a0933 0%, #0d0718 70%);
+      display: flex; align-items: center; justify-content: center;
+    }
+    #pin-overlay.hidden { display: none; }
+    .pin-box {
+      width: 100%; max-width: 360px; padding: 40px 32px;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 24px; backdrop-filter: blur(20px); text-align: center;
+      animation: pinFadeIn 0.5s ease;
+    }
+    @keyframes pinFadeIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:none; } }
+    .pin-icon { font-size: 3rem; margin-bottom: 12px; }
+    .pin-title { font-size: 1.4rem; font-weight: 700; color: var(--gold-light); margin-bottom: 4px; }
+    .pin-sub   { font-size: 0.85rem; color: var(--muted); margin-bottom: 28px; }
+    .pin-dots  { display: flex; justify-content: center; gap: 12px; margin-bottom: 24px; }
+    .pin-dot   { width: 14px; height: 14px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.25); background: transparent; transition: all 0.2s; }
+    .pin-dot.filled { background: var(--purple-light); border-color: var(--purple-light); box-shadow: 0 0 8px rgba(155,93,229,0.6); }
+    .pin-dot.error  { background: var(--error); border-color: var(--error); animation: shake 0.4s ease; }
+    .pin-keypad { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 16px; }
+    .pin-key { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; color: var(--text); font-family: inherit; font-size: 1.4rem; font-weight: 600; padding: 16px; cursor: pointer; transition: var(--transition); }
+    .pin-key:hover  { background: rgba(155,93,229,0.2); border-color: var(--purple-light); transform: translateY(-1px); }
+    .pin-key:active { transform: scale(0.95); }
+    .pin-key.wide   { grid-column: span 2; }
+    .pin-key.del    { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.2); }
+    .pin-error-msg  { font-size: 0.82rem; color: #fca5a5; min-height: 20px; margin-top: 4px; opacity: 0; transition: opacity 0.2s; }
+    .pin-error-msg.show { opacity: 1; }
+    @keyframes shake { 0%,100%{transform:none} 20%,60%{transform:translateX(-5px)} 40%,80%{transform:translateX(5px)} }
+
+    /* ══ HEADER ════════════════════════════════════════════════ */
+    .staff-header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(13,7,24,0.96); backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border); padding: 14px 20px;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .staff-logo { font-size: 1rem; font-weight: 700; color: var(--gold-light); }
+    .staff-badge { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; padding: 4px 12px; border-radius: 50px; font-size: 0.72rem; font-weight: 700; }
+    .staff-link  { color: var(--muted); font-size: 0.82rem; text-decoration: none; padding: 6px 14px; border: 1px solid var(--border); border-radius: 50px; transition: var(--transition); }
+    .staff-link:hover { color: var(--text); border-color: var(--purple-light); }
+
+    /* ══ MAIN ══════════════════════════════════════════════════ */
+    .staff-main { max-width: 700px; margin: 0 auto; padding: 24px 16px 80px; display: flex; flex-direction: column; gap: 20px; }
+
+    /* ══ STATS ═════════════════════════════════════════════════ */
+    .stats-bar { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
+    @media(max-width:500px){ .stats-bar { grid-template-columns: repeat(2,1fr); } }
+    .stat-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 16px 12px; text-align: center; backdrop-filter: blur(10px);
+      cursor: pointer; transition: var(--transition); user-select: none;
+    }
+    .stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+    .stat-card:active { transform: scale(0.97); }
+    .stat-num   { font-size: 2.2rem; font-weight: 700; line-height: 1; }
+    .stat-label { font-size: 0.72rem; color: var(--muted); margin-top: 4px; }
+    .stat-hint  { font-size: 0.62rem; color: var(--muted); margin-top: 6px; opacity: 0.7; }
+    .stat-total .stat-num     { color: #c084fc; }
+    .stat-checked .stat-num   { color: #86efac; }
+    .stat-remaining .stat-num { color: var(--gold-light); }
+    .stat-cancelled .stat-num { color: #fca5a5; }
+
+    /* ══ CARDS ═════════════════════════════════════════════════ */
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); backdrop-filter: blur(10px); overflow: hidden; }
+    .card-header { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .card-title  { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); }
+
+    /* ══ SCANNER ════════════════════════════════════════════════ */
+    .scanner-viewport { background: #000; min-height: 180px; display: flex; align-items: center; justify-content: center; }
+    .scan-placeholder { display: flex; flex-direction: column; align-items: center; gap: 10px; color: var(--muted); text-align: center; padding: 32px; }
+    .scan-placeholder svg { color: var(--purple-light); }
+    .scan-placeholder p { font-size: 0.9rem; }
+    #reader { width: 100%; }
+    #reader video { width: 100% !important; }
+    #reader img   { display: none !important; }
+
+    /* ══ BUTTONS ════════════════════════════════════════════════ */
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: none; border-radius: 50px; font-family: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: var(--transition); padding: 10px 20px; }
+    .btn-scan { background: linear-gradient(135deg, var(--purple), var(--purple-light)); color: white; }
+    .btn-scan:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(107,53,176,0.4); }
+    .btn-scan.stop { background: linear-gradient(135deg,#dc2626,#ef4444); }
+    .btn-check { background: var(--surface); border: 1px solid var(--border); color: var(--text); }
+    .btn-check:hover { border-color: var(--purple-light); background: rgba(155,93,229,0.1); }
+    .btn-danger { background: transparent; border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; font-size: 0.75rem; padding: 5px 12px; }
+    .btn-danger:hover { background: rgba(239,68,68,0.1); }
+    .btn-edit   { background: rgba(212,160,23,0.12); border: 1px solid rgba(212,160,23,0.3); color: var(--gold-light); font-size: 0.8rem; padding: 6px 14px; }
+    .btn-edit:hover { background: rgba(212,160,23,0.2); }
+    .btn-save   { background: linear-gradient(135deg,#16a34a,#22c55e); color: white; padding: 10px 24px; }
+    .btn-save:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(34,197,94,0.3); }
+    .btn-cancel-edit { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 10px 20px; }
+    .btn-cancel-edit:hover { border-color: var(--purple-light); color: var(--text); }
+    .btn-restore { background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.3); color: #86efac; font-size: 0.8rem; padding: 6px 14px; }
+    .btn-restore:hover { background: rgba(34,197,94,0.2); }
+    /* Per-ticket action buttons */
+    .ticket-status-actions { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; flex-shrink: 0; }
+    .btn-tkt { display: inline-flex; align-items: center; gap: 4px; border: 1px solid; border-radius: 50px; font-family: inherit; font-size: 0.7rem; font-weight: 600; padding: 4px 10px; cursor: pointer; transition: var(--transition); white-space: nowrap; }
+    .btn-tkt-checkin  { background: rgba(34,197,94,0.12);  border-color: rgba(34,197,94,0.3);  color: #86efac; }
+    .btn-tkt-checkin:hover  { background: rgba(34,197,94,0.25); }
+    .btn-tkt-undo     { background: rgba(245,158,11,0.12); border-color: rgba(245,158,11,0.3); color: #fde68a; }
+    .btn-tkt-undo:hover     { background: rgba(245,158,11,0.25); }
+    .btn-tkt-cancel   { background: rgba(239,68,68,0.1);   border-color: rgba(239,68,68,0.25); color: #fca5a5; }
+    .btn-tkt-cancel:hover   { background: rgba(239,68,68,0.2); }
+    .btn-tkt-restore  { background: rgba(107,53,176,0.15); border-color: rgba(155,93,229,0.3); color: #c084fc; }
+    .btn-tkt-restore:hover  { background: rgba(107,53,176,0.3); }
+
+    /* ══ MANUAL INPUT ═══════════════════════════════════════════ */
+    .manual-row { display: flex; gap: 10px; padding: 14px 18px; border-top: 1px solid var(--border); }
+    .manual-row input { flex: 1; background: rgba(255,255,255,0.05); border: 1.5px solid var(--border); border-radius: 12px; padding: 11px 14px; color: var(--text); font-family: inherit; font-size: 0.9rem; outline: none; transition: var(--transition); }
+    .manual-row input:focus { border-color: var(--purple-light); box-shadow: 0 0 0 3px rgba(155,93,229,0.15); }
+    .manual-row input::placeholder { color: var(--muted); }
+
+    /* ══ RESULT ═════════════════════════════════════════════════ */
+    .result-card { border-radius: var(--radius); padding: 24px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 14px; border: 1px solid; animation: slideIn 0.3s ease; }
+    @keyframes slideIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:none} }
+    .result-card.ok  { background: rgba(34,197,94,0.08);  border-color: rgba(34,197,94,0.3); }
+    .result-card.dup { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.3); }
+    .result-card.err { background: rgba(239,68,68,0.08);  border-color: rgba(239,68,68,0.3); }
+    .result-icon  { font-size: 3.5rem; line-height: 1; }
+    .result-title { font-size: 1.4rem; font-weight: 700; }
+    .result-card.ok  .result-title { color: #86efac; }
+    .result-card.dup .result-title { color: #fde68a; }
+    .result-card.err .result-title { color: #fca5a5; }
+    .result-table { background: rgba(255,255,255,0.05); border-radius: 12px; width: 100%; overflow: hidden; }
+    .result-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.88rem; }
+    .result-row:last-child { border-bottom: none; }
+    .result-row span:first-child { color: var(--muted); }
+    .result-row strong { font-weight: 600; text-align: right; }
+
+    /* ══ LOG ════════════════════════════════════════════════════ */
+    .log-list  { max-height: 320px; overflow-y: auto; }
+    .log-item  { display: flex; align-items: center; gap: 12px; padding: 11px 18px; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.84rem; animation: slideIn 0.2s ease; }
+    .log-item:last-child { border-bottom: none; }
+    .log-dot   { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .log-dot.ok  { background: var(--success); }
+    .log-dot.dup { background: var(--warning); }
+    .log-dot.err { background: var(--error); }
+    .log-info  { flex: 1; min-width: 0; }
+    .log-name  { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .log-sub   { font-size: 0.76rem; color: var(--muted); }
+    .log-meta  { flex-shrink: 0; text-align: right; }
+    .log-time  { font-size: 0.74rem; color: var(--muted); }
+    .log-status { font-size: 0.7rem; }
+    .log-empty { padding: 36px; text-align: center; color: var(--muted); font-size: 0.88rem; }
+
+    /* ══ SYNC BADGE ═════════════════════════════════════════════ */
+    .sync-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 0.72rem; padding: 3px 10px; border-radius: 50px; }
+    .sync-badge.on  { background: rgba(34,197,94,0.15); color: #86efac; border: 1px solid rgba(34,197,94,0.3); }
+    .sync-badge.off { background: rgba(107,53,176,0.15); color: #c084fc; border: 1px solid rgba(107,53,176,0.3); }
+    .sync-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .sync-badge.on  .sync-dot { background: var(--success); animation: pulse 2s infinite; }
+    .sync-badge.off .sync-dot { background: #9b5de5; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    /* ══ LIST MODAL ═════════════════════════════════════════════ */
+    #modal-overlay {
+      position: fixed; inset: 0; z-index: 400;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(6px);
+      display: none; align-items: flex-start; justify-content: center;
+      padding: 20px 16px 40px; overflow-y: auto;
+    }
+    #modal-overlay.open { display: flex; animation: fadeIn 0.25s ease; }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+    .modal-box { width: 100%; max-width: 620px; background: #130d24; border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; overflow: hidden; animation: modalSlide 0.3s ease; margin: auto; }
+    @keyframes modalSlide { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; background: rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .modal-title  { font-size: 1rem; font-weight: 700; }
+    .modal-close  { background: rgba(255,255,255,0.08); border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; color: var(--text); font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
+    .modal-close:hover { background: rgba(239,68,68,0.2); color: #fca5a5; }
+    .modal-filter { display: flex; gap: 8px; padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .modal-search { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 10px; padding: 8px 14px; color: var(--text); font-family: inherit; font-size: 0.88rem; outline: none; transition: var(--transition); }
+    .modal-search:focus { border-color: var(--purple-light); }
+    .modal-search::placeholder { color: var(--muted); }
+    .customer-list { max-height: 54vh; overflow-y: auto; }
+    /* Show filter */
+    .modal-show-filter { display: flex; align-items: center; gap: 8px; padding: 8px 16px 10px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .modal-show-select { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 10px; padding: 7px 12px; color: var(--text); font-family: inherit; font-size: 0.85rem; outline: none; cursor: pointer; transition: var(--transition); }
+    .modal-show-select:focus { border-color: var(--purple-light); }
+    .modal-show-select option { background: #1a0d2e; }
+    .modal-sort-hint { font-size: 0.7rem; color: var(--muted); white-space: nowrap; flex-shrink: 0; }
+    .customer-item { display: flex; align-items: center; gap: 14px; padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.2s; cursor: pointer; }
+    .customer-item:last-child { border-bottom: none; }
+    .customer-item:hover { background: rgba(155,93,229,0.08); }
+    .customer-item:hover .customer-arrow { opacity: 1; }
+    .customer-avatar { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1rem; flex-shrink: 0; }
+    .avatar-checked { background: rgba(34,197,94,0.2); color: #86efac; border: 1px solid rgba(34,197,94,0.3); }
+    .avatar-pending { background: rgba(253,230,138,0.15); color: var(--gold-light); border: 1px solid rgba(253,230,138,0.25); }
+    .customer-info { flex: 1; min-width: 0; }
+    .customer-name { font-weight: 600; font-size: 0.92rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .customer-meta { font-size: 0.76rem; color: var(--muted); margin-top: 2px; }
+    .customer-tid  { font-family: monospace; font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+    .customer-status { flex-shrink: 0; text-align: right; }
+    .customer-arrow  { flex-shrink: 0; color: var(--muted); opacity: 0.4; transition: opacity 0.2s; font-size: 1rem; }
+    .status-pill { display: inline-block; padding: 3px 10px; border-radius: 50px; font-size: 0.7rem; font-weight: 700; }
+    .status-pill.checked   { background: rgba(34,197,94,0.15);  color: #86efac;       border: 1px solid rgba(34,197,94,0.3); }
+    .status-pill.pending   { background: rgba(253,230,138,0.1); color: var(--gold-light); border: 1px solid rgba(253,230,138,0.2); }
+    .status-pill.cancelled { background: rgba(239,68,68,0.1);   color: #fca5a5;       border: 1px solid rgba(239,68,68,0.25); }
+    .checkin-time { font-size: 0.68rem; color: var(--muted); margin-top: 4px; }
+    .modal-empty { padding: 48px; text-align: center; color: var(--muted); font-size: 0.9rem; }
+    .modal-count { padding: 10px 20px; font-size: 0.78rem; color: var(--muted); border-top: 1px solid rgba(255,255,255,0.06); text-align: right; }
+
+    /* ══ DETAIL MODAL ═══════════════════════════════════════════ */
+    #detail-overlay {
+      position: fixed; inset: 0; z-index: 500;
+      background: rgba(0,0,0,0.82); backdrop-filter: blur(8px);
+      display: none; align-items: flex-start; justify-content: center;
+      padding: 20px 16px 60px; overflow-y: auto;
+    }
+    #detail-overlay.open { display: flex; animation: fadeIn 0.2s ease; }
+    .detail-box { width: 100%; max-width: 600px; background: #13092a; border: 1px solid rgba(155,93,229,0.25); border-radius: 22px; overflow: hidden; animation: modalSlide 0.3s ease; margin: auto; }
+    .detail-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; background: rgba(107,53,176,0.15); border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .detail-header-title { font-size: 0.95rem; font-weight: 700; }
+    .detail-header-actions { display: flex; gap: 8px; align-items: center; }
+
+    /* Profile section */
+    .detail-profile { display: flex; align-items: center; gap: 16px; padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .detail-avatar { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; font-weight: 700; background: linear-gradient(135deg,rgba(107,53,176,0.3),rgba(155,93,229,0.3)); border: 2px solid rgba(155,93,229,0.4); flex-shrink: 0; }
+    .detail-profile-info h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
+    .detail-profile-info p  { font-size: 0.82rem; color: var(--muted); }
+
+    /* Info rows */
+    .detail-section { padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .detail-section-title { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 12px; }
+    .detail-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.86rem; gap: 12px; }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-row .dr-label { color: var(--muted); flex-shrink: 0; }
+    .detail-row .dr-val   { font-weight: 500; text-align: right; word-break: break-all; }
+    .detail-row .dr-mono  { font-family: monospace; font-size: 0.78rem; }
+
+    /* Ticket list in detail */
+    .detail-ticket-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: rgba(255,255,255,0.04); border-radius: 10px; margin-bottom: 8px; gap: 10px; }
+    .detail-ticket-item:last-child { margin-bottom: 0; }
+    .detail-ticket-num  { font-family: monospace; font-size: 0.78rem; color: var(--muted); }
+    .detail-ticket-id   { font-family: monospace; font-size: 0.75rem; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* Slip image */
+    .detail-slip-img { max-width: 100%; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); display: block; cursor: zoom-in; }
+    .slip-thumb-wrap { padding: 12px 20px 20px; }
+
+    /* Edit form */
+    .edit-form { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+    .edit-form-group label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 6px; font-weight: 600; }
+    .edit-form-group input,
+    .edit-form-group select,
+    .edit-form-group textarea {
+      width: 100%; background: rgba(255,255,255,0.05); border: 1.5px solid var(--border);
+      border-radius: 10px; padding: 10px 14px; color: var(--text); font-family: inherit;
+      font-size: 0.9rem; outline: none; transition: var(--transition);
+    }
+    .edit-form-group input:focus,
+    .edit-form-group select:focus,
+    .edit-form-group textarea:focus { border-color: var(--purple-light); box-shadow: 0 0 0 3px rgba(155,93,229,0.15); }
+    .edit-form-group select option { background: #1a0d2e; }
+    .edit-form-group textarea { resize: vertical; min-height: 80px; }
+    .edit-form-actions { display: flex; gap: 10px; padding-top: 4px; }
+    .edit-note { font-size: 0.78rem; color: var(--muted); padding: 10px 14px; background: rgba(107,53,176,0.1); border-radius: 10px; border: 1px solid rgba(107,53,176,0.2); }
+
+    /* ══ STOCK TABLE ═════════════════════════════════════════════════ */
+    .stock-wrap { padding: 16px; overflow-x: auto; }
+    .stock-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+    .stock-table th { padding: 8px 12px; text-align: left; font-size: 0.68rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.2px; color: var(--muted);
+      border-bottom: 1px solid var(--border); white-space: nowrap; }
+    .stock-table td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: middle; }
+    .stock-table tr:last-child td { border-bottom: none; }
+    .stock-row-full td { opacity: 0.6; }
+    .stock-label { font-size: 0.82rem; white-space: nowrap; }
+    .stock-num { text-align: center; font-weight: 700; font-size: 1rem; }
+    .stock-cap  { color: #c084fc; }
+    .stock-sold { color: #94a3b8; }
+    .stock-ok   { color: #86efac; }
+    .stock-low  { color: var(--gold-light); }
+    .stock-zero { color: #fca5a5; }
+    .stock-actions { display: flex; align-items: center; gap: 6px; justify-content: flex-end; }
+    .btn-stock-adj {
+      width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--border);
+      background: rgba(255,255,255,0.06); color: var(--text); font-size: 1.1rem;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: var(--transition); flex-shrink: 0;
+    }
+    .btn-stock-adj:hover { background: rgba(155,93,229,0.2); border-color: var(--purple-light); }
+    .stock-input {
+      width: 62px; background: rgba(255,255,255,0.05); border: 1.5px solid var(--border);
+      border-radius: 8px; padding: 6px 8px; color: var(--text); font-family: inherit;
+      font-size: 0.9rem; text-align: center; outline: none; transition: var(--transition);
+    }
+    .stock-input:focus { border-color: var(--purple-light); }
+    .stock-soldout-badge {
+      display: inline-block; padding: 2px 8px; border-radius: 50px;
+      font-size: 0.65rem; font-weight: 700; background: rgba(239,68,68,0.15);
+      color: #fca5a5; border: 1px solid rgba(239,68,68,0.25); margin-left: 6px;
+    }
+    .stock-footer { padding: 12px 16px; border-top: 1px solid var(--border);
+      font-size: 0.78rem; color: var(--muted); display: flex; gap: 16px; flex-wrap: wrap; }
+    .stock-footer span { display: flex; align-items: center; gap: 5px; }
+    /* Quota Booking Form styling */
+    .booking-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      padding: 20px;
+    }
+    @media (max-width: 768px) {
+      .booking-form {
+        grid-template-columns: 1fr;
+      }
+    }
+    .booking-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .booking-group.full-width {
+      grid-column: 1 / -1;
+    }
+    .booking-group label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    .booking-group input,
+    .booking-group select,
+    .booking-group textarea {
+      background: rgba(255,255,255,0.05);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 11px 14px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.9rem;
+      outline: none;
+      transition: var(--transition);
+      width: 100%;
+    }
+    .booking-group input:focus,
+    .booking-group select:focus,
+    .booking-group textarea:focus {
+      border-color: var(--purple-light);
+      box-shadow: 0 0 0 3px rgba(155,93,229,0.15);
+    }
+    .booking-group textarea {
+      resize: vertical;
+    }
+    .booking-price-calc {
+      background: rgba(155,93,229,0.05);
+      border: 1px solid rgba(155,93,229,0.25);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      grid-column: 1 / -1;
+      margin-top: 8px;
+    }
+    .price-calc-details {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .price-calc-row {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .price-calc-row strong {
+      color: var(--text);
+    }
+    .price-calc-total {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--gold-light);
+    }
+    .btn-booking-submit {
+      grid-column: 1 / -1;
+      width: 100%;
+      padding: 14px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      border-radius: 12px;
+      border: none;
+      background: linear-gradient(135deg, var(--purple) 0%, #b5179e 100%);
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: var(--transition);
+      box-shadow: 0 4px 15px rgba(181, 23, 158, 0.3);
+    }
+    .btn-booking-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(181, 23, 158, 0.5);
+    }
+    .btn-booking-submit:active {
+      transform: scale(0.98);
+    }
+    /* Switch toggle styling */
+    .switch input:checked + .slider {
+      background-color: var(--success);
+      border-color: var(--success);
+    }
+    .switch .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 2.5px;
+      background-color: white;
+      border-radius: 50%;
+      transition: .4s;
+    }
+    .switch input:checked + .slider:before {
+      transform: translateX(23px);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ PIN OVERLAY ══════════════════════════════════════════════════════════ -->
+<div id="pin-overlay">
+  <div class="pin-box">
+    <div class="pin-icon">🔐</div>
+    <div class="pin-title">Staff Dashboard</div>
+    <div class="pin-sub">กรุณากรอก PIN 6 หลักเพื่อเข้าใช้งาน</div>
+    <div class="pin-dots" id="pin-dots">
+      <div class="pin-dot" id="pd-0"></div><div class="pin-dot" id="pd-1"></div>
+      <div class="pin-dot" id="pd-2"></div><div class="pin-dot" id="pd-3"></div>
+      <div class="pin-dot" id="pd-4"></div><div class="pin-dot" id="pd-5"></div>
+    </div>
+    <div class="pin-keypad">
+      <button class="pin-key" onclick="pinPress('1')">1</button>
+      <button class="pin-key" onclick="pinPress('2')">2</button>
+      <button class="pin-key" onclick="pinPress('3')">3</button>
+      <button class="pin-key" onclick="pinPress('4')">4</button>
+      <button class="pin-key" onclick="pinPress('5')">5</button>
+      <button class="pin-key" onclick="pinPress('6')">6</button>
+      <button class="pin-key" onclick="pinPress('7')">7</button>
+      <button class="pin-key" onclick="pinPress('8')">8</button>
+      <button class="pin-key" onclick="pinPress('9')">9</button>
+      <button class="pin-key wide" onclick="pinPress('0')">0</button>
+      <button class="pin-key del"  onclick="pinDel()">⌫</button>
+    </div>
+    <div class="pin-error-msg" id="pin-error-msg">รหัสไม่ถูกต้อง กรุณาลองใหม่</div>
+    <a href="index.html" class="btn btn-check" style="width:100%; border-radius:12px; margin-top:14px; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; gap:8px;">🏠 กลับหน้าหลัก</a>
+  </div>
+</div>
+
+<!-- ══ LIST MODAL ═══════════════════════════════════════════════════════════ -->
+<div id="modal-overlay" onclick="handleModalBgClick(event)">
+  <div class="modal-box" id="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">รายชื่อลูกค้า</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-filter">
+      <input class="modal-search" id="modal-search" type="text"
+             placeholder="🔍 ค้นหาชื่อ / เบอร์ / รหัสบัตร" oninput="filterCustomers()" />
+    </div>
+    <div class="modal-show-filter">
+      <select id="modal-show-select" class="modal-show-select" onchange="filterCustomers()">
+        <option value="all">📅 ทุกรอบ</option>
+      </select>
+      <span class="modal-sort-hint">⏱ เรียงตามวันซื้อ</span>
+    </div>
+    <div class="customer-list" id="customer-list"></div>
+    <div class="modal-count"  id="modal-count"></div>
+  </div>
+</div>
+
+<!-- ══ DETAIL MODAL ══════════════════════════════════════════════════════════ -->
+<div id="detail-overlay" onclick="handleDetailBgClick(event)">
+  <div class="detail-box" id="detail-box">
+    <div class="detail-header">
+      <button class="btn btn-cancel-edit" style="padding:6px 14px;border-radius:50px;font-size:0.82rem" onclick="closeDetailModal()">← กลับ</button>
+      <div class="detail-header-title" id="detail-header-title">รายละเอียดลูกค้า</div>
+      <div class="detail-header-actions">
+        <button class="btn btn-restore" id="btn-restore-order" onclick="confirmRestoreOrder()" style="display:none">♻️ กู้คืน</button>
+        <button class="btn btn-danger" id="btn-delete-order" onclick="confirmDeleteOrderPermanently()" style="display:none;background:#ef4444;border-color:#dc2626;color:#fff;font-size:0.8rem;padding:6px 14px">🗑️ ลบถาวร</button>
+        <button class="btn btn-danger" id="btn-cancel-order" onclick="confirmCancelOrder()" style="font-size:0.8rem;padding:6px 14px">🚫 ยกเลิก</button>
+        <button class="btn btn-edit" id="btn-edit-toggle" onclick="toggleEditMode()">✏️ แก้ไข</button>
+      </div>
+    </div>
+
+    <!-- VIEW MODE -->
+    <div id="detail-view-mode">
+      <!-- Cancelled notice banner (shown when order is cancelled) -->
+      <div id="dv-cancelled-banner" style="display:none;background:rgba(239,68,68,0.12);border-bottom:1px solid rgba(239,68,68,0.3);padding:12px 20px;color:#fca5a5;font-size:0.85rem;font-weight:600;gap:8px;align-items:center">
+        🚫 ออร์เดอร์นี้ถูกยกเลิกแล้ว — กดปุ่ม ♻️ กู้คืน เพื่อเปิดใช้งานใหม่
+      </div>
+      <div class="detail-profile">
+        <div class="detail-avatar" id="dv-avatar">?</div>
+        <div class="detail-profile-info">
+          <h2 id="dv-name">—</h2>
+          <p id="dv-phone">—</p>
+          <p id="dv-email" style="margin-top:2px"></p>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-section-title">📋 ข้อมูลคำสั่งซื้อ</div>
+        <div class="detail-row"><span class="dr-label">รหัสคำสั่งซื้อ</span><span class="dr-val dr-mono" id="dv-orderid">—</span></div>
+        <div class="detail-row"><span class="dr-label">รอบการแสดง</span><span class="dr-val" id="dv-showdate">—</span></div>
+        <div class="detail-row"><span class="dr-label">ประเภทบัตร</span><span class="dr-val" id="dv-type">—</span></div>
+        <div class="detail-row"><span class="dr-label">จำนวน</span><span class="dr-val" id="dv-qty">—</span></div>
+        <div class="detail-row"><span class="dr-label">ราคารวม</span><span class="dr-val" id="dv-total">—</span></div>
+        <div class="detail-row" id="dv-note-row" style="display:none"><span class="dr-label">หมายเหตุ</span><span class="dr-val" id="dv-note">—</span></div>
+        <div class="detail-row"><span class="dr-label">วันที่จอง</span><span class="dr-val" id="dv-timestamp">—</span></div>
+      </div>
+
+      <div class="detail-section" id="dv-tickets-section">
+        <div class="detail-section-title">🎫 บัตรในออร์เดอร์</div>
+        <div id="dv-tickets-list"></div>
+      </div>
+
+      <div class="detail-section" id="dv-slip-section" style="display:none">
+        <div class="detail-section-title">🧾 สลิปการโอนเงิน</div>
+        <div class="slip-thumb-wrap" style="padding:0">
+          <img id="dv-slip-img" class="detail-slip-img" src="" alt="สลิป" onclick="openSlipFull(this.src)" />
+        </div>
+      </div>
+    </div>
+
+    <!-- EDIT MODE -->
+    <div id="detail-edit-mode" style="display:none">
+      <div class="edit-form">
+        <div class="edit-note">⚠️ การแก้ไขจะอัปเดตข้อมูลใน localStorage และมีผลต่อทุกบัตรในออร์เดอร์นี้</div>
+
+        <div class="edit-form-group">
+          <label>ชื่อ–นามสกุล</label>
+          <input type="text" id="edit-name" placeholder="ชื่อผู้ซื้อ" />
+        </div>
+        <div class="edit-form-group">
+          <label>เบอร์โทรศัพท์</label>
+          <input type="tel" id="edit-phone" placeholder="0812345678" />
+        </div>
+        <div class="edit-form-group">
+          <label>อีเมล</label>
+          <input type="email" id="edit-email" placeholder="email@example.com" />
+        </div>
+        <div class="edit-form-group">
+          <label>หมายเหตุ</label>
+          <textarea id="edit-note" placeholder="หมายเหตุเพิ่มเติม"></textarea>
+        </div>
+        <div class="edit-form-group">
+          <label>ประเภทบัตร</label>
+          <select id="edit-type">
+            <option value="QT SPON">🎟️ QT SPON (0 บาท)</option>
+            <option value="QT FREE">🎟️ QT FREE (0 บาท)</option>
+            <option value="QT DISCOUNT">🎟️ QT DISCOUNT (590 บาท)</option>
+            <option value="บัตรปกติ">🎭 บัตรปกติ (790 บาท)</option>
+            <option value="Early Bird">🐦 Early Bird (590 บาท)</option>
+            <option value="บัตรโควต้า">🎟️ บัตรโควต้า (0 บาท)</option>
+          </select>
+        </div>
+        <div class="edit-form-group">
+          <label>รอบการแสดง</label>
+          <select id="edit-showdate"><!-- populated by JS --></select>
+        </div>
+
+        <div class="edit-form-actions">
+          <button class="btn btn-save" onclick="saveCustomerEdit()">💾 บันทึกการแก้ไข</button>
+          <button class="btn btn-cancel-edit" onclick="cancelEdit()">ยกเลิก</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIP FULLSCREEN ══════════════════════════════════════════════════════ -->
+<div id="slip-full-overlay" style="display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.92);display:none;align-items:center;justify-content:center;cursor:zoom-out" onclick="closeSlipFull()">
+  <img id="slip-full-img" style="max-width:95vw;max-height:95vh;border-radius:12px;object-fit:contain" src="" alt="slip" />
+</div>
+
+<!-- ══ HEADER ════════════════════════════════════════════════════════════════ -->
+<header class="staff-header">
+  <div class="staff-logo">🎭 น่าจะรู้อย่างนี้ตั้งแต่ปี 2475</div>
+  <div id="sync-indicator" class="sync-badge off">
+    <div class="sync-dot"></div><span>โหมดออฟไลน์</span>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <a href="index.html" class="staff-link">🏠 กลับหน้าหลัก</a>
+    <span class="staff-badge">🔐 STAFF</span>
+  </div>
+</header>
+
+<main class="staff-main">
+
+  <!-- STATS (clickable) -->
+  <div class="stats-bar">
+    <div class="stat-card stat-total" onclick="openModal('all')">
+      <div class="stat-num" id="stat-total">0</div>
+      <div class="stat-label">บัตรทั้งหมด</div>
+      <div class="stat-hint">👆 แตะดูรายชื่อ</div>
+    </div>
+    <div class="stat-card stat-checked" onclick="openModal('checked')">
+      <div class="stat-num" id="stat-checked">0</div>
+      <div class="stat-label">เช็คอินแล้ว</div>
+      <div class="stat-hint">👆 แตะดูรายชื่อ</div>
+    </div>
+    <div class="stat-card stat-remaining" onclick="openModal('pending')">
+      <div class="stat-num" id="stat-remaining">0</div>
+      <div class="stat-label">ยังไม่เข้างาน</div>
+      <div class="stat-hint">👆 แตะดูรายชื่อ</div>
+    </div>
+    <div class="stat-card stat-cancelled" onclick="openModal('cancelled')">
+      <div class="stat-num" id="stat-cancelled">0</div>
+      <div class="stat-label">ยกเลิกแล้ว</div>
+      <div class="stat-hint">👆 แตะดูรายชื่อ</div>
+    </div>
+  </div>
+
+  <!-- SCANNER -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">📷 สแกน QR Code</span>
+      <button class="btn btn-scan" id="btn-toggle" onclick="toggleScanner()">📷 เปิดกล้องสแกน</button>
+    </div>
+    <div class="scanner-viewport" id="scanner-viewport">
+      <div class="scan-placeholder" id="scan-placeholder">
+        <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+          <path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/>
+          <rect x="7" y="7" width="10" height="10" rx="1"/>
+        </svg>
+        <p>กดปุ่มเพื่อเปิดกล้อง<br/>หรือพิมพ์รหัสบัตรด้านล่าง</p>
+      </div>
+      <div id="reader" style="display:none;width:100%"></div>
+    </div>
+    <div class="manual-row">
+      <input type="text" id="manual-id" placeholder="รหัสบัตร เช่น FNH-20241201-AB123-T01"
+             onkeydown="if(event.key==='Enter') manualCheck()" />
+      <button class="btn btn-check" onclick="manualCheck()">ตรวจสอบ</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-wrap" style="display:none"></div>
+
+  <!-- TICKET SALE SETTINGS -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">⚙️ ตั้งค่าการขายบัตร</span>
+    </div>
+    <div style="padding: 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+      <div>
+        <h4 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 4px;">ขายบัตร Early Bird</h4>
+        <p style="font-size: 0.8rem; color: var(--muted);">เปิดหรือปิดการขายบัตร Early Bird ในหน้าจองสำหรับลูกค้าทั่วไป</p>
+      </div>
+      <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 26px;">
+        <input type="checkbox" id="toggle-earlybird" onchange="toggleEarlyBirdSale(this.checked)" style="opacity: 0; width: 0; height: 0;">
+        <span class="slider" style="position: absolute; cursor: pointer; inset: 0; background-color: rgba(255,255,255,0.06); border: 1.5px solid var(--border); border-radius: 34px; transition: .4s;"></span>
+      </label>
+    </div>
+  </div>
+
+  <!-- QUOTA BOOKING -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">🎫 ออกตั๋วโควต้า / จองบัตรพิเศษ (แอดมิน)</span>
+    </div>
+    <div class="booking-form">
+      <div class="booking-group">
+        <label for="sb-name">ชื่อ–นามสกุลผู้ซื้อ <span style="color:var(--error)">*</span></label>
+        <input type="text" id="sb-name" placeholder="เช่น สมชาย ใจดี" required />
+      </div>
+      <div class="booking-group">
+        <label for="sb-phone">เบอร์โทรศัพท์ <span style="color:var(--error)">*</span></label>
+        <input type="tel" id="sb-phone" placeholder="0812345678" pattern="[0-9]{9,10}" required />
+      </div>
+      <div class="booking-group">
+        <label for="sb-email">อีเมล (ไม่บังคับ)</label>
+        <input type="email" id="sb-email" placeholder="example@email.com" />
+      </div>
+      <div class="booking-group">
+        <label for="sb-showdate">รอบการแสดง <span style="color:var(--error)">*</span></label>
+        <select id="sb-showdate" onchange="updateQuotaBookingPrice()"></select>
+      </div>
+      <div class="booking-group">
+        <label for="sb-type">ประเภทบัตร <span style="color:var(--error)">*</span></label>
+        <select id="sb-type" onchange="updateQuotaBookingPrice()">
+          <option value="QT SPON">🎟️ QT SPON (0 บาท)</option>
+          <option value="QT FREE">🎟️ QT FREE (0 บาท)</option>
+          <option value="QT DISCOUNT">🎟️ QT DISCOUNT (590 บาท)</option>
+          <option value="บัตรปกติ">🎭 บัตรปกติ (790 บาท)</option>
+          <option value="Early Bird">🐦 Early Bird (590 บาท)</option>
+        </select>
+      </div>
+      <div class="booking-group">
+        <label for="sb-qty">จำนวนบัตร <span style="color:var(--error)">*</span></label>
+        <input type="number" id="sb-qty" min="1" max="100" value="1" oninput="updateQuotaBookingPrice()" />
+      </div>
+      <div class="booking-group full-width">
+        <label for="sb-note">หมายเหตุการจอง</label>
+        <textarea id="sb-note" rows="2" placeholder="เช่น โควต้าทีมงานฝั่งนักแสดง / ผู้สนับสนุน VIP"></textarea>
+      </div>
+      
+      <!-- Price Calculation Preview -->
+      <div class="booking-price-calc">
+        <div class="price-calc-details">
+          <div class="price-calc-row">ราคาต่อใบ: <span id="sb-calc-original">0</span> บาท</div>
+          <div class="price-calc-row">จำนวนบัตร: <strong id="sb-calc-qty">1</strong> ใบ</div>
+        </div>
+        <div>
+          <div class="price-calc-row" style="text-align:right;font-size:0.75rem">ราคาสุทธิรวม</div>
+          <div class="price-calc-total"><span id="sb-calc-total">0</span> บาท</div>
+        </div>
+      </div>
+
+      <button class="btn-booking-submit" onclick="submitQuotaBooking()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        ยืนยันออกตั๋วโควต้าทีมงาน
+      </button>
+    </div>
+  </div>
+
+  <!-- STOCK MANAGEMENT -->
+  <div class="card" id="stock-card">
+    <div class="card-header">
+      <span class="card-title">📦 จัดการ Stock บัตรแต่ละรอบ</span>
+      <button class="btn btn-check" onclick="renderStockTable()">🔄 รีเฟรช</button>
+    </div>
+    <div class="stock-wrap" id="stock-table-wrap"></div>
+    <div class="stock-footer">
+      <span>🟣 Capacity = จำนวนที่นั่งสูงสุดที่ตั้งไว้</span>
+      <span>⚫ ขายแล้ว = บัตรที่ถูกจองจริง</span>
+      <span>🟢 คงเหลือ = ยังซื้อได้</span>
+    </div>
+  </div>
+
+  <!-- LOG -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">📋 ประวัติการเช็คอิน</span>
+      <button class="btn btn-danger" onclick="clearLog()">ล้างรายการ</button>
+    </div>
+    <div class="log-list" id="log-list">
+      <div class="log-empty">ยังไม่มีการเช็คอิน</div>
+    </div>
+  </div>
+
+</main>
+
+<!-- QR Scanner library -->
+<script src="assets/html5-qrcode.min.js" onerror="loadFallbackQR()"></script>
+<script>
+function loadFallbackQR() {
+  const s = document.createElement('script');
+  s.src   = 'https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js';
+  document.head.appendChild(s);
+}
+</script>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════════════════════
+const APPS_SCRIPT_URL = 'YOUR_APPS_SCRIPT_URL_HERE';
+const STAFF_PIN       = '002406';
+
+const TICKET_TYPES = {
+  'QT SPON': 0,
+  'QT FREE': 0,
+  'QT DISCOUNT': 590,
+  'บัตรปกติ':  790,
+  'Early Bird': 590,
+  'บัตรโควต้า': 0,
+  'โควต้าฟรี': 0,
+  'โควต้าราคา Early Bird': 590,
+  'โควต้า Spon': 0,
+};
+
+// ตารางรอบการแสดง (ต้องตรงกับ app.js)
+const SCHEDULE = [
+  { id:'w1-fri', dateLabel:'ศุกร์ที่ 16 ต.ค. 2569',    slots:['19:00'] },
+  { id:'w1-sat', dateLabel:'เสาร์ที่ 17 ต.ค. 2569',   slots:['14:00','19:00'] },
+  { id:'w1-sun', dateLabel:'อาทิตย์ที่ 18 ต.ค. 2569', slots:['14:00','19:00'] },
+  { id:'w2-fri', dateLabel:'ศุกร์ที่ 23 ต.ค. 2569',    slots:['19:00'] },
+  { id:'w2-sat', dateLabel:'เสาร์ที่ 24 ต.ค. 2569',   slots:['14:00','19:00'] },
+  { id:'w2-sun', dateLabel:'อาทิตย์ที่ 25 ต.ค. 2569', slots:['14:00','19:00'] },
+];
+const DEFAULT_CAPACITY = 50;
+
+// ═ SLOT HELPERS ═════════════════════════════════════════════════
+function getSlotKey(dateId, slot) { return `${dateId}|${slot}`; }
+
+function getSlotCapacity(key) {
+  const stock = JSON.parse(localStorage.getItem('theater_stock') || '{}');
+  return typeof stock[key] === 'number' ? stock[key] : DEFAULT_CAPACITY;
+}
+
+function getStaffSoldCount(dateId, slot) {
+  const tickets = JSON.parse(localStorage.getItem('theater_tickets') || '{}');
+  return Object.values(tickets).filter(t =>
+    t.showDateId === dateId && t.showSlot === slot && !t.cancelled
+  ).length;
+}
+
+function makeShowDateLabel(dateLabel, slot) {
+  return `${dateLabel} · ${slot} น.`;
+}
+
+function findSlotByLabel(showDateLabel) {
+  for (const d of SCHEDULE) {
+    for (const slot of d.slots) {
+      if (makeShowDateLabel(d.dateLabel, slot) === showDateLabel) {
+        return { dateId: d.id, slot };
+      }
+    }
+  }
+  return { dateId: null, slot: null };
+}
+
+function populateShowdateSelect(selectedValue) {
+  const sel = document.getElementById('edit-showdate');
+  sel.innerHTML = SCHEDULE.flatMap(d =>
+    d.slots.map(slot => {
+      const label = makeShowDateLabel(d.dateLabel, slot);
+      const key   = getSlotKey(d.id, slot);
+      const cap   = getSlotCapacity(key);
+      const sold  = getStaffSoldCount(d.id, slot);
+      const rem   = Math.max(0, cap - sold);
+      const extra = rem <= 0 ? ' [เต็ม]' : rem <= 10 ? ` [เหลือ ${rem}]` : '';
+      return `<option value="${label}" ${selectedValue===label?'selected':''}>${label}${extra}</option>`;
+    })
+  ).join('');
+  // If current value not in schedule (legacy data), add it
+  if (selectedValue && !SCHEDULE.some(d => d.slots.some(s => makeShowDateLabel(d.dateLabel,s) === selectedValue))) {
+    sel.innerHTML = `<option value="${selectedValue}" selected>${selectedValue} [บันทึกเดิม]</option>` + sel.innerHTML;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PIN LOCK
+// ═══════════════════════════════════════════════════════════════
+let pinInput = '';
+
+function pinPress(d) {
+  if (pinInput.length >= 6) return;
+  pinInput += d;
+  updatePinDots();
+  if (pinInput.length === 6) setTimeout(verifyPin, 120);
+}
+function pinDel() {
+  if (!pinInput.length) return;
+  pinInput = pinInput.slice(0,-1);
+  updatePinDots();
+  document.getElementById('pin-error-msg').classList.remove('show');
+}
+function updatePinDots(state) {
+  for (let i = 0; i < 6; i++) {
+    const d = document.getElementById('pd-'+i);
+    d.className = 'pin-dot';
+    if (state === 'error') d.classList.add('error');
+    else if (i < pinInput.length) d.classList.add('filled');
+  }
+}
+function verifyPin() {
+  if (pinInput === STAFF_PIN) {
+    document.getElementById('pin-overlay').classList.add('hidden');
+    // No sessionStorage — PIN required every visit
+  } else {
+    updatePinDots('error');
+    document.getElementById('pin-error-msg').classList.add('show');
+    setTimeout(() => { pinInput = ''; updatePinDots(); document.getElementById('pin-error-msg').classList.remove('show'); }, 1200);
+  }
+}
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('pin-overlay').classList.contains('hidden')) {
+    if (e.key >= '0' && e.key <= '9') pinPress(e.key);
+    if (e.key === 'Backspace') pinDel();
+  }
+  if (e.key === 'Escape') { closeDetailModal(); closeModal(); }
+});
+
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+let scannerRunning = false;
+let html5Scanner   = null;
+let scanCooldown   = false;
+let checkInLog     = JSON.parse(localStorage.getItem('checkin_log') || '[]');
+let currentModalFilter  = 'all';
+let allTicketsCache      = {};
+let currentDetailTicketId = null; // the ticketId we opened detail for
+let editMode             = false;
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  // PIN is always required on every page load — no session bypass
+  updateStats();
+  renderLog();
+  renderStockTable();
+  updateSyncBadge();
+  populateQuotaBookingSelect();
+  initSettings();
+});
+
+function initSettings() {
+  const toggle = document.getElementById('toggle-earlybird');
+  if (toggle) {
+    const isEarlyBirdDisabled = localStorage.getItem('theater_disable_earlybird') === 'true';
+    toggle.checked = !isEarlyBirdDisabled;
+  }
+}
+
+function toggleEarlyBirdSale(enabled) {
+  localStorage.setItem('theater_disable_earlybird', (!enabled).toString());
+  showToastStaff(enabled ? '✅ เปิดการขายบัตร Early Bird แล้ว' : '🚫 ปิดการขายบัตร Early Bird แล้ว');
+}
+
+function updateSyncBadge() {
+  const el = document.getElementById('sync-indicator');
+  const ok = APPS_SCRIPT_URL && APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_HERE';
+  el.className = `sync-badge ${ok ? 'on' : 'off'}`;
+  el.querySelector('span').textContent = ok ? 'ซิงค์ Google Sheets' : 'โหมดออฟไลน์';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LIST MODAL
+// ═══════════════════════════════════════════════════════════════
+function openModal(filter) {
+  currentModalFilter = filter;
+  allTicketsCache    = JSON.parse(localStorage.getItem('theater_tickets') || '{}');
+  const titles = { all:'🎫 บัตรทั้งหมด', checked:'✅ บัตรเช็คอินแล้ว', pending:'⏳ ยังไม่เข้างาน', cancelled:'🚫 ยกเลิกแล้ว' };
+  document.getElementById('modal-title').textContent  = titles[filter] || 'รายชื่อลูกค้า';
+  document.getElementById('modal-search').value       = '';
+  // Populate show filter
+  const sel = document.getElementById('modal-show-select');
+  if (sel) {
+    sel.innerHTML = '<option value="all">📅 ทุกรอบ</option>';
+    SCHEDULE.forEach(d => d.slots.forEach(slot => {
+      const label = makeShowDateLabel(d.dateLabel, slot);
+      sel.innerHTML += `<option value="${label}">${label}</option>`;
+    }));
+    sel.value = 'all';
+  }
+  renderCustomerList('');
+  document.getElementById('modal-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => document.getElementById('modal-search').focus(), 300);
+}
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function handleModalBgClick(e) {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+}
+function filterCustomers() {
+  renderCustomerList(document.getElementById('modal-search').value);
+}
+
+function renderCustomerList(query) {
+  const list    = document.getElementById('customer-list');
+  const countEl = document.getElementById('modal-count');
+
+  let tickets = Object.values(allTicketsCache);
+  if (currentModalFilter === 'checked')   tickets = tickets.filter(t => t.checkedIn && !t.cancelled);
+  if (currentModalFilter === 'pending')   tickets = tickets.filter(t => !t.checkedIn && !t.cancelled);
+  if (currentModalFilter === 'cancelled') tickets = tickets.filter(t => t.cancelled);
+
+  // Deduplicate by orderId — one row per order
+  const seenOrders = new Set();
+  const reps = [];
+  tickets.forEach(t => {
+    if (!seenOrders.has(t.orderId)) {
+      seenOrders.add(t.orderId);
+      reps.push(t);
+    }
+  });
+
+  // Apply show filter
+  const showF    = document.getElementById('modal-show-select')?.value || 'all';
+  const filtered = (showF && showF !== 'all') ? reps.filter(t => t.showDate === showF) : reps;
+
+  // Sort by purchase timestamp ascending
+  const allOrders = JSON.parse(localStorage.getItem('theater_orders') || '[]');
+  const tsMap     = {};
+  allOrders.forEach(o => { if (o.orderId) tsMap[o.orderId] = o.timestamp || ''; });
+  filtered.sort((a, b) => (tsMap[a.orderId] || '').localeCompare(tsMap[b.orderId] || ''));
+
+  // Search
+  if (query.trim()) {
+    const q        = query.toLowerCase();
+    const searched = filtered.filter(t =>
+      (t.name||'').toLowerCase().includes(q) ||
+      (t.phone||'').includes(q) ||
+      (t.orderId||'').toLowerCase().includes(q) ||
+      (t.ticketId||'').toLowerCase().includes(q)
+    );
+    renderRows(searched, list, countEl);
+  } else {
+    renderRows(filtered, list, countEl);
+  }
+}
+
+function renderRows(rows, list, countEl) {
+  if (!rows.length) {
+    list.innerHTML  = '<div class="modal-empty">ไม่พบข้อมูลที่ต้องการ</div>';
+    countEl.textContent = '';
+    return;
+  }
+  countEl.textContent = `${rows.length} ออร์เดอร์`;
+
+  // For each order rep, figure out how many tickets checked in
+  list.innerHTML = rows.map(t => {
+    const allT         = Object.values(allTicketsCache).filter(x => x.orderId === t.orderId);
+    const activeT      = allT.filter(x => !x.cancelled);
+    const isAllCancelled = allT.length > 0 && allT.every(x => x.cancelled);
+    const checkedCount = activeT.filter(x => x.checkedIn).length;
+    const isAllChecked = !isAllCancelled && checkedCount === activeT.length && activeT.length > 0;
+    const initial      = (t.name||'?').charAt(0);
+    let checkTimeStr   = '';
+    if (isAllChecked && t.checkInTime) {
+      checkTimeStr = new Date(t.checkInTime).toLocaleString('th-TH',{timeZone:'Asia/Bangkok',hour:'2-digit',minute:'2-digit',day:'2-digit',month:'short'});
+    }
+    let pillClass, pillText;
+    if (isAllCancelled) {
+      pillClass = 'cancelled'; pillText = `🚫 ยกเลิกแล้ว`;
+    } else if (isAllChecked) {
+      pillClass = 'checked';   pillText = `${checkedCount}/${activeT.length} เข้าแล้ว`;
+    } else {
+      pillClass = 'pending';   pillText = `${checkedCount}/${activeT.length} เข้าแล้ว`;
+    }
+    return `
+      <div class="customer-item" onclick="openDetailModal('${t.ticketId}')">
+        <div class="customer-avatar ${isAllChecked?'avatar-checked':'avatar-pending'}" style="${isAllCancelled?'opacity:0.4':''}">${escHtml(initial)}</div>
+        <div class="customer-info">
+          <div class="customer-name" style="${isAllCancelled?'text-decoration:line-through;opacity:0.6':''}">${escHtml(t.name||'—')}</div>
+          <div class="customer-meta">📞 ${escHtml(t.phone||'—')} · ${escHtml(t.type||'—')} · ${allT.length} ใบ${isAllCancelled?' · ยกเลิก':''}</div>
+          <div class="customer-tid">${escHtml(t.orderId||'—')}</div>
+        </div>
+        <div class="customer-status">
+          <div class="status-pill ${pillClass}">${pillText}</div>
+          ${checkTimeStr?`<div class="checkin-time">${checkTimeStr}</div>`:''}
+        </div>
+        <div class="customer-arrow">›</div>
+      </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DETAIL MODAL
+// ═══════════════════════════════════════════════════════════════
+function openDetailModal(ticketId) {
+  currentDetailTicketId = ticketId;
+  editMode = false;
+
+  const allTickets = JSON.parse(localStorage.getItem('theater_tickets') || '{}');
+  const rep        = allTickets[ticketId];
+  if (!rep) return;
+
+  const orderId    = rep.orderId;
+  const orderTickets = Object.values(allTickets)
+    .filter(t => t.orderId === orderId)
+    .sort((a,b) => a.ticketNum - b.ticketNum);
+
+  // --- Fill VIEW mode ---
+  document.getElementById('dv-avatar').textContent = (rep.name||'?').charAt(0);
+  document.getElementById('dv-name').textContent   = rep.name   || '—';
+  document.getElementById('dv-phone').textContent  = `📞 ${rep.phone||'—'}`;
+  document.getElementById('dv-email').textContent  = rep.email  ? `✉️ ${rep.email}` : '';
+  document.getElementById('dv-orderid').textContent   = orderId   || '—';
+  document.getElementById('dv-showdate').textContent  = rep.showDate || '—';
+  document.getElementById('dv-type').textContent      = rep.type  || '—';
+  document.getElementById('dv-qty').textContent       = orderTickets.length + ' ใบ';
+
+  const total = rep.pricePerTicket ? rep.pricePerTicket * orderTickets.length : (rep.total || 0);
+  document.getElementById('dv-total').textContent = total
+    ? total.toLocaleString('th-TH') + ' บาท' : '—';
+
+  if (rep.note) {
+    document.getElementById('dv-note').textContent = rep.note;
+    document.getElementById('dv-note-row').style.display = 'flex';
+  } else {
+    document.getElementById('dv-note-row').style.display = 'none';
+  }
+
+  // timestamp from orderId or fallback
+  const allOrders = JSON.parse(localStorage.getItem('theater_orders') || '[]');
+  const order     = allOrders.find(o => o.orderId === orderId);
+  document.getElementById('dv-timestamp').textContent = order?.timestamp
+    ? new Date(order.timestamp).toLocaleString('th-TH',{timeZone:'Asia/Bangkok'}) : '—';
+
+  // Ticket list with per-ticket action buttons
+  document.getElementById('dv-tickets-list').innerHTML = orderTickets.map(t => {
+    const isChecked   = !!t.checkedIn;
+    const isCancelled = !!t.cancelled;
+    const ctStr = t.checkInTime ? new Date(t.checkInTime).toLocaleString('th-TH',{timeZone:'Asia/Bangkok',hour:'2-digit',minute:'2-digit'}) : '';
+
+    let pillHtml, actionsHtml;
+    if (isCancelled) {
+      pillHtml    = `<span class="status-pill cancelled" style="flex-shrink:0">🚫 ยกเลิก</span>`;
+      actionsHtml = `<button class="btn-tkt btn-tkt-restore" onclick="ticketAction('restore','${escHtml(t.ticketId)}')">♻️ กู้คืน</button>
+                     <button class="btn-tkt btn-tkt-delete" style="background:rgba(239,68,68,0.25);border-color:rgba(239,68,68,0.4);color:#fca5a5;" onclick="deleteTicketPermanently('${escHtml(t.ticketId)}')">🗑️ ลบถาวร</button>`;
+    } else if (isChecked) {
+      pillHtml    = `<span class="status-pill checked" style="flex-shrink:0">✅ ${ctStr}</span>`;
+      actionsHtml = `<button class="btn-tkt btn-tkt-undo" onclick="ticketAction('undo','${escHtml(t.ticketId)}')">↩️ ยกเลิกเช็คอิน</button>
+                     <button class="btn-tkt btn-tkt-cancel" onclick="ticketAction('cancel','${escHtml(t.ticketId)}')">🚫 ยกเลิก</button>`;
+    } else {
+      pillHtml    = `<span class="status-pill pending" style="flex-shrink:0">⏳ ยังไม่เข้า</span>`;
+      actionsHtml = `<button class="btn-tkt btn-tkt-checkin" onclick="ticketAction('checkin','${escHtml(t.ticketId)}')">✅ เช็คอิน</button>
+                     <button class="btn-tkt btn-tkt-cancel" onclick="ticketAction('cancel','${escHtml(t.ticketId)}')">🚫 ยกเลิก</button>`;
+    }
+    return `
+      <div class="detail-ticket-item" style="flex-wrap:wrap;gap:8px;">
+        <span class="detail-ticket-num">#${t.ticketNum}</span>
+        <span class="detail-ticket-id">${escHtml(t.ticketId)}</span>
+        ${pillHtml}
+        <div class="ticket-status-actions">${actionsHtml}</div>
+      </div>`;
+  }).join('');
+
+  // Slip image
+  const slipSrc = rep.slipImage || order?.slipImage;
+  if (slipSrc) {
+    document.getElementById('dv-slip-img').src           = slipSrc;
+    document.getElementById('dv-slip-section').style.display = 'block';
+  } else {
+    document.getElementById('dv-slip-section').style.display = 'none';
+  }
+
+  // --- Fill EDIT mode form ---
+  document.getElementById('edit-name').value  = rep.name  || '';
+  document.getElementById('edit-phone').value = rep.phone || '';
+  document.getElementById('edit-email').value = rep.email || '';
+  document.getElementById('edit-note').value  = rep.note  || '';
+
+  // Set type select
+  const typeSelect = document.getElementById('edit-type');
+  const typeName   = rep.type || '';
+  for (const opt of typeSelect.options) {
+    if (opt.value === typeName) { opt.selected = true; break; }
+  }
+
+  // ——— Show/hide buttons based on cancellation state ———
+  const isOrderCancelled = orderTickets.every(t => t.cancelled);
+  const cancelBtn  = document.getElementById('btn-cancel-order');
+  const editBtn    = document.getElementById('btn-edit-toggle');
+  const restoreBtn = document.getElementById('btn-restore-order');
+  const deleteBtn  = document.getElementById('btn-delete-order');
+  if (cancelBtn)  cancelBtn.style.display  = isOrderCancelled ? 'none' : 'inline-flex';
+  if (editBtn)    editBtn.style.display    = isOrderCancelled ? 'none' : 'inline-flex';
+  if (restoreBtn) restoreBtn.style.display = isOrderCancelled ? 'inline-flex' : 'none';
+  if (deleteBtn)  deleteBtn.style.display  = isOrderCancelled ? 'inline-flex' : 'none';
+
+  // Cancelled banner
+  const banner = document.getElementById('dv-cancelled-banner');
+  if (banner) banner.style.display = isOrderCancelled ? 'flex' : 'none';
+
+  // Update header title
+  document.getElementById('detail-header-title').textContent = isOrderCancelled
+    ? '🚫 ออร์เดอร์ยกเลิก'
+    : 'รายละเอียดลูกค้า';
+
+  // ——— Set show date select (dynamic from SCHEDULE) ———
+  populateShowdateSelect(rep.showDate || '');
+
+  // Show modal (view mode)
+  showDetailViewMode();
+  document.getElementById('detail-overlay').classList.add('open');
+}
+
+function closeDetailModal() {
+  document.getElementById('detail-overlay').classList.remove('open');
+  editMode = false;
+}
+function handleDetailBgClick(e) {
+  if (e.target === document.getElementById('detail-overlay')) closeDetailModal();
+}
+
+function showDetailViewMode() {
+  document.getElementById('detail-view-mode').style.display = 'block';
+  document.getElementById('detail-edit-mode').style.display = 'none';
+  document.getElementById('btn-edit-toggle').textContent    = '✏️ แก้ไข';
+  document.getElementById('detail-header-title').textContent = 'รายละเอียดลูกค้า';
+  editMode = false;
+}
+function showDetailEditMode() {
+  document.getElementById('detail-view-mode').style.display = 'none';
+  document.getElementById('detail-edit-mode').style.display = 'block';
+  document.getElementById('btn-edit-toggle').textContent    = '👁 ดูข้อมูล';
+  document.getElementById('detail-header-title').textContent = 'แก้ไขข้อมูล';
+  editMode = true;
+}
+function toggleEditMode() {
+  editMode ? showDetailViewMode() : showDetailEditMode();
+}
+function cancelEdit() { showDetailViewMode(); }
+
+// Save edits
+function saveCustomerEdit() {
+  const newName     = document.getElementById('edit-name').value.trim();
+  const newPhone    = document.getElementById('edit-phone').value.trim();
+  const newEmail    = document.getElementById('edit-email').value.trim();
+  const newNote     = document.getElementById('edit-note').value.trim();
+  const newType     = document.getElementById('edit-type').value;
+  const newShowDate = document.getElementById('edit-showdate').value;
+
+  if (!newName)  { alert('กรุณากรอกชื่อ'); return; }
+  if (!newPhone) { alert('กรุณากรอกเบอร์โทร'); return; }
+
+  const allTickets = JSON.parse(localStorage.getItem('theater_tickets') || '{}');
+  const rep        = allTickets[currentDetailTicketId];
+  if (!rep) return;
+  const orderId    = rep.orderId;
+
+  // Resolve new slot info from showDate label
+  const { dateId: newDateId, slot: newSlot } = findSlotByLabel(newShowDate);
+  const oldDateId = rep.showDateId;
+  const oldSlot   = rep.showSlot;
+  const showDateChanged = newDateId && (newDateId !== oldDateId || newSlot !== oldSlot);
+
+  // Update all tickets in this order
+  const newPrice = TICKET_TYPES[newType] || rep.pricePerTicket;
+  const newTypeId = newType === 'Early Bird' ? 'earlybird' : 
+                    (newType === 'QT DISCOUNT' || newType === 'โควต้าราคา Early Bird' ? 'qt-discount' : 
+                    (newType === 'QT SPON' || newType === 'โควต้า Spon' ? 'qt-spon' : 
+                    (newType === 'QT FREE' || newType === 'โควต้าฟรี' || newType === 'บัตรโควต้า' ? 'qt-free' : 'regular')));
+  Object.keys(allTickets).forEach(tid => {
+    if (allTickets[tid].orderId === orderId) {
+      allTickets[tid] = {
+        ...allTickets[tid],
+        name:           newName,
+        phone:          newPhone,
+        email:          newEmail,
+        note:           newNote,
+        type:           newType,
+        typeId:         newTypeId,
+        showDate:       newShowDate,
+        pricePerTicket: newPrice,
+        // Update slot references so stock counts update automatically
+        ...(newDateId ? { showDateId: newDateId, showSlot: newSlot } : {}),
+      };
+    }
+  });
+  localStorage.setItem('theater_tickets', JSON.stringify(allTickets));
+
+  // Update theater_orders
+  const orders = JSON.parse(localStorage.getItem('theater_orders') || '[]');
+  const oIdx   = orders.findIndex(o => o.orderId === orderId);
+  if (oIdx >= 0) {
+    const qty = orders[oIdx].qty || 1;
+    orders[oIdx] = {
+      ...orders[oIdx],
+      name:      newName,
+      phone:     newPhone,
+      email:     newEmail,
+      note:      newNote,
+      typeId:    newTypeId,
+      typeName:  newType,
+      pricePerTicket: newPrice,
+      total:     newPrice * qty,
+      showDate:  newShowDate,
+      ...(newDateId ? { showDateId: newDateId, showSlot: newSlot } : {}),
+      tickets:   orders[oIdx].tickets?.map(t => ({
+        ...t,
+        name: newName, phone: newPhone, email: newEmail,
+        note: newNote, type: newType, typeId: newTypeId, showDate: newShowDate, pricePerTicket: newPrice,
+        ...(newDateId ? { showDateId: newDateId, showSlot: newSlot } : {}),
+      })),
+    };
+    localStorage.setItem('theater_orders', JSON.stringify(orders));
+  }
+
+  // Refresh
+  allTicketsCache = allTickets;
+  renderStockTable();
+  updateStats();
+
+  const stockMsg = showDateChanged
+    ? ` (ย้ายรอบ → ${newShowDate})` : '';
+  showToastStaff(`✅ บันทึกเรียบร้อย${stockMsg}`);
+  openDetailModal(currentDetailTicketId); // re-render view mode
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SLIP FULLSCREEN
+// ═══════════════════════════════════════════════════════════════
+function openSlipFull(src) {
+  const ov = document.getElementById('slip-full-overlay');
+  document.getElementById('slip-full-img').src = src;
+  ov.style.display = 'flex';
+}
+function closeSlipFull() {
+  document.getElementById('slip-full-overlay').style.display = 'none';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SCANNER
+// ═══════════════════════════════════════════════════════════════
+function toggleScanner() { scannerRunning ? stopScanner() : startScanner(); }
+
+function startScanner() {
+  if (typeof Html5Qrcode === 'undefined') {
+    alert('ไลบรารีสแกนยังไม่โหลด กรุณารอสักครู่\n(หรือใช้ช่องพิมพ์รหัสด้านล่าง)');
+    return;
+  }
+  document.getElementById('scan-placeholder').style.display = 'none';
+  const readerEl = document.getElementById('reader');
+  readerEl.style.display = 'block'; readerEl.innerHTML = '';
+  const btn = document.getElementById('btn-toggle');
+  btn.textContent = '⏹ หยุดสแกน'; btn.classList.add('stop');
+  html5Scanner = new Html5Qrcode('reader');
+  html5Scanner.start(
+    { facingMode: 'environment' },
+    { fps: 10, qrbox: { width: 240, height: 240 } },
+    (text) => {
+      if (scanCooldown) return;
+      scanCooldown = true;
+      setTimeout(() => { scanCooldown = false; }, 2000);
+      stopScanner(); processQR(text);
+    },
+    () => {}
+  ).catch(err => {
+    console.error(err);
+    alert('ไม่สามารถเปิดกล้องได้\nกรุณาอนุญาตในเบราว์เซอร์');
+    resetScannerUI();
+  });
+  scannerRunning = true;
+}
+
+function stopScanner() {
+  if (html5Scanner && scannerRunning)
+    html5Scanner.stop().catch(()=>{}).finally(() => { html5Scanner = null; resetScannerUI(); });
+  scannerRunning = false;
+}
+function resetScannerUI() {
+  document.getElementById('reader').style.display = 'none';
+  document.getElementById('scan-placeholder').style.display = 'flex';
+  const btn = document.getElementById('btn-toggle');
+  btn.textContent = '📷 เปิดกล้องสแกน'; btn.classList.remove('stop');
+  scannerRunning = false;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MANUAL INPUT
+// ═══════════════════════════════════════════════════════════════
+function manualCheck() {
+  const val = document.getElementById('manual-id').value.trim();
+  if (!val) return;
+  processQR(JSON.stringify({ id: val }));
+  document.getElementById('manual-id').value = '';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PROCESS QR
+// ═══════════════════════════════════════════════════════════════
+function processQR(rawText) {
+  let data;
+  try { data = JSON.parse(rawText); }
+  catch { data = { id: rawText.trim() }; }
+
+  const ticketId = data.id;
+  if (!ticketId) { showResult('err','❌','QR Code ไม่ถูกต้อง', null); return; }
+
+  const allTickets = JSON.parse(localStorage.getItem('theater_tickets') || '{}');
+  const ticket     = allTickets[ticketId];
+
+  if (!ticket) {
+    showResult('err','❌','ไม่พบบัตรในระบบ', { id: ticketId });
+    addLog('err', ticketId, '—', '—', 'ไม่พบในระบบ');
+    return;
+  }
+  if (ticket.checkedIn) {
+    const at = ticket.checkInTime
+      ? new Date(ticket.checkInTime).toLocaleString('th-TH',{timeZone:'Asia/Bangkok',hour:'2-digit',minute:'2-digit',day:'2-digit',month:'short'})
+      : '—';
+    showResult('dup','⚠️','เช็คอินซ้ำ!', ticket, `เข้างานแล้วเมื่อ ${at}`);
+    addLog('dup', ticketId, ticket.name, ticket.type, 'เช็คอินซ้ำ');
+    return;
+  }
+
+  // Mark checked in
+  ticket.checkedIn = true; ticket.checkInTime = new Date().toISOString();
+  allTickets[ticketId] = ticket;
+  localStorage.setItem('theater_tickets', JSON.stringify(allTickets));
+
+  showResult('ok','✅','เช็คอินสำเร็จ!', ticket);
+  addLog('ok', ticketId, ticket.name, ticket.type, 'เข้างานแล้ว');
+  updateStats();
+  syncCheckin(ticket);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SYNC
+// ═══════════════════════════════════════════════════════════════
+async function syncCheckin(ticket) {
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') return;
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method:'POST', mode:'no-cors',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'checkin', ticketId:ticket.ticketId, orderId:ticket.orderId,
+        name:ticket.name, phone:ticket.phone, type:ticket.type,
+        checkInTime:new Date().toLocaleString('th-TH',{timeZone:'Asia/Bangkok'}) }),
+    });
+  } catch(e) { console.warn('Sync failed:',e); }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RESULT
+// ═══════════════════════════════════════════════════════════════
+function showResult(type, icon, title, ticket, extra) {
+  const wrap = document.getElementById('result-wrap');
+  wrap.style.display = 'block';
+  let rows = '';
+  if (ticket?.name) {
+    rows += `<div class="result-row"><span>ชื่อ-นามสกุล</span><strong>${ticket.name}</strong></div>`;
+    rows += `<div class="result-row"><span>เบอร์โทร</span><strong>${ticket.phone||'—'}</strong></div>`;
+    if (ticket.type) rows += `<div class="result-row"><span>ประเภทบัตร</span><strong>${ticket.type}</strong></div>`;
+    if (ticket.showDate) rows += `<div class="result-row"><span>รอบแสดง</span><strong>${ticket.showDate}</strong></div>`;
+    rows += `<div class="result-row"><span>รหัสบัตร</span><strong style="font-size:0.78rem;font-family:monospace">${ticket.ticketId||ticket.id}</strong></div>`;
+    if (ticket.orderId) rows += `<div class="result-row"><span>คำสั่งซื้อ</span><strong style="font-size:0.78rem;font-family:monospace">${ticket.orderId}</strong></div>`;
+  } else if (ticket) {
+    rows += `<div class="result-row"><span>รหัสบัตร</span><strong style="font-family:monospace;font-size:0.78rem">${ticket.id||'—'}</strong></div>`;
+  }
+  if (extra) rows += `<div class="result-row"><span>หมายเหตุ</span><strong>${extra}</strong></div>`;
+  wrap.innerHTML = `
+    <div class="result-card ${type}">
+      <div class="result-icon">${icon}</div>
+      <div class="result-title">${title}</div>
+      ${rows ? `<div class="result-table">${rows}</div>` : ''}
+    </div>`;
+  if (type === 'ok') setTimeout(() => { wrap.style.display = 'none'; }, 6000);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STATS
+// ═══════════════════════════════════════════════════════════════
+function updateStats() {
+  const all       = Object.values(JSON.parse(localStorage.getItem('theater_tickets') || '{}'));
+  const active    = all.filter(t => !t.cancelled);
+  const cancelled = all.filter(t => t.cancelled);
+  const total     = active.length;
+  const checked   = active.filter(t => t.checkedIn).length;
+  document.getElementById('stat-total').textContent     = total;
+  document.getElementById('stat-checked').textContent   = checked;
+  document.getElementById('stat-remaining').textContent = total - checked;
+  const cancelEl = document.getElementById('stat-cancelled');
+  if (cancelEl) cancelEl.textContent = cancelled.length;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LOG
+// ═══════════════════════════════════════════════════════════════
+function addLog(status, ticketId, name, type, label) {
+  checkInLog.unshift({ status, ticketId, name, type, label, time: new Date().toISOString() });
+  if (checkInLog.length > 200) checkInLog = checkInLog.slice(0, 200);
+  localStorage.setItem('checkin_log', JSON.stringify(checkInLog));
+  renderLog();
+}
+function renderLog() {
+  const list = document.getElementById('log-list');
+  if (!checkInLog.length) { list.innerHTML = '<div class="log-empty">ยังไม่มีการเช็คอิน</div>'; return; }
+  const sc = { ok:'#86efac', dup:'#fde68a', err:'#fca5a5' };
+  list.innerHTML = checkInLog.map(e => {
+    const t = new Date(e.time);
+    const ts = t.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    return `
+      <div class="log-item">
+        <div class="log-dot ${e.status}"></div>
+        <div class="log-info">
+          <div class="log-name">${e.name !== '—' ? e.name : e.ticketId}</div>
+          <div class="log-sub">${e.type||''} · <span style="font-family:monospace;font-size:0.72rem">${e.ticketId}</span></div>
+        </div>
+        <div class="log-meta">
+          <div class="log-time">${ts}</div>
+          <div class="log-status" style="color:${sc[e.status]||'#9b5de5'}">${e.label}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+function clearLog() {
+  if (!confirm('ล้างประวัติการเช็คอินทั้งหมดใช่ไหม?')) return;
+  checkInLog = []; localStorage.removeItem('checkin_log'); renderLog();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TOAST (staff-side)
+// ═══════════════════════════════════════════════════════════════
+let staffToastTimer;
+function showToastStaff(msg) {
+  let t = document.getElementById('staff-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'staff-toast';
+    t.style.cssText = `position:fixed;bottom:32px;left:50%;transform:translateX(-50%);
+      background:#22c55e;color:#fff;padding:12px 24px;border-radius:50px;
+      font-family:Sarabun,sans-serif;font-weight:600;font-size:0.9rem;
+      z-index:700;box-shadow:0 4px 20px rgba(34,197,94,0.4);
+      transition:opacity 0.3s;white-space:nowrap;`;
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(staffToastTimer);
+  staffToastTimer = setTimeout(() => { t.style.opacity = '0'; }, 3000);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PER-TICKET STATUS ACTION
+// ═══════════════════════════════════════════════════════════════
+function ticketAction(action, ticketId) {
+  const allTickets = JSON.parse(localStorage.getItem('theater_tickets') || '{}');
+  const t = allTickets[ticketId];
+  if (!t) return;
+
+  const now = new Date().toISOString();
+  if (action === 'checkin') {
+    if (t.checkedIn)  { showToastStaff('⚠️ บัตรนี้เช็คอินแล้ว'); return; }
+    if (t.cancelled)  { showToastStaff('⚠️ บัตรนี้ถูกยกเลิกแล้ว'); return; }
+    t.checkedIn   = true;
+    t.checkInTime = now;
+    showToastStaff(`✅ เช็คอิน ${ticketId} สำเร็จ`);
+    addLog('ok', ticketId, t.name, t.type, 'เข้างานแล้ว');
+  } else if (action === 'undo') {
+    if (!t.checkedIn) { showToastStaff('⚠️ บัตรนี้ยังไม่ได้เช็คอิน'); return; }
+    t.checkedIn   = false;
+    t.checkInTime = null;
+    showToastStaff(`↩️ ยกเลิกเช็คอิน ${ticketId} แล้ว`);
+  } else if (action === 'cancel') {
+    if (t.cancelled) { showToastStaff('⚠️ บัตรนี้ถูกยกเลิกแล้ว'); return; }
+    if (!confirm(`❗ ยืนยันการยกเลิกบัตรใบนี้\n${ticketId}\n\nStock จะคืน 1 ที่นั่ง`)) return;
+    t.cancelled   = true;
+    t.cancelledAt = now;
+    t.checkedIn   = false;
+    t.checkInTime = null;
+    showToastStaff(`🚫 ยกเลิกบัตร ${ticketId} แล้ว`);
+  } else if (action === 'restore') {
+    if (!t.cancelled) { showToastStaff('⚠️ บัตรนี้ยังใช้งานอยู่'); return; }
+    t.cancelled   = false;
+    t.cancelledAt = null;
+    showToastStaff(`♻️ กู้คืนบัตร ${ticketId} แล้ว`);
+  }
+
+  allTickets[ticketId] = t;
+  localStorage.setItem('theater_tickets', JSON.stringify(allTickets));
+  allTicketsCache = allTickets;
+  updateStats();
+  renderStockTable();
+  openDetailModal(ticketId); // re-render
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CANCEL / RESTORE ORDER (all tickets)
+// ═══════════════════════════════════════════════════════════════
+function confirmCancelOrder() {
+  const allTickets = JSON.parse(localStorage.getItem('theater_tickets') || '{}');
+  const rep = allTickets[currentDetailTicketId];
+  if (!rep) return;
+  const name = rep.name || 'ลูกค้า';
+  const qty  = Object.values(allTickets).filter(t => t.orderId === rep.orderId && !t.cancelled).length;
+  if (!confirm(`❗ ยืนยันการยกเลิกตั๋ว ${qty} ใบของ\n\n"​${name}"\n\nบัตรจะถูกทำเครื่องหมาย Cancelled และ Stock จะคืนอัตโนมัติ`)) return;
+  cancelOrder(rep.orderId);
+}
+
+function cancelOrder(orderId) {
+  const allTickets   = JSON.parse(localStorage.getItem('theater_tickets') || '{}');
+  const orderTickets = Object.values(allTickets).filter(t => t.orderId === orderId && !t.cancelled);
+  if (!orderTickets.length) { showToastStaff('⚠️ ไม่มีตั๋วที่ยังใช้งานได้'); return; }
+
+  const rep = orderTickets[0];
+  const qty = orderTickets.length;
+  const now = new Date().toISOString();
+
+  Object.keys(allTickets).forEach(tid => {
+    if (allTickets[tid].orderId === orderId) {
+      allTickets[tid].cancelled   = true;
+      allTickets[tid].cancelledAt = now;
+      allTickets[tid].checkedIn   = false;
+      allTickets[tid].checkInTime = null;
+    }
+  });
+  localStorage.setItem('theater_tickets', JSON.stringify(allTickets));
+
+  const orders = JSON.parse(localStorage.getItem('theater_orders') || '[]');
+  const oIdx   = orders.findIndex(o => o.orderId === orderId);
+  if (oIdx >= 0) { orders[oIdx].cancelled = true; orders[oIdx].cancelledAt = now;
+    localStorage.setItem('theater_orders', JSON.stringify(orders)); }
+
+  allTicketsCache = allTickets;
+  updateStats(); renderStockTable();
+  openDetailModal(currentDetailTicketId);
+  showToastStaff(`🚫 ยกเลิกตั๋ว ${qty} ใบของ "${rep.name}" — Stock คืนแล้ว`);
+}
+
+function confirmRestoreOrder() {
+  const allTickets = JSON.parse(localStorage.getItem('theater_tickets') || '{}');
+  const rep = allTickets[currentDetailTicketId];
+  if (!rep) return;
+  const name = rep.name || 'ลูกค้า';
+  const qty  = Object.values(allTickets).filter(t => t.orderId === rep.orderId && t.cancelled).length;
+  if (!confirm(`♻️ กู้คืนออร์เดอร์\n\n"${name}"\n${qty} ใบ\n\nบัตรทุกใบจะกลับมาใช้งานได้ (ยังไม่เช็คอิน)`)) return;
+  restoreOrder(rep.orderId);
+}
+
+function restoreOrder(orderId) {
+  const allTickets   = JSON.parse(localStorage.getItem('theater_tickets') || '{}');
+  const orderTickets = Object.values(allTickets).filter(t => t.orderId === orderId);
+  if (!orderTickets.length) return;
+
+  const rep = orderTickets[0];
+  const qty = orderTickets.length;
+
+  Object.keys(allTickets).forEach(tid => {
+    if (allTickets[tid].orderId === orderId) {
+      allTickets[tid].cancelled   = false;
+      allTickets[tid].cancelledAt = null;
+      // Do NOT restore checkedIn — staff must re-check-in manually
+    }
+  });
+  localStorage.setItem('theater_tickets', JSON.stringify(allTickets));
+
+  const orders = JSON.parse(localStorage.getItem('theater_orders') || '[]');
+  const oIdx   = orders.findIndex(o => o.orderId === orderId);
+  if (oIdx >= 0) { orders[oIdx].cancelled = false; orders[oIdx].cancelledAt = null;
+    localStorage.setItem('theater_orders', JSON.stringify(orders)); }
+
+  allTicketsCache = allTickets;
+  updateStats(); renderStockTable();
+  openDetailModal(currentDetailTicketId);
+  showToastStaff(`♻️ กู้คืนออร์เดอร์ ${qty} ใบของ "${rep.name}" แล้ว`);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PERMANENTLY DELETE TICKETS / ORDERS (Save Space)
+// ═══════════════════════════════════════════════════════════════
+function deleteTicketPermanently(ticketId) {
+  if (!confirm(`⚠️ คำเตือน: คุณต้องการลบข้อมูลบัตรใบนี้อย่างถาวรใช่หรือไม่?\n${ticketId}\n\n(การดำเนินการนี้จะไม่สามารถย้อนกลับได้ และจะช่วยประหยัดพื้นที่จัดเก็บข้อมูล)`)) return;
+
+  const allTickets = JSON.parse(localStorage.getItem('theater_tickets') || '{}');
+  const t = allTickets[ticketId];
+  if (!t) return;
+  const orderId = t.orderId;
+
+  // 1. Delete from theater_tickets
+  delete allTickets[ticketId];
+  localStorage.setItem('theater_tickets', JSON.stringify(allTickets));
+
+  // 2. Update the corresponding order in theater_orders
+  const orders = JSON.parse(localStorage.getItem('theater_orders') || '[]');
+  const oIdx = orders.findIndex(o => o.orderId === orderId);
+  if (oIdx >= 0) {
+    const o = orders[oIdx];
+    // Remove the ticket from order.tickets array
+    o.tickets = (o.tickets || []).filter(tk => tk.ticketId !== ticketId);
+    o.qty = o.tickets.length;
+    o.total = o.qty * (o.pricePerTicket || 0);
+
+    if (o.qty <= 0) {
+      // If no tickets left in the order, delete the entire order
+      orders.splice(oIdx, 1);
+    } else {
+      orders[oIdx] = o;
+    }
+    localStorage.setItem('theater_orders', JSON.stringify(orders));
+  }
+
+  // 3. Refresh and close/re-open details
+  allTicketsCache = allTickets;
+  updateStats();
+  renderStockTable();
+  
+  // If there are still tickets left in the order, re-open details for another ticket, else close modal
+  const remainingTicketsInOrder = Object.values(allTickets).filter(tk => tk.orderId === orderId);
+  if (remainingTicketsInOrder.length > 0) {
+    openDetailModal(remainingTicketsInOrder[0].ticketId);
+  } else {
+    closeDetailModal();
+    // If we were inside the list modal, refresh list
+    if (document.getElementById('modal-overlay').classList.contains('open')) {
+      renderCustomerList(document.getElementById('modal-search').value);
+    }
+  }
+  showToastStaff('🗑️ ลบข้อมูลบัตรถาวรสำเร็จแล้ว');
+}
+
+function confirmDeleteOrderPermanently() {
+  const allTickets = JSON.parse(localStorage.getItem('theater_tickets') || '{}');
+  const rep = allTickets[currentDetailTicketId];
+  if (!rep) return;
+  const name = rep.name || 'ลูกค้า';
+  
+  if (!confirm(`🚨🚨 คำเตือนขั้นเด็ดขาด 🚨🚨\n\nคุณกำลังจะลบออร์เดอร์และตั๋วทั้งหมดของ "${name}" อย่างถาวร!\nการกระทำนี้จะลบรูปภาพสลิปและประวัติทั้งหมดของคำสั่งซื้อนี้ออกอย่างสิ้นเชิง เพื่อประหยัดพื้นที่จัดเก็บข้อมูลสูงสุด\n\nต้องการลบถาวรใช่หรือไม่?`)) return;
+  
+  deleteOrderPermanently(rep.orderId);
+}
+
+function deleteOrderPermanently(orderId) {
+  // 1. Delete all tickets under this orderId from theater_tickets
+  const allTickets = JSON.parse(localStorage.getItem('theater_tickets') || '{}');
+  Object.keys(allTickets).forEach(tid => {
+    if (allTickets[tid].orderId === orderId) {
+      delete allTickets[tid];
+    }
+  });
+  localStorage.setItem('theater_tickets', JSON.stringify(allTickets));
+
+  // 2. Delete the order from theater_orders
+  const orders = JSON.parse(localStorage.getItem('theater_orders') || '[]');
+  const filteredOrders = orders.filter(o => o.orderId !== orderId);
+  localStorage.setItem('theater_orders', JSON.stringify(filteredOrders));
+
+  // 3. Refresh and close modal
+  allTicketsCache = allTickets;
+  updateStats();
+  renderStockTable();
+  closeDetailModal();
+  
+  // Refresh list if open
+  if (document.getElementById('modal-overlay').classList.contains('open')) {
+    renderCustomerList(document.getElementById('modal-search').value);
+  }
+  
+  showToastStaff('🗑️ ลบข้อมูลออร์เดอร์ถาวรแล้ว');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STOCK MANAGEMENT
+// ═══════════════════════════════════════════════════════════════
+function renderStockTable() {
+  const wrap = document.getElementById('stock-table-wrap');
+  if (!wrap) return;
+
+  let totalCap = 0, totalSold = 0, totalRem = 0;
+  let rows = '';
+
+  SCHEDULE.forEach(d => {
+    d.slots.forEach(slot => {
+      const key   = getSlotKey(d.id, slot);
+      const cap   = getSlotCapacity(key);
+      const sold  = getStaffSoldCount(d.id, slot);
+      const rem   = Math.max(0, cap - sold);
+      totalCap  += cap;
+      totalSold += sold;
+      totalRem  += rem;
+
+      const isFull = rem <= 0;
+      const isLow  = !isFull && rem <= 10;
+      const remClass = isFull ? 'stock-zero' : isLow ? 'stock-low' : 'stock-ok';
+      const label = makeShowDateLabel(d.dateLabel, slot);
+      const soldOut = isFull ? `<span class="stock-soldout-badge">SOLD OUT</span>` : '';
+
+      rows += `<tr class="${isFull ? 'stock-row-full' : ''}">
+        <td class="stock-label">${escHtml(label)}${soldOut}</td>
+        <td class="stock-num stock-cap">${cap}</td>
+        <td class="stock-num stock-sold">${sold}</td>
+        <td class="stock-num ${remClass}">${rem}</td>
+        <td class="stock-actions">
+          <button class="btn-stock-adj" onclick="adjustCapacity('${escHtml(key)}', -1)">−</button>
+          <input type="number" class="stock-input" id="si-${escHtml(key)}" value="${cap}"
+                 min="${sold}" max="999"
+                 onchange="setCapacity('${escHtml(key)}', this.value)" />
+          <button class="btn-stock-adj" onclick="adjustCapacity('${escHtml(key)}', 1)">+</button>
+        </td>
+      </tr>`;
+    });
+  });
+
+  wrap.innerHTML = `
+    <table class="stock-table">
+      <thead><tr>
+        <th>รอบการแสดง</th>
+        <th style="text-align:center">🟣 Capacity</th>
+        <th style="text-align:center">⬤ ขายแล้ว</th>
+        <th style="text-align:center">🟢 คงเหลือ</th>
+        <th style="text-align:right">ปรับ Capacity</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+      <tfoot><tr style="border-top:2px solid rgba(255,255,255,0.12);font-weight:700">
+        <td style="padding:10px 12px;font-size:0.82rem;color:var(--muted)">รวมทั้งหมด</td>
+        <td class="stock-num stock-cap">${totalCap}</td>
+        <td class="stock-num stock-sold">${totalSold}</td>
+        <td class="stock-num ${totalRem <= 0 ? 'stock-zero' : totalRem <= 20 ? 'stock-low' : 'stock-ok'}">${totalRem}</td>
+        <td></td>
+      </tr></tfoot>
+    </table>`;
+}
+
+function adjustCapacity(key, delta) {
+  const stock   = JSON.parse(localStorage.getItem('theater_stock') || '{}');
+  const current = getSlotCapacity(key);
+  // Cannot go below current sold count
+  const [dateId, slot] = key.split('|');
+  const minVal  = getStaffSoldCount(dateId, slot);
+  const newVal  = Math.max(minVal, current + delta);
+  if (newVal === current) { showToastStaff(`⚠️ ไม่สามารถลด Capacity ต่ำกว่าจำนวนที่ขายไปแล้ว (${minVal})`); return; }
+  stock[key] = newVal;
+  localStorage.setItem('theater_stock', JSON.stringify(stock));
+  renderStockTable();
+  showToastStaff(`✅ เปลี่ยน Capacity เป็น ${newVal}`);
+}
+
+function setCapacity(key, val) {
+  const num = parseInt(val, 10);
+  if (isNaN(num) || num < 0) { renderStockTable(); return; }
+  const [dateId, slot] = key.split('|');
+  const minVal = getStaffSoldCount(dateId, slot);
+  const capped = Math.max(minVal, num);
+  const stock  = JSON.parse(localStorage.getItem('theater_stock') || '{}');
+  stock[key]   = capped;
+  localStorage.setItem('theater_stock', JSON.stringify(stock));
+  renderStockTable();
+  showToastStaff(`✅ อัพเดต Stock เรียบร้อย`);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════════════
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STAFF QUOTA / SPECIAL BOOKING SYSTEM
+// ═══════════════════════════════════════════════════════════════
+function populateQuotaBookingSelect() {
+  const sel = document.getElementById('sb-showdate');
+  if (!sel) return;
+  sel.innerHTML = SCHEDULE.flatMap(d =>
+    d.slots.map(slot => {
+      const label = makeShowDateLabel(d.dateLabel, slot);
+      const key   = getSlotKey(d.id, slot);
+      const cap   = getSlotCapacity(key);
+      const sold  = getStaffSoldCount(d.id, slot);
+      const rem   = Math.max(0, cap - sold);
+      const extra = rem <= 0 ? ' [เต็ม/Sold Out]' : ` [คงเหลือ ${rem}]`;
+      return `<option value="${label}" ${rem <= 0 ? 'disabled' : ''}>${label}${extra}</option>`;
+    })
+  ).join('');
+  updateQuotaBookingPrice();
+}
+
+function updateQuotaBookingPrice() {
+  const typeSelect = document.getElementById('sb-type');
+  const qtyInput   = document.getElementById('sb-qty');
+  
+  if (!typeSelect || !qtyInput) return;
+
+  const ticketType = typeSelect.value;
+  const originalPrice = TICKET_TYPES[ticketType] || 0;
+  
+  let qty = parseInt(qtyInput.value) || 1;
+  if (qty < 1) { qty = 1; qtyInput.value = 1; }
+
+  const totalNet = originalPrice * qty;
+
+  document.getElementById('sb-calc-original').textContent = originalPrice.toLocaleString();
+  document.getElementById('sb-calc-qty').textContent = qty.toLocaleString();
+  document.getElementById('sb-calc-total').textContent = totalNet.toLocaleString();
+}
+
+async function submitQuotaBooking() {
+  const nameEl     = document.getElementById('sb-name');
+  const phoneEl    = document.getElementById('sb-phone');
+  const emailEl    = document.getElementById('sb-email');
+  const showdateEl = document.getElementById('sb-showdate');
+  const typeEl     = document.getElementById('sb-type');
+  const qtyEl      = document.getElementById('sb-qty');
+  const noteEl     = document.getElementById('sb-note');
+
+  if (!nameEl || !phoneEl || !showdateEl || !typeEl || !qtyEl) return;
+
+  const name  = nameEl.value.trim();
+  const phone = phoneEl.value.trim();
+  const email = emailEl.value.trim();
+  const showDateLabel = showdateEl.value;
+  const ticketType = typeEl.value;
+  const qty   = parseInt(qtyEl.value) || 1;
+  const note  = noteEl.value.trim();
+
+  if (!name) { alert('❌ กรุณากรอกชื่อ-นามสกุลผู้ซื้อ'); nameEl.focus(); return; }
+  if (!phone || !/^\d{9,10}$/.test(phone)) { alert('❌ กรุณากรอกเบอร์โทรศัพท์ 9-10 หลัก'); phoneEl.focus(); return; }
+
+  // 1. Resolve dateId and slot
+  const { dateId, slot } = findSlotByLabel(showDateLabel);
+  if (!dateId || !slot) { alert('❌ ไม่พบรอบการแสดงที่เลือก'); return; }
+
+  // 2. Check remaining seats
+  const key   = getSlotKey(dateId, slot);
+  const cap   = getSlotCapacity(key);
+  const sold  = getStaffSoldCount(dateId, slot);
+  const rem   = Math.max(0, cap - sold);
+  if (rem < qty) {
+    alert(`❌ ที่นั่งคงเหลือในรอบนี้ (${rem} ที่) ไม่เพียงพอกับจำนวนที่ต้องการออกตั๋ว (${qty} ใบ)\nกรุณาลดจำนวนตั๋วหรือเปลี่ยนรอบแสดง`);
+    return;
+  }
+
+  // 3. Generate Order ID
+  const generateStaffOrderId = () => {
+    const d      = new Date();
+    const date   = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+    const random = Math.random().toString(36).substr(2, 5).toUpperCase();
+    return `STAFF-${date}-${random}`;
+  };
+  const orderId = generateStaffOrderId();
+
+  // 4. Calculate pricing
+  const netPrice  = TICKET_TYPES[ticketType] || 0;
+  const totalNet  = netPrice * qty;
+
+  // 5. Create tickets array
+  const tickets = [];
+  for (let i = 1; i <= qty; i++) {
+    tickets.push({
+      ticketId:  `${orderId}-T${String(i).padStart(2,'0')}`,
+      ticketNum: i,
+      orderId,
+      name,
+      phone,
+      email,
+      note:       note ? `[โควต้าแอดมิน] ${note}` : '[โควต้าแอดมิน]',
+      type:       ticketType,
+      typeId:     ticketType === 'Early Bird' ? 'earlybird' : 
+                  (ticketType === 'QT DISCOUNT' ? 'qt-discount' : 
+                  (ticketType === 'QT SPON' ? 'qt-spon' : 
+                  (ticketType === 'QT FREE' || ticketType === 'บัตรโควต้า' ? 'qt-free' : 'regular'))),
+      show:       'น่าจะรู้อย่างนี้ตั้งแต่ปี 2475',
+      venue:      'KINJAI CONTEMPORARY',
+      showDateId: dateId,
+      showSlot:   slot,
+      showDate:   showDateLabel,
+      pricePerTicket: netPrice,
+    });
+  }
+
+  // 6. Create order object
+  const order = {
+    orderId,
+    name,
+    phone,
+    email,
+    note:       note ? `[โควต้าแอดมิน] ${note}` : '[โควต้าแอดมิน]',
+    slipImage:  'assets/staff-quota-slip.png',
+    typeId:     ticketType === 'Early Bird' ? 'earlybird' : 
+                (ticketType === 'QT DISCOUNT' ? 'qt-discount' : 
+                (ticketType === 'QT SPON' ? 'qt-spon' : 
+                (ticketType === 'QT FREE' || ticketType === 'บัตรโควต้า' ? 'qt-free' : 'regular'))),
+    typeName:   ticketType,
+    pricePerTicket: netPrice,
+    qty,
+    total:      totalNet,
+    showDateId: dateId,
+    showSlot:   slot,
+    showDate:   showDateLabel,
+    timestamp:  new Date().toISOString(),
+    tickets,
+  };
+
+  // 7. Save to localStorage
+  try {
+    const allOrders = JSON.parse(localStorage.getItem('theater_orders') || '[]');
+    allOrders.push(order);
+    localStorage.setItem('theater_orders', JSON.stringify(allOrders));
+
+    const allTickets = JSON.parse(localStorage.getItem('theater_tickets') || '{}');
+    tickets.forEach(t => {
+      allTickets[t.ticketId] = {
+        ...t,
+        total:      order.total,
+        qty:        order.qty,
+        checkedIn:  false,
+        checkInTime: null,
+      };
+    });
+    localStorage.setItem('theater_tickets', JSON.stringify(allTickets));
+
+    // Clear form inputs
+    nameEl.value = '';
+    phoneEl.value = '';
+    emailEl.value = '';
+    qtyEl.value = '1';
+    noteEl.value = '';
+
+    // Update staff pages stats and tables
+    allTicketsCache = allTickets;
+    updateStats();
+    renderStockTable();
+    populateQuotaBookingSelect();
+
+    // 8. If App Script is configured, post it too!
+    if (typeof APPS_SCRIPT_URL !== 'undefined' && APPS_SCRIPT_URL && APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
+      try {
+        await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          mode:   'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            orderId:        order.orderId,
+            timestamp:      new Date().toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' }),
+            name:           order.name + ' (ทีมงานออกตั๋ว)',
+            phone:          order.phone,
+            email:          order.email  || '—',
+            ticketType:     order.typeName,
+            qty:            order.qty,
+            pricePerTicket: order.pricePerTicket,
+            total:          order.total,
+            showDate:       order.showDate,
+            note:           order.note   || '—',
+            tickets:        order.tickets.map(t => t.ticketId).join(', '),
+            slipImage:      'โควต้าทีมงาน (ตั๋วพิเศษ)',
+          }),
+        });
+      } catch (e) { console.warn('AppScript Sync failed:', e); }
+    }
+
+    alert(`🎉 ยืนยันจองตั๋วสำเร็จ!\nรหัสสั่งซื้อ: ${orderId}\nจำนวน: ${qty} ใบ (ราคาสุทธิ: ${totalNet.toLocaleString()} บาท)`);
+    showToastStaff('🎫 ออกตั๋วโควต้าสำเร็จแล้ว');
+  } catch (err) {
+    console.error('Staff booking error:', err);
+    alert('❌ เกิดข้อผิดพลาดในการบันทึกข้อมูลโควต้า');
+  }
+}
+</script>
+</body>
+</html>
