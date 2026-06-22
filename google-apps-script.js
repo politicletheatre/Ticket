@@ -539,11 +539,11 @@ function handleNewOrder(data) {
       const blob = Utilities.newBlob(Utilities.base64Decode(base64Data), mimeType, `slip-${data.orderId}.jpg`);
       
       let folder;
-      const folders = DriveApp.getFoldersByName('Theater Slips - ฝันในม่านหมอก');
+      const folders = DriveApp.getFoldersByName('Theater Slips - น่าจะรู้อย่างนี้ตั้งแต่ปี 2475');
       if (folders.hasNext()) {
         folder = folders.next();
       } else {
-        folder = DriveApp.createFolder('Theater Slips - ฝันในม่านหมอก');
+        folder = DriveApp.createFolder('Theater Slips - น่าจะรู้อย่างนี้ตั้งแต่ปี 2475');
       }
       const file = folder.createFile(blob);
       file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
