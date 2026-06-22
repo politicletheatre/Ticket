@@ -1,6 +1,6 @@
 /**
  * ============================================================
- * Google Apps Script — ฝันในม่านหมอก Theater Ticket Backend (Updated & Optimized)
+ * Google Apps Script — น่าจะรู้อย่างนี้ตั้งแต่ปี 2475 Theater Ticket Backend (Updated & Optimized)
  * ============================================================
  *
  * วิธีติดตั้ง:
