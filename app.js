@@ -19,7 +19,7 @@ const CONFIG = {
     { id:'w1-fri', week:1, day:'ศุกร์',    date:'16', month:'ต.ค.', year:'2569', dateLabel:'ศุกร์ที่ 16 ต.ค. 2569',    slots:['19:00'] },
     { id:'w1-sat', week:1, day:'เสาร์',   date:'17', month:'ต.ค.', year:'2569', dateLabel:'เสาร์ที่ 17 ต.ค. 2569',   slots:['14:00','19:00'] },
     { id:'w1-sun', week:1, day:'อาทิตย์', date:'18', month:'ต.ค.', year:'2569', dateLabel:'อาทิตย์ที่ 18 ต.ค. 2569', slots:['14:00','19:00'] },
-    { id:'w2-fri', week:2, day:'ศุกร์',    date:'23', month:'ต.ค.', year:'2569', dateLabel:'ศุกร์ที่ 23 ต.ค. 2569',    slots:['19:00'] },
+    { id:'w2-fri', week:2, day:'ศุกร์',    date:'23', month:'ต.ค.', year:'2569', dateLabel:'ศุกร์ที่ 23 ต.ค. 2569',    slots:['14:00','19:00'] },
     { id:'w2-sat', week:2, day:'เสาร์',   date:'24', month:'ต.ค.', year:'2569', dateLabel:'เสาร์ที่ 24 ต.ค. 2569',   slots:['14:00','19:00'] },
     { id:'w2-sun', week:2, day:'อาทิตย์', date:'25', month:'ต.ค.', year:'2569', dateLabel:'อาทิตย์ที่ 25 ต.ค. 2569', slots:['14:00','19:00'] },
   ],
@@ -593,11 +593,8 @@ function makeQR(elementId, text, size = 160) {
 
 // ─── PAYMENT QR ───────────────────────────────────────────────────────────
 function renderPaymentQR() {
-  const type = CONFIG.ticketTypes.find(t => t.id === state.selectedTypeId);
-  if (!type) return;
-  const total  = type.price * state.qty;
-  const qrData = `PromptPay|${CONFIG.bankAccount.promptpay}|THB|${total}`;
-  makeQR('payment-qr-container', qrData, 160);
+  // ใช้รูปภาพ QR Code สแกนโอนเงินแบบคงที่ (Static QR Code) ที่ผู้ใช้อัปโหลดมาแทนการเจนใหม่
+  // ไม่จำเป็นต้องเรียก makeQR สำหรับ payment-qr-container
 }
 
 // ─── RECAP ────────────────────────────────────────────────────────────────
