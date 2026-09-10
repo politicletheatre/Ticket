@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#0d0718" />
+  <meta name="theme-color" content="#ffffff" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <title>🔐 Staff Check-in — น่าจะรู้อย่างนี้ตั้งแต่ปี 2475</title>
   <meta name="robots" content="noindex, nofollow" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -15,10 +15,10 @@
 
   <style>
     :root {
-      --bg: #0d0718; --surface: rgba(255,255,255,0.06); --border: rgba(255,255,255,0.12);
-      --purple: #6b35b0; --purple-light: #9b5de5; --gold: #d4a017; --gold-light: #fde68a;
+      --bg: #ffffff; --surface: #f5f5f5; --border: #dddddd;
+      --purple: #ff3b30; --purple-light: #ff6b60; --gold: #000000; --gold-light: #111111;
       --success: #22c55e; --warning: #f59e0b; --error: #ef4444;
-      --text: #f8f4ff; --muted: #7c6fa8; --radius: 16px;
+      --text: #111111; --muted: #555555; --radius: 16px;
       --transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -27,14 +27,14 @@
     /* ══ PIN OVERLAY ══════════════════════════════════════════════ */
     #pin-overlay {
       position: fixed; inset: 0; z-index: 9999;
-      background: radial-gradient(ellipse at top, #1a0933 0%, #0d0718 70%);
+      background: #ffffff;
       display: flex; align-items: center; justify-content: center;
     }
     #pin-overlay.hidden { display: none; }
     .pin-box {
       width: 100%; max-width: 360px; padding: 40px 32px;
-      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 24px; backdrop-filter: blur(20px); text-align: center;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 24px; text-align: center;
       animation: pinFadeIn 0.5s ease;
     }
     @keyframes pinFadeIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:none; } }
@@ -226,105 +226,192 @@
     /* ══ LIST MODAL ═════════════════════════════════════════════ */
     #modal-overlay {
       position: fixed; inset: 0; z-index: 400;
-      background: rgba(0,0,0,0.7); backdrop-filter: blur(6px);
+      background: rgba(0,0,0,0.82); backdrop-filter: blur(8px);
       display: none; align-items: flex-start; justify-content: center;
       padding: 20px 16px 40px; overflow-y: auto;
     }
     #modal-overlay.open { display: flex; animation: fadeIn 0.25s ease; }
     @keyframes fadeIn { from{opacity:0} to{opacity:1} }
-    .modal-box { width: 100%; max-width: 620px; background: #130d24; border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; overflow: hidden; animation: modalSlide 0.3s ease; margin: auto; }
+    .modal-box {
+      width: 100%; max-width: 620px;
+      background: #141414;
+      border: 1px solid #2e2e2e;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+      animation: modalSlide 0.3s ease;
+      margin: auto;
+      color: #ffffff;
+    }
     @keyframes modalSlide { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
-    .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; background: rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.08); }
-    .modal-title  { font-size: 1rem; font-weight: 700; }
-    .modal-close  { background: rgba(255,255,255,0.08); border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; color: var(--text); font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
-    .modal-close:hover { background: rgba(239,68,68,0.2); color: #fca5a5; }
-    .modal-filter { display: flex; gap: 8px; padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.06); }
-    .modal-search { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 10px; padding: 8px 14px; color: var(--text); font-family: inherit; font-size: 0.88rem; outline: none; transition: var(--transition); }
-    .modal-search:focus { border-color: var(--purple-light); }
-    .modal-search::placeholder { color: var(--muted); }
-    .customer-list { max-height: 54vh; overflow-y: auto; }
+    .modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 20px;
+      background: #1c1c1c;
+      border-bottom: 1px solid #282828;
+    }
+    .modal-title  { font-size: 1.05rem; font-weight: 700; color: #ffffff; }
+    .modal-close  {
+      background: #2a2a2a; border: 1px solid #3a3a3a;
+      border-radius: 50%; width: 34px; height: 34px;
+      cursor: pointer; color: #ffffff; font-size: 1.1rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: var(--transition);
+    }
+    .modal-close:hover { background: #ff3b30; border-color: #ff3b30; color: #ffffff; }
+    .modal-filter {
+      display: flex; gap: 8px; padding: 14px 16px;
+      background: #141414;
+      border-bottom: 1px solid #222222;
+    }
+    .modal-search {
+      flex: 1; background: #1f1f1f;
+      border: 1px solid #383838;
+      border-radius: 10px; padding: 10px 14px;
+      color: #ffffff; font-family: inherit; font-size: 0.9rem;
+      outline: none; transition: var(--transition);
+    }
+    .modal-search:focus { border-color: #ff3b30; box-shadow: 0 0 0 3px rgba(255,59,48,0.2); }
+    .modal-search::placeholder { color: #888888; }
+    .customer-list { max-height: 54vh; overflow-y: auto; background: #141414; }
     /* Show filter */
-    .modal-show-filter { display: flex; align-items: center; gap: 8px; padding: 8px 16px 10px; border-bottom: 1px solid rgba(255,255,255,0.06); }
-    .modal-show-select { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 10px; padding: 7px 12px; color: var(--text); font-family: inherit; font-size: 0.85rem; outline: none; cursor: pointer; transition: var(--transition); }
-    .modal-show-select:focus { border-color: var(--purple-light); }
-    .modal-show-select option { background: #1a0d2e; }
-    .modal-sort-hint { font-size: 0.7rem; color: var(--muted); white-space: nowrap; flex-shrink: 0; }
-    .customer-item { display: flex; align-items: center; gap: 14px; padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.2s; cursor: pointer; }
+    .modal-show-filter {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 16px 12px;
+      background: #181818;
+      border-bottom: 1px solid #222222;
+    }
+    .modal-show-select {
+      flex: 1; background: #222222;
+      border: 1px solid #383838;
+      border-radius: 10px; padding: 9px 12px;
+      color: #ffffff; font-family: inherit; font-size: 0.88rem;
+      outline: none; cursor: pointer; transition: var(--transition);
+    }
+    .modal-show-select:focus { border-color: #ff3b30; }
+    .modal-show-select option { background: #1e1e1e; color: #ffffff; }
+    .modal-sort-hint { font-size: 0.72rem; color: #888888; white-space: nowrap; flex-shrink: 0; }
+    .customer-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 15px 20px; border-bottom: 1px solid #222222;
+      transition: background 0.2s; cursor: pointer;
+    }
     .customer-item:last-child { border-bottom: none; }
-    .customer-item:hover { background: rgba(155,93,229,0.08); }
-    .customer-item:hover .customer-arrow { opacity: 1; }
-    .customer-avatar { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1rem; flex-shrink: 0; }
-    .avatar-checked { background: rgba(34,197,94,0.2); color: #86efac; border: 1px solid rgba(34,197,94,0.3); }
-    .avatar-pending { background: rgba(253,230,138,0.15); color: var(--gold-light); border: 1px solid rgba(253,230,138,0.25); }
+    .customer-item:hover { background: rgba(255,255,255,0.06); }
+    .customer-item:hover .customer-arrow { opacity: 1; color: #ffffff; }
+    .customer-avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 1.05rem; flex-shrink: 0;
+    }
+    .avatar-checked { background: rgba(34,197,94,0.2); color: #86efac; border: 1px solid rgba(34,197,94,0.4); }
+    .avatar-pending { background: rgba(255,255,255,0.1); color: #ffffff; border: 1px solid rgba(255,255,255,0.25); }
     .customer-info { flex: 1; min-width: 0; }
-    .customer-name { font-weight: 600; font-size: 0.92rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .customer-meta { font-size: 0.76rem; color: var(--muted); margin-top: 2px; }
-    .customer-tid  { font-family: monospace; font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+    .customer-name {
+      font-weight: 600; font-size: 0.96rem;
+      color: #ffffff;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .customer-meta { font-size: 0.82rem; color: #cccccc; margin-top: 3px; font-weight: 400; }
+    .customer-tid  { font-family: monospace; font-size: 0.72rem; color: #888888; margin-top: 3px; }
     .customer-status { flex-shrink: 0; text-align: right; }
-    .customer-arrow  { flex-shrink: 0; color: var(--muted); opacity: 0.4; transition: opacity 0.2s; font-size: 1rem; }
-    .status-pill { display: inline-block; padding: 3px 10px; border-radius: 50px; font-size: 0.7rem; font-weight: 700; }
-    .status-pill.checked   { background: rgba(34,197,94,0.15);  color: #86efac;       border: 1px solid rgba(34,197,94,0.3); }
-    .status-pill.pending   { background: rgba(253,230,138,0.1); color: var(--gold-light); border: 1px solid rgba(253,230,138,0.2); }
-    .status-pill.cancelled { background: rgba(239,68,68,0.1);   color: #fca5a5;       border: 1px solid rgba(239,68,68,0.25); }
-    .checkin-time { font-size: 0.68rem; color: var(--muted); margin-top: 4px; }
-    .modal-empty { padding: 48px; text-align: center; color: var(--muted); font-size: 0.9rem; }
-    .modal-count { padding: 10px 20px; font-size: 0.78rem; color: var(--muted); border-top: 1px solid rgba(255,255,255,0.06); text-align: right; }
+    .customer-arrow  { flex-shrink: 0; color: #888888; opacity: 0.4; transition: opacity 0.2s; font-size: 1.1rem; }
+    .status-pill { display: inline-block; padding: 4px 12px; border-radius: 50px; font-size: 0.72rem; font-weight: 700; }
+    .status-pill.checked   { background: rgba(34,197,94,0.15);  color: #86efac; border: 1px solid rgba(34,197,94,0.4); }
+    .status-pill.pending   { background: rgba(255,255,255,0.12); color: #f1f5f9; border: 1px solid rgba(255,255,255,0.25); }
+    .status-pill.cancelled { background: rgba(239,68,68,0.15);  color: #fca5a5; border: 1px solid rgba(239,68,68,0.35); }
+    .checkin-time { font-size: 0.7rem; color: #888888; margin-top: 4px; }
+    .modal-empty { padding: 48px; text-align: center; color: #888888; font-size: 0.9rem; }
+    .modal-count { padding: 12px 20px; font-size: 0.82rem; color: #aaaaaa; border-top: 1px solid #222222; background: #181818; text-align: right; }
 
     /* ══ DETAIL MODAL ═══════════════════════════════════════════ */
     #detail-overlay {
       position: fixed; inset: 0; z-index: 500;
-      background: rgba(0,0,0,0.82); backdrop-filter: blur(8px);
+      background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
       display: none; align-items: flex-start; justify-content: center;
       padding: 20px 16px 60px; overflow-y: auto;
     }
     #detail-overlay.open { display: flex; animation: fadeIn 0.2s ease; }
-    .detail-box { width: 100%; max-width: 600px; background: #13092a; border: 1px solid rgba(155,93,229,0.25); border-radius: 22px; overflow: hidden; animation: modalSlide 0.3s ease; margin: auto; }
-    .detail-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; background: rgba(107,53,176,0.15); border-bottom: 1px solid rgba(255,255,255,0.08); }
-    .detail-header-title { font-size: 0.95rem; font-weight: 700; }
+    .detail-box {
+      width: 100%; max-width: 600px;
+      background: #141414;
+      border: 1px solid #2e2e2e;
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: 0 24px 54px rgba(0,0,0,0.92);
+      animation: modalSlide 0.3s ease;
+      margin: auto;
+      color: #ffffff;
+    }
+    .detail-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px;
+      background: #1c1c1c;
+      border-bottom: 1px solid #282828;
+    }
+    .detail-header-title { font-size: 0.98rem; font-weight: 700; color: #ffffff; }
     .detail-header-actions { display: flex; gap: 8px; align-items: center; }
 
     /* Profile section */
-    .detail-profile { display: flex; align-items: center; gap: 16px; padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.06); }
-    .detail-avatar { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; font-weight: 700; background: linear-gradient(135deg,rgba(107,53,176,0.3),rgba(155,93,229,0.3)); border: 2px solid rgba(155,93,229,0.4); flex-shrink: 0; }
-    .detail-profile-info h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
-    .detail-profile-info p  { font-size: 0.82rem; color: var(--muted); }
+    .detail-profile {
+      display: flex; align-items: center; gap: 16px;
+      padding: 20px; border-bottom: 1px solid #222222;
+      background: #181818;
+    }
+    .detail-avatar {
+      width: 64px; height: 64px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem; font-weight: 700;
+      background: rgba(255,59,48,0.15);
+      border: 2px solid rgba(255,59,48,0.4);
+      color: #ff6b60;
+      flex-shrink: 0;
+    }
+    .detail-profile-info h2 { font-size: 1.15rem; font-weight: 700; color: #ffffff; margin-bottom: 4px; }
+    .detail-profile-info p  { font-size: 0.86rem; color: #cccccc; }
 
     /* Info rows */
-    .detail-section { padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.06); }
-    .detail-section-title { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 12px; }
-    .detail-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.86rem; gap: 12px; }
+    .detail-section { padding: 16px 20px; border-bottom: 1px solid #222222; }
+    .detail-section-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #888888; margin-bottom: 12px; }
+    .detail-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid #1f1f1f; font-size: 0.88rem; gap: 12px; }
     .detail-row:last-child { border-bottom: none; }
-    .detail-row .dr-label { color: var(--muted); flex-shrink: 0; }
-    .detail-row .dr-val   { font-weight: 500; text-align: right; word-break: break-all; }
-    .detail-row .dr-mono  { font-family: monospace; font-size: 0.78rem; }
+    .detail-row .dr-label { color: #999999; flex-shrink: 0; }
+    .detail-row .dr-val   { font-weight: 600; color: #ffffff; text-align: right; word-break: break-all; }
+    .detail-row .dr-mono  { font-family: monospace; font-size: 0.8rem; color: #eeeeee; }
 
     /* Ticket list in detail */
-    .detail-ticket-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: rgba(255,255,255,0.04); border-radius: 10px; margin-bottom: 8px; gap: 10px; }
+    .detail-ticket-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 14px;
+      background: #1d1d1d;
+      border: 1px solid #2c2c2c;
+      border-radius: 10px; margin-bottom: 8px; gap: 10px;
+    }
     .detail-ticket-item:last-child { margin-bottom: 0; }
-    .detail-ticket-num  { font-family: monospace; font-size: 0.78rem; color: var(--muted); }
-    .detail-ticket-id   { font-family: monospace; font-size: 0.75rem; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .detail-ticket-num  { font-family: monospace; font-size: 0.8rem; color: #888888; }
+    .detail-ticket-id   { font-family: monospace; font-size: 0.78rem; color: #ffffff; font-weight: 600; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
     /* Slip image */
-    .detail-slip-img { max-width: 100%; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); display: block; cursor: zoom-in; }
+    .detail-slip-img { max-width: 100%; border-radius: 12px; border: 1px solid #333333; display: block; cursor: zoom-in; }
     .slip-thumb-wrap { padding: 12px 20px 20px; }
 
     /* Edit form */
-    .edit-form { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
-    .edit-form-group label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 6px; font-weight: 600; }
+    .edit-form { padding: 20px; display: flex; flex-direction: column; gap: 14px; background: #141414; }
+    .edit-form-group label { display: block; font-size: 0.82rem; color: #cccccc; margin-bottom: 6px; font-weight: 600; }
     .edit-form-group input,
     .edit-form-group select,
     .edit-form-group textarea {
-      width: 100%; background: rgba(255,255,255,0.05); border: 1.5px solid var(--border);
-      border-radius: 10px; padding: 10px 14px; color: var(--text); font-family: inherit;
-      font-size: 0.9rem; outline: none; transition: var(--transition);
+      width: 100%; background: #1e1e1e; border: 1.5px solid #383838;
+      border-radius: 10px; padding: 10px 14px; color: #ffffff; font-family: inherit;
+      font-size: 0.92rem; outline: none; transition: var(--transition);
     }
     .edit-form-group input:focus,
     .edit-form-group select:focus,
-    .edit-form-group textarea:focus { border-color: var(--purple-light); box-shadow: 0 0 0 3px rgba(155,93,229,0.15); }
-    .edit-form-group select option { background: #1a0d2e; }
+    .edit-form-group textarea:focus { border-color: #ff3b30; box-shadow: 0 0 0 3px rgba(255,59,48,0.2); }
+    .edit-form-group select option { background: #1e1e1e; color: #ffffff; }
     .edit-form-group textarea { resize: vertical; min-height: 80px; }
     .edit-form-actions { display: flex; gap: 10px; padding-top: 4px; }
-    .edit-note { font-size: 0.78rem; color: var(--muted); padding: 10px 14px; background: rgba(107,53,176,0.1); border-radius: 10px; border: 1px solid rgba(107,53,176,0.2); }
+    .edit-note { font-size: 0.8rem; color: #cccccc; padding: 10px 14px; background: #1c1c1c; border-radius: 10px; border: 1px solid #333333; }
 
     /* ══ STOCK TABLE ═════════════════════════════════════════════════ */
     .stock-wrap { padding: 16px; overflow-x: auto; }
@@ -406,15 +493,15 @@
     .booking-group input:focus,
     .booking-group select:focus,
     .booking-group textarea:focus {
-      border-color: var(--purple-light);
-      box-shadow: 0 0 0 3px rgba(155,93,229,0.15);
+      border-color: #ff3b30;
+      box-shadow: 0 0 0 3px rgba(255, 59, 48, 0.15);
     }
     .booking-group textarea {
       resize: vertical;
     }
     .booking-price-calc {
-      background: rgba(155,93,229,0.05);
-      border: 1px solid rgba(155,93,229,0.25);
+      background: rgba(255, 59, 48, 0.04);
+      border: 1px solid rgba(255, 59, 48, 0.25);
       border-radius: 12px;
       padding: 16px;
       display: flex;
@@ -493,11 +580,10 @@
   <div class="pin-box">
     <div class="pin-icon">🔐</div>
     <div class="pin-title">Staff Dashboard</div>
-    <div class="pin-sub">กรุณากรอก PIN 6 หลักเพื่อเข้าใช้งาน</div>
+    <div class="pin-sub">กรุณากรอก PIN 4 หลักเพื่อเข้าใช้งาน</div>
     <div class="pin-dots" id="pin-dots">
       <div class="pin-dot" id="pd-0"></div><div class="pin-dot" id="pd-1"></div>
       <div class="pin-dot" id="pd-2"></div><div class="pin-dot" id="pd-3"></div>
-      <div class="pin-dot" id="pd-4"></div><div class="pin-dot" id="pd-5"></div>
     </div>
     <div class="pin-keypad">
       <button class="pin-key" onclick="pinPress('1')">1</button>
@@ -599,19 +685,19 @@
 
         <div class="edit-form-group">
           <label>ชื่อ–นามสกุล</label>
-          <input type="text" id="edit-name" placeholder="ชื่อผู้ซื้อ" />
+          <input type="text" id="edit-name" />
         </div>
         <div class="edit-form-group">
           <label>เบอร์โทรศัพท์</label>
-          <input type="tel" id="edit-phone" placeholder="0812345678" />
+          <input type="tel" id="edit-phone" />
         </div>
         <div class="edit-form-group">
           <label>อีเมล</label>
-          <input type="email" id="edit-email" placeholder="email@example.com" />
+          <input type="email" id="edit-email" />
         </div>
         <div class="edit-form-group">
           <label>หมายเหตุ</label>
-          <textarea id="edit-note" placeholder="หมายเหตุเพิ่มเติม"></textarea>
+          <textarea id="edit-note"></textarea>
         </div>
         <div class="edit-form-group">
           <label>ประเภทบัตร</label>
@@ -651,7 +737,7 @@
     <span class="logo-text logo-short">ปี 2475</span>
   </div>
   <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-    <button id="btn-cloud-sync" onclick="syncAllFromSheets()" class="staff-link" style="background:rgba(107,53,176,0.25); border:1px solid rgba(155,93,229,0.35); color:#fff; display:inline-flex; align-items:center; gap:6px; cursor:pointer; font-family:inherit; padding:5px 12px; border-radius:50px; font-size:0.8rem; font-weight:600; transition:all 0.2s">
+    <button id="btn-cloud-sync" onclick="syncAllFromSheets()" class="staff-link" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#fff; display:inline-flex; align-items:center; gap:6px; cursor:pointer; font-family:inherit; padding:6px 14px; border-radius:50px; font-size:0.8rem; font-weight:600; transition:all 0.2s">
       🔄 ซิงค์ข้อมูล Sheets
     </button>
     <div id="sync-indicator" class="sync-badge off">
@@ -716,34 +802,6 @@
   <!-- RESULT -->
   <div id="result-wrap" style="display:none"></div>
 
-  <!-- TICKET SALE SETTINGS -->
-  <div class="card">
-    <div class="card-header">
-      <span class="card-title">⚙️ ตั้งค่าการขายบัตร</span>
-    </div>
-    <div style="padding: 20px; display: flex; flex-direction: column; gap: 16px;">
-      <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
-        <div>
-          <h4 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 4px;">ขายบัตร Early Bird</h4>
-          <p style="font-size: 0.8rem; color: var(--muted);">เปิดหรือปิดการขายบัตร Early Bird ในหน้าจองสำหรับลูกค้าทั่วไป</p>
-          <p id="earlybird-status-text" style="font-size: 0.8rem; margin-top: 4px; font-weight: 600;"></p>
-        </div>
-        <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 26px;">
-          <input type="checkbox" id="toggle-earlybird" onchange="toggleEarlyBirdSale(this.checked)" style="opacity: 0; width: 0; height: 0;">
-          <span class="slider" style="position: absolute; cursor: pointer; inset: 0; background-color: rgba(255,255,255,0.06); border: 1.5px solid var(--border); border-radius: 34px; transition: .4s;"></span>
-        </label>
-      </div>
-      <div id="earlybird-push-notice" style="display:none; background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.3); border-radius: 12px; padding: 12px 14px; font-size: 0.82rem; color: #fde68a; line-height: 1.6;">
-        ⚠️ เปลี่ยนค่าแล้ว กรุณากดปุ่มด้านล่างเพื่อดาวน์โหลดไฟล์ config.json และนำไปวางทับเดิมในโฟลเดอร์โปรเจกต์ แล้ว git push เพื่อให้ทุกเครื่องแสดงค่าล่าสุด
-        <br><br>
-        <button onclick="downloadConfig()" style="background: rgba(245,158,11,0.2); border: 1px solid rgba(245,158,11,0.5); color: #fde68a; padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 0.8rem;">
-          ⬇️ ดาวน์โหลด config.json
-        </button>
-      </div>
-    </div>
-  </div>
-
-
   <!-- QUOTA BOOKING -->
   <div class="card">
     <div class="card-header">
@@ -752,15 +810,15 @@
     <div class="booking-form">
       <div class="booking-group">
         <label for="sb-name">ชื่อ–นามสกุลผู้ซื้อ <span style="color:var(--error)">*</span></label>
-        <input type="text" id="sb-name" placeholder="เช่น สมชาย ใจดี" required />
+        <input type="text" id="sb-name" required />
       </div>
       <div class="booking-group">
         <label for="sb-phone">เบอร์โทรศัพท์ <span style="color:var(--error)">*</span></label>
-        <input type="tel" id="sb-phone" placeholder="0812345678" pattern="[0-9]{9,10}" required />
+        <input type="tel" id="sb-phone" pattern="[0-9]{9,10}" required />
       </div>
       <div class="booking-group">
         <label for="sb-email">อีเมล (ไม่บังคับ)</label>
-        <input type="email" id="sb-email" placeholder="example@email.com" />
+        <input type="email" id="sb-email" />
       </div>
       <div class="booking-group">
         <label for="sb-showdate">รอบการแสดง <span style="color:var(--error)">*</span></label>
@@ -769,11 +827,7 @@
       <div class="booking-group">
         <label for="sb-type">ประเภทบัตร <span style="color:var(--error)">*</span></label>
         <select id="sb-type" onchange="updateQuotaBookingPrice()">
-          <option value="QT SPON">🎟️ QT SPON (0 บาท)</option>
           <option value="QT FREE">🎟️ QT FREE (0 บาท)</option>
-          <option value="QT DISCOUNT">🎟️ QT DISCOUNT (590 บาท)</option>
-          <option value="บัตรปกติ">🎭 บัตรปกติ (790 บาท)</option>
-          <option value="Early Bird">🐦 Early Bird (590 บาท)</option>
         </select>
       </div>
       <div class="booking-group">
@@ -782,7 +836,7 @@
       </div>
       <div class="booking-group full-width">
         <label for="sb-note">หมายเหตุการจอง</label>
-        <textarea id="sb-note" rows="2" placeholder="เช่น โควต้าทีมงานฝั่งนักแสดง / ผู้สนับสนุน VIP"></textarea>
+        <textarea id="sb-note" rows="2"></textarea>
       </div>
       
       <!-- Price Calculation Preview -->
@@ -808,7 +862,10 @@
   <div class="card" id="stock-card">
     <div class="card-header">
       <span class="card-title">📦 จัดการ Stock บัตรแต่ละรอบ</span>
-      <button class="btn btn-check" onclick="renderStockTable()">🔄 รีเฟรช</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-check" onclick="resetAllCapacityTo50()" style="font-size:0.78rem;padding:5px 12px;background:rgba(34,197,94,0.12);border-color:rgba(34,197,94,0.3);color:#86efac;">⚡ ตั้งทุกรอบเป็น 80 ที่</button>
+        <button class="btn btn-check" onclick="renderStockTable()" style="font-size:0.78rem;padding:5px 12px;">🔄 รีเฟรช</button>
+      </div>
     </div>
     <div class="stock-wrap" id="stock-table-wrap"></div>
     <div class="stock-footer">
@@ -846,7 +903,7 @@ function loadFallbackQR() {
 // CONFIG
 // ═══════════════════════════════════════════════════════════════
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw8J0UW5pBkFVGfaRKh0THmaHjUqVIQgCTQATUUNGjhZ1h6525M1Gad-Jn2zUi9Oyc1/exec';
-const STAFF_PIN       = '002406';
+const STAFF_PIN       = '2406'; // Accepts 2406 or 002406
 
 // ── JSONBin config (global Early Bird toggle) ────────────────────────────
 // ไปเปิด https://jsonbin.io → สมัครฟรี → สร้าง Bin → ใส่ {"earlybird_enabled":true}
@@ -875,7 +932,7 @@ const SCHEDULE = [
   { id:'w1-fri', dateLabel:'ศุกร์ที่ 16 ต.ค. 2569',    slots:['19:00'] },
   { id:'w1-sat', dateLabel:'เสาร์ที่ 17 ต.ค. 2569',   slots:['14:00','19:00'] },
   { id:'w1-sun', dateLabel:'อาทิตย์ที่ 18 ต.ค. 2569', slots:['14:00','19:00'] },
-  { id:'w2-fri', dateLabel:'ศุกร์ที่ 23 ต.ค. 2569',    slots:['19:00'] },
+  { id:'w2-fri', dateLabel:'ศุกร์ที่ 23 ต.ค. 2569',    slots:['14:00','19:00'] },
   { id:'w2-sat', dateLabel:'เสาร์ที่ 24 ต.ค. 2569',   slots:['14:00','19:00'] },
   { id:'w2-sun', dateLabel:'อาทิตย์ที่ 25 ต.ค. 2569', slots:['14:00','19:00'] },
 ];
@@ -886,7 +943,11 @@ function getSlotKey(dateId, slot) { return `${dateId}|${slot}`; }
 
 function getSlotCapacity(key) {
   const stock = JSON.parse(localStorage.getItem('theater_stock') || '{}');
-  return typeof stock[key] === 'number' ? stock[key] : DEFAULT_CAPACITY;
+  const val = Number(stock[key]);
+  if (!isNaN(val) && val > 0 && val !== 85) {
+    return val;
+  }
+  return DEFAULT_CAPACITY;
 }
 
 function getStaffSoldCount(dateId, slot) {
@@ -896,6 +957,10 @@ function getStaffSoldCount(dateId, slot) {
     if (t.cancelled) return false;
     if (t.showDateId && t.showSlot) {
       return t.showDateId === dateId && t.showSlot === slot;
+    }
+    const resolved = findSlotByLabel(t.showDate);
+    if (resolved.dateId && resolved.slot) {
+      return resolved.dateId === dateId && resolved.slot === slot;
     }
     return t.showDate === targetLabel;
   }).length;
@@ -941,10 +1006,10 @@ function populateShowdateSelect(selectedValue) {
 let pinInput = '';
 
 function pinPress(d) {
-  if (pinInput.length >= 6) return;
+  if (pinInput.length >= 4) return;
   pinInput += d;
   updatePinDots();
-  if (pinInput.length === 6) setTimeout(verifyPin, 120);
+  if (pinInput.length === 4) setTimeout(verifyPin, 120);
 }
 function pinDel() {
   if (!pinInput.length) return;
@@ -953,7 +1018,7 @@ function pinDel() {
   document.getElementById('pin-error-msg').classList.remove('show');
 }
 function updatePinDots(state) {
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 4; i++) {
     const d = document.getElementById('pd-'+i);
     d.className = 'pin-dot';
     if (state === 'error') d.classList.add('error');
@@ -994,6 +1059,24 @@ let editMode             = false;
 // INIT
 // ═══════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', async () => {
+  // Auto-migrate legacy stock values to 80
+  try {
+    const stock = JSON.parse(localStorage.getItem('theater_stock') || '{}');
+    let changed = false;
+    SCHEDULE.forEach(d => {
+      d.slots.forEach(slot => {
+        const key = getSlotKey(d.id, slot);
+        if (typeof stock[key] !== 'number' || stock[key] <= 0) {
+          stock[key] = 50;
+          changed = true;
+        }
+      });
+    });
+    if (changed) {
+      localStorage.setItem('theater_stock', JSON.stringify(stock));
+    }
+  } catch(e){}
+
   // PIN is always required on every page load — no session bypass
   updateStats();
   renderLog();
@@ -1696,15 +1779,21 @@ async function syncAllFromSheets(silent = false) {
             const resolved = findSlotByLabel(t.showDate);
             normalizedTickets[tId] = {
               ...t,
+              phone: cleanThaiPhone(t.phone),
               showDateId: resolved.dateId || t.showDateId || '',
               showSlot: resolved.slot || t.showSlot || '',
             };
           });
         }
 
+        const normalizedOrders = (data.orders || []).map(o => ({
+          ...o,
+          phone: cleanThaiPhone(o.phone)
+        }));
+
         // อัปเดตตั๋วและประวัติสั่งซื้อใน localStorage
         localStorage.setItem('theater_tickets', JSON.stringify(normalizedTickets));
-        localStorage.setItem('theater_orders', JSON.stringify(data.orders || []));
+        localStorage.setItem('theater_orders', JSON.stringify(normalizedOrders));
         
         // อัปเดตสถานะ Early Bird ใน UI
         if (typeof data.earlybird_enabled === 'boolean') {
@@ -1720,7 +1809,14 @@ async function syncAllFromSheets(silent = false) {
           Object.keys(data.settings).forEach(key => {
             if (key.startsWith('capacity|')) {
               const slotKey = key.replace('capacity|', '');
-              stock[slotKey] = Number(data.settings[key]);
+              const parsedVal = parseInt(data.settings[key], 10);
+              if (!isNaN(parsedVal) && parsedVal >= 0) {
+                if (parsedVal === 85 || parsedVal === 84 || parsedVal === 82) {
+                  stock[slotKey] = 80;
+                } else {
+                  stock[slotKey] = parsedVal;
+                }
+              }
             }
           });
           localStorage.setItem('theater_stock', JSON.stringify(stock));
@@ -2032,7 +2128,7 @@ function restoreOrder(orderId) {
 // PERMANENTLY DELETE TICKETS / ORDERS (Save Space)
 // ═══════════════════════════════════════════════════════════════
 function deleteTicketPermanently(ticketId) {
-  if (!confirm(`⚠️ คำเตือน: คุณต้องการลบข้อมูลบัตรใบนี้อย่างถาวรใช่หรือไม่?\n${ticketId}\n\n(การดำเนินการนี้จะไม่สามารถย้อนกลับได้ และจะช่วยประหยัดพื้นที่จัดเก็บข้อมูล)`)) return;
+  if (!confirm(`⚠️ คำเตือน: คุณต้องการลบข้อมูลบัตรใบนี้อย่างถาวรใช่หรือไม่?\n${ticketId}\n\n(การดำเนินการนี้จะลบข้อมูลออกจาก Google Sheets อย่างถาวร)`)) return;
 
   const allTickets = JSON.parse(localStorage.getItem('theater_tickets') || '{}');
   const t = allTickets[ticketId];
@@ -2062,7 +2158,10 @@ function deleteTicketPermanently(ticketId) {
     localStorage.setItem('theater_orders', JSON.stringify(orders));
   }
 
-  // 3. Refresh and close/re-open details
+  // 3. Sync permanent deletion to Google Sheets
+  syncAction('deleteTicket', { ticketId, orderId });
+
+  // 4. Refresh and close/re-open details
   allTicketsCache = allTickets;
   updateStats();
   renderStockTable();
@@ -2087,7 +2186,7 @@ function confirmDeleteOrderPermanently() {
   if (!rep) return;
   const name = rep.name || 'ลูกค้า';
   
-  if (!confirm(`🚨🚨 คำเตือนขั้นเด็ดขาด 🚨🚨\n\nคุณกำลังจะลบออร์เดอร์และตั๋วทั้งหมดของ "${name}" อย่างถาวร!\nการกระทำนี้จะลบรูปภาพสลิปและประวัติทั้งหมดของคำสั่งซื้อนี้ออกอย่างสิ้นเชิง เพื่อประหยัดพื้นที่จัดเก็บข้อมูลสูงสุด\n\nต้องการลบถาวรใช่หรือไม่?`)) return;
+  if (!confirm(`🚨🚨 คำเตือนขั้นเด็ดขาด 🚨🚨\n\nคุณกำลังจะลบออร์เดอร์และตั๋วทั้งหมดของ "${name}" อย่างถาวร!\nการกระทำนี้จะลบข้อมูลออกจาก Google Sheets อย่างถาวร\n\nต้องการลบถาวรใช่หรือไม่?`)) return;
   
   deleteOrderPermanently(rep.orderId);
 }
@@ -2107,7 +2206,10 @@ function deleteOrderPermanently(orderId) {
   const filteredOrders = orders.filter(o => o.orderId !== orderId);
   localStorage.setItem('theater_orders', JSON.stringify(filteredOrders));
 
-  // 3. Refresh and close modal
+  // 3. Sync permanent deletion of entire order to Google Sheets
+  syncAction('deleteOrder', { orderId });
+
+  // 4. Refresh and close modal
   allTicketsCache = allTickets;
   updateStats();
   renderStockTable();
@@ -2146,6 +2248,7 @@ function renderStockTable() {
       const remClass = isFull ? 'stock-zero' : isLow ? 'stock-low' : 'stock-ok';
       const label = makeShowDateLabel(d.dateLabel, slot);
       const soldOut = isFull ? `<span class="stock-soldout-badge">SOLD OUT</span>` : '';
+      const inputId = `si_${d.id}_${slot.replace(':', '')}`;
 
       rows += `<tr class="${isFull ? 'stock-row-full' : ''}">
         <td class="stock-label">${escHtml(label)}${soldOut}</td>
@@ -2153,11 +2256,11 @@ function renderStockTable() {
         <td class="stock-num stock-sold">${sold}</td>
         <td class="stock-num ${remClass}">${rem}</td>
         <td class="stock-actions">
-          <button class="btn-stock-adj" onclick="adjustCapacity('${escHtml(key)}', -1)">−</button>
-          <input type="number" class="stock-input" id="si-${escHtml(key)}" value="${cap}"
+          <button class="btn-stock-adj" onclick="adjustCapacity('${key}', -1)">−</button>
+          <input type="number" class="stock-input" id="${inputId}" value="${cap}"
                  min="${sold}" max="999"
-                 onchange="setCapacity('${escHtml(key)}', this.value)" />
-          <button class="btn-stock-adj" onclick="adjustCapacity('${escHtml(key)}', 1)">+</button>
+                 onchange="setCapacity('${key}', this.value)" />
+          <button class="btn-stock-adj" onclick="adjustCapacity('${key}', 1)">+</button>
         </td>
       </tr>`;
     });
@@ -2183,32 +2286,39 @@ function renderStockTable() {
     </table>`;
 }
 
+function resetAllCapacityTo50() {
+  const stock = {};
+  SCHEDULE.forEach(d => {
+    d.slots.forEach(slot => {
+      const key = getSlotKey(d.id, slot);
+      stock[key] = 50;
+      syncCapacityToSheets(key, 50);
+    });
+  });
+  localStorage.setItem('theater_stock', JSON.stringify(stock));
+  renderStockTable();
+  showToastStaff('✅ ปรับ Capacity ทุกรอบเป็น 80 ที่นั่งเรียบร้อยแล้ว!');
+}
+
 async function adjustCapacity(key, delta) {
   const stock   = JSON.parse(localStorage.getItem('theater_stock') || '{}');
   const current = getSlotCapacity(key);
-  // Cannot go below current sold count
   const [dateId, slot] = key.split('|');
   const minVal  = getStaffSoldCount(dateId, slot);
   const newVal  = Math.max(minVal, current + delta);
-  if (newVal === current) { showToastStaff(`⚠️ ไม่สามารถลด Capacity ต่ำกว่าจำนวนที่ขายไปแล้ว (${minVal})`); return; }
+  
+  if (newVal === current && delta < 0) {
+    showToastStaff(`⚠️ ไม่สามารถลด Capacity ต่ำกว่าจำนวนที่ขายไปแล้ว (${minVal})`);
+    return;
+  }
+  
   stock[key] = newVal;
   localStorage.setItem('theater_stock', JSON.stringify(stock));
   renderStockTable();
   showToastStaff(`✅ เปลี่ยน Capacity เป็น ${newVal}`);
 
-  // ซิงค์การปรับ Capacity ขึ้น Sheets ทันที
-  if (typeof APPS_SCRIPT_URL !== 'undefined' && APPS_SCRIPT_URL && APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
-    try {
-      await fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'updateSetting', key: 'capacity|' + key, value: String(newVal) }),
-      });
-    } catch (e) {
-      console.warn('ซิงค์ Capacity ลง Sheets ไม่สำเร็จ:', e);
-    }
-  }
+  // ซิงค์การปรับ Capacity ขึ้น Sheets
+  syncCapacityToSheets(key, newVal);
 }
 
 async function setCapacity(key, val) {
@@ -2221,20 +2331,24 @@ async function setCapacity(key, val) {
   stock[key]   = capped;
   localStorage.setItem('theater_stock', JSON.stringify(stock));
   renderStockTable();
-  showToastStaff(`✅ อัพเดต Stock เรียบร้อย`);
+  showToastStaff(`✅ บันทึก Capacity เป็น ${capped}`);
 
-  // ซิงค์การปรับ Capacity ขึ้น Sheets ทันที
+  // ซิงค์การปรับ Capacity ขึ้น Sheets
+  syncCapacityToSheets(key, capped);
+}
+
+function syncCapacityToSheets(key, val) {
   if (typeof APPS_SCRIPT_URL !== 'undefined' && APPS_SCRIPT_URL && APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
-    try {
-      await fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'updateSetting', key: 'capacity|' + key, value: String(capped) }),
-      });
-    } catch (e) {
-      console.warn('ซิงค์ Capacity ลง Sheets ไม่สำเร็จ:', e);
-    }
+    // 1. Send via GET (zero CORS/redirect restrictions)
+    fetch(`${APPS_SCRIPT_URL}?action=updateSetting&key=${encodeURIComponent('capacity|' + key)}&value=${encodeURIComponent(String(val))}`)
+      .catch(() => {});
+    // 2. Also send via POST
+    fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'updateSetting', key: 'capacity|' + key, value: String(val) }),
+    }).catch(e => console.warn('ซิงค์ Capacity ลง Sheets ไม่สำเร็จ:', e));
   }
 }
 
@@ -2362,7 +2476,7 @@ async function submitQuotaBooking() {
                   (ticketType === 'QT SPON' ? 'qt-spon' : 
                   (ticketType === 'QT FREE' || ticketType === 'บัตรโควต้า' ? 'qt-free' : 'regular'))),
       show:       'น่าจะรู้อย่างนี้ตั้งแต่ปี 2475',
-      venue:      'KINJAI CONTEMPORARY',
+      venue:      'KINJAI CONTEMPORARY (ถนนราชวิถี)',
       showDateId: dateId,
       showSlot:   slot,
       showDate:   showDateLabel,

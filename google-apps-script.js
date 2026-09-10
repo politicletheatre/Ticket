@@ -151,6 +151,89 @@ function doPost(e) {
       return output({ success: true });
     }
 
+    // 3.1 จัดการลบตั๋วถาวร (Permanent Delete Ticket)
+    if (data.action === 'deleteTicket') {
+      const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+      const ticketsSheet = getOrCreateSheet(ss, SHEET_TICKETS, []);
+      const ticketId = data.ticketId;
+      const orderId = data.orderId;
+
+      // 1. ลบแถวใน Tickets sheet
+      const tData = ticketsSheet.getDataRange().getValues();
+      const tHeaders = tData[0] || [];
+      const idxTId = tHeaders.indexOf('รหัสบัตร');
+
+      for (let i = tData.length - 1; i >= 1; i--) {
+        if (tData[i][idxTId] === ticketId) {
+          ticketsSheet.deleteRow(i + 1);
+          break;
+        }
+      }
+
+      // 2. ปรับลดจำนวนตั๋วใน Orders sheet หรือลบออร์เดอร์หากไม่เหลือตั๋ว
+      if (orderId) {
+        const ordersSheet = getOrCreateSheet(ss, SHEET_ORDERS, []);
+        const oData = ordersSheet.getDataRange().getValues();
+        const oHeaders = oData[0] || [];
+        const idxOId = oHeaders.indexOf('เลขที่คำสั่งซื้อ');
+        const idxOQty = oHeaders.indexOf('จำนวนบัตร (ใบ)');
+        const idxOTotal = oHeaders.indexOf('ยอดเงินรวม (บาท)');
+        const idxOPrice = oHeaders.indexOf('ราคาต่อใบ (บาท)');
+        const idxOTkts = oHeaders.indexOf('รหัสตั๋วทั้งหมด');
+
+        for (let i = 1; i < oData.length; i++) {
+          if (oData[i][idxOId] === orderId) {
+            const rowNum = i + 1;
+            let currentTkts = String(oData[i][idxOTkts] || '').split(',').map(s => s.trim()).filter(Boolean);
+            currentTkts = currentTkts.filter(id => id !== ticketId);
+            const newQty = currentTkts.length;
+            if (newQty <= 0) {
+              ordersSheet.deleteRow(rowNum);
+            } else {
+              const pricePer = Number(oData[i][idxOPrice]) || 0;
+              if (idxOQty >= 0) ordersSheet.getRange(rowNum, idxOQty + 1).setValue(newQty);
+              if (idxOTotal >= 0) ordersSheet.getRange(rowNum, idxOTotal + 1).setValue(newQty * pricePer);
+              if (idxOTkts >= 0) ordersSheet.getRange(rowNum, idxOTkts + 1).setValue(currentTkts.join(', '));
+            }
+            break;
+          }
+        }
+      }
+      return output({ success: true });
+    }
+
+    // 3.2 จัดการลบคำสั่งซื้อถาวรทั้งออร์เดอร์ (Permanent Delete Order)
+    if (data.action === 'deleteOrder') {
+      const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+      const ordersSheet = getOrCreateSheet(ss, SHEET_ORDERS, []);
+      const ticketsSheet = getOrCreateSheet(ss, SHEET_TICKETS, []);
+      const orderId = data.orderId;
+
+      // 1. ลบตั๋วทั้งหมดของออร์เดอร์นี้ใน Tickets sheet
+      const tData = ticketsSheet.getDataRange().getValues();
+      const tHeaders = tData[0] || [];
+      const idxTOId = tHeaders.indexOf('เลขที่คำสั่งซื้อ');
+
+      for (let i = tData.length - 1; i >= 1; i--) {
+        if (tData[i][idxTOId] === orderId) {
+          ticketsSheet.deleteRow(i + 1);
+        }
+      }
+
+      // 2. ลบแถวใน Orders sheet
+      const oData = ordersSheet.getDataRange().getValues();
+      const oHeaders = oData[0] || [];
+      const idxOId = oHeaders.indexOf('เลขที่คำสั่งซื้อ');
+
+      for (let i = oData.length - 1; i >= 1; i--) {
+        if (oData[i][idxOId] === orderId) {
+          ordersSheet.deleteRow(i + 1);
+          break;
+        }
+      }
+      return output({ success: true });
+    }
+
     // 4. จัดการแก้ไขข้อมูลลูกค้า (จาก Staff Edit Modal)
     if (data.action === 'saveEdit') {
       const ss = SpreadsheetApp.openById(SPREADSHEET_ID);

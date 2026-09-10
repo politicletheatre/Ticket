@@ -3,21 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#0d0718" />
+  <meta name="theme-color" content="#ffffff" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <title>🎫 ตรวจสอบสถานะบัตร — น่าจะรู้อย่างนี้ตั้งแต่ปี 2475</title>
-  <meta name="description" content="ตรวจสอบสถานะบัตรและ QR Code ของคุณสำหรับการแสดง น่าจะรู้อย่างนี้ตั้งแต่ปี 2475" />
+  <meta name="description" content="ตรวจสอบสถานะบัตรและ QR Code ของคุณสำหรับการแสดง AFTER 6 มรดก 6 ตุลา" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <script src="assets/qrcodejs.min.js"></script>
   <style>
     :root {
-      --bg: #0d0718; --surface: rgba(255,255,255,0.06); --border: rgba(255,255,255,0.12);
-      --purple: #6b35b0; --purple-light: #9b5de5; --gold: #d4a017; --gold-light: #fde68a;
+      --bg: #ffffff; --surface: #f5f5f5; --border: #dddddd;
+      --purple: #ff3b30; --purple-light: #ff6b60; --gold: #000000; --gold-light: #111111;
       --success: #22c55e; --error: #ef4444;
-      --text: #f8f4ff; --muted: #7c6fa8; --radius: 16px;
+      --text: #111111; --muted: #555555; --radius: 16px;
       --transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -26,13 +26,12 @@
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
-      background-image: radial-gradient(ellipse at top, #1a0933 0%, #0d0718 60%);
     }
 
     /* ── HEADER ── */
     .status-header {
       position: sticky; top: 0; z-index: 100;
-      background: rgba(13,7,24,0.96); backdrop-filter: blur(20px);
+      background: rgba(255,255,255,0.96); backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--border);
       padding: 14px 20px;
       display: flex; align-items: center; justify-content: space-between;
@@ -92,15 +91,15 @@
       font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: var(--transition);
     }
     .search-tab.active {
-      background: rgba(107,53,176,0.2); border-color: var(--purple-light); color: var(--text);
+      background: rgba(255,59,48,0.15); border-color: var(--purple-light); color: var(--text);
     }
     .search-input-wrap { position: relative; }
     .search-input-wrap input {
-      width: 100%; background: rgba(255,255,255,0.05); border: 1.5px solid var(--border);
+      width: 100%; background: var(--surface); border: 1.5px solid var(--border);
       border-radius: 12px; padding: 13px 16px; color: var(--text);
       font-family: inherit; font-size: 1rem; outline: none; transition: var(--transition);
     }
-    .search-input-wrap input:focus { border-color: var(--purple-light); box-shadow: 0 0 0 3px rgba(155,93,229,0.15); }
+    .search-input-wrap input:focus { border-color: var(--purple-light); box-shadow: 0 0 0 3px rgba(255,59,48,0.15); }
     .search-input-wrap input::placeholder { color: var(--muted); }
     .btn-search {
       width: 100%; margin-top: 12px;
@@ -330,9 +329,9 @@
       <button class="search-tab" id="tab-order" onclick="switchTab('order')">📋 รหัสคำสั่งซื้อ</button>
     </div>
     <div class="search-input-wrap">
-      <input type="tel" id="input-phone" placeholder="กรอกเบอร์โทรศัพท์ เช่น 0812345678"
+      <input type="tel" id="input-phone" placeholder="กรอกเบอร์โทรศัพท์"
              inputmode="numeric" onkeydown="if(event.key==='Enter') doSearch()" />
-      <input type="text" id="input-order" placeholder="กรอกรหัส เช่น FNH-20241206-XXXXX"
+      <input type="text" id="input-order" placeholder="กรอกรหัสการจอง"
              style="display:none;text-transform:uppercase"
              onkeydown="if(event.key==='Enter') doSearch()" />
     </div>
@@ -347,13 +346,6 @@
 
   <!-- RESULT -->
   <div id="result-section"></div>
-
-  <!-- NOTE -->
-  <div class="status-note">
-    <span>ℹ️</span>
-    <span>หากไม่พบข้อมูลบัตร กรุณาติดต่อทีมงานที่ @fandreams หรือโทร 02-XXX-XXXX
-    ข้อมูลบัตรจัดเก็บในเบราว์เซอร์ที่ใช้สั่งซื้อ หากใช้เบราว์เซอร์อื่นอาจไม่พบข้อมูล</span>
-  </div>
 
 </main>
 
@@ -449,6 +441,7 @@ async function doSearch() {
   }
 
   let matchedOrderIds = new Set();
+  let cloudSearched = false;
 
   // พยายามดึงข้อมูลจาก Sheets แบบ Real-time ตลอดเวลาหากมีการเชื่อมต่อคลาวด์ เพื่อความสอดคล้องสูงสุดข้ามอุปกรณ์
   if (typeof APPS_SCRIPT_URL !== 'undefined' && APPS_SCRIPT_URL && APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
@@ -456,18 +449,26 @@ async function doSearch() {
       const res = await fetch(`${APPS_SCRIPT_URL}?action=searchOrder&query=${encodeURIComponent(query)}&type=${currentTab}`);
       if (res.ok) {
         const data = await res.json();
-        if (data.success && data.orders && data.orders.length > 0) {
-          // บันทึกแคชตั๋วรายใบ
-          Object.assign(allTickets, data.tickets);
-          localStorage.setItem('theater_tickets', JSON.stringify(allTickets));
+        if (data.success) {
+          cloudSearched = true;
+          if (data.orders && data.orders.length > 0) {
+            // บันทึกแคชตั๋วรายใบ
+            Object.assign(allTickets, data.tickets);
+            localStorage.setItem('theater_tickets', JSON.stringify(allTickets));
 
-          // บันทึกแคชคำสั่งซื้อ
-          data.orders.forEach(newO => {
-            const idx = allOrders.findIndex(o => o.orderId === newO.orderId);
-            if (idx >= 0) allOrders[idx] = newO;
-            else allOrders.push(newO);
-          });
-          localStorage.setItem('theater_orders', JSON.stringify(allOrders));
+            // บันทึกแคชคำสั่งซื้อ
+            data.orders.forEach(newO => {
+              const idx = allOrders.findIndex(o => o.orderId === newO.orderId);
+              if (idx >= 0) allOrders[idx] = newO;
+              else allOrders.push(newO);
+            });
+            localStorage.setItem('theater_orders', JSON.stringify(allOrders));
+
+            matchedOrderIds = new Set(data.orders.map(o => o.orderId));
+          } else {
+            // บน Google Sheets ไม่พบข้อมูลนี้แล้ว (ถูกลบออกแล้ว)
+            matchedOrderIds = new Set();
+          }
         }
       }
     } catch (e) {
@@ -475,8 +476,10 @@ async function doSearch() {
     }
   }
 
-  // ค้นหาในโลคัลแคชหลังดึงข้อมูล (หรือเมื่อการเชื่อมต่อล้มเหลว)
-  matchedOrderIds = findLocalMatchedIds();
+  // หากออฟไลน์หรือไม่สามารถติดต่อคลาวด์ได้ ให้ค้นหาในแคชเครื่องแทน
+  if (!cloudSearched) {
+    matchedOrderIds = findLocalMatchedIds();
+  }
 
   if (matchedOrderIds.size === 0) {
     resultEl.innerHTML = `
@@ -722,35 +725,75 @@ function downloadQR(ticketId) {
   const qrCanvas = qrEl?.querySelector('canvas');
 
   const tc  = document.createElement('canvas');
-  tc.width  = 400; tc.height = 520;
+  tc.width  = 400; tc.height = 540;
   const ctx = tc.getContext('2d');
 
-  ctx.fillStyle = '#1a0d2e';
+  // Background: Deep dark / black
+  ctx.fillStyle = '#0f0f11';
   ctx.fillRect(0, 0, tc.width, tc.height);
-  ctx.strokeStyle = '#d4a017'; ctx.lineWidth = 3;
-  ctx.strokeRect(12, 12, tc.width - 24, tc.height - 24);
 
-  ctx.fillStyle = '#fde68a'; ctx.font = 'bold 18px sans-serif'; ctx.textAlign = 'center';
-  ctx.fillText('น่าจะรู้อย่างนี้ตั้งแต่ปี 2475', tc.width / 2, 58);
-  ctx.fillStyle = '#c4b5fd'; ctx.font = '12px sans-serif';
-  ctx.fillText('What I Wish I Knew When I was back in 1932', tc.width / 2, 82);
+  // Border: Sleek graphite border
+  ctx.strokeStyle = '#27272a';
+  ctx.lineWidth   = 2;
+  ctx.strokeRect(10, 10, tc.width - 20, tc.height - 20);
 
+  // Top Red Accent Line
+  ctx.fillStyle = '#ff3b30';
+  ctx.fillRect(20, 14, tc.width - 40, 3);
+
+  // Header Titles
+  ctx.fillStyle  = '#ffffff';
+  ctx.font       = 'bold 19px sans-serif';
+  ctx.textAlign  = 'center';
+  ctx.fillText('น่าจะรู้อย่างนี้ตั้งแต่ปี 2475', tc.width / 2, 50);
+
+  ctx.fillStyle  = '#ff3b30';
+  ctx.font       = 'bold 11px sans-serif';
+  ctx.fillText('What I Wish I Knew When I was back in 1932', tc.width / 2, 72);
+
+  // QR Code Box (White background card for 100% scan contrast)
   if (qrCanvas) {
-    const qrSize = 200;
-    ctx.drawImage(qrCanvas, (tc.width - qrSize) / 2, 104, qrSize, qrSize);
+    const qrSize = 190;
+    const boxPadding = 10;
+    const boxSize = qrSize + boxPadding * 2;
+    const boxX = (tc.width - boxSize) / 2;
+    const boxY = 92;
+
+    ctx.fillStyle = '#ffffff';
+    if (ctx.roundRect) {
+      ctx.beginPath();
+      ctx.roundRect(boxX, boxY, boxSize, boxSize, 12);
+      ctx.fill();
+    } else {
+      ctx.fillRect(boxX, boxY, boxSize, boxSize);
+    }
+
+    ctx.drawImage(qrCanvas, (tc.width - qrSize) / 2, boxY + boxPadding, qrSize, qrSize);
   }
 
-  ctx.fillStyle = '#ffffff'; ctx.font = 'bold 15px sans-serif';
-  ctx.fillText(ticket.name || '', tc.width / 2, 335);
-  ctx.fillStyle = '#c4b5fd'; ctx.font = '13px sans-serif';
-  ctx.fillText(`ประเภท: ${ticket.type}`, tc.width / 2, 360);
-  ctx.fillText(`ใบที่ ${ticket.ticketNum}`, tc.width / 2, 382);
+  // Info details
+  ctx.fillStyle = '#ffffff';
+  ctx.font      = 'bold 16px sans-serif';
+  ctx.fillText(ticket.name || '', tc.width / 2, 340);
+
+  ctx.fillStyle = '#d4d4d8';
+  ctx.font      = '13px sans-serif';
+  ctx.fillText(`ประเภท: ${ticket.type}`, tc.width / 2, 365);
+  ctx.fillText(`ใบที่ ${ticket.ticketNum}`, tc.width / 2, 388);
+
   if (ticket.showDate) {
-    ctx.fillStyle = '#d4a017'; ctx.font = 'bold 11px sans-serif';
-    ctx.fillText(ticket.showDate, tc.width / 2, 408);
+    ctx.fillStyle = '#ff453a';
+    ctx.font      = 'bold 13px sans-serif';
+    ctx.fillText(ticket.showDate, tc.width / 2, 416);
   }
-  ctx.fillStyle = '#6b7280'; ctx.font = '10px monospace';
-  ctx.fillText(ticketId, tc.width / 2, 440);
+
+  ctx.fillStyle = '#71717a';
+  ctx.font      = '11px monospace';
+  ctx.fillText(ticketId, tc.width / 2, 444);
+
+  ctx.fillStyle = '#52525b';
+  ctx.font      = '10px sans-serif';
+  ctx.fillText('KINJAI CONTEMPORARY (ถนนราชวิถี)', tc.width / 2, 470);
 
   const link = document.createElement('a');
   link.download = `ticket-${ticketId}.png`;

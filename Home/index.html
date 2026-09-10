@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🎭 Politicle Theatre — สะท้อนสังคมผ่านม่านศิลปะการแสดง</title>
+  <meta name="description" content="หน้าหลักและประวัติผลงานของคณะละคร Politicle Theatre ผู้สรรค์สร้างละครเวทีสะท้อนสังคมและประวัติศาสตร์" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="home-style.css" />
+  <script>
+    // Initialize language as early as possible
+    const savedLang = localStorage.getItem('preferred-lang') || 'en';
+    document.documentElement.setAttribute('lang', savedLang);
+  </script>
+</head>
+<body>
+
+  <!-- BACKGROUND DECORATIONS -->
+  <div class="glow-bg">
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+  </div>
+
+  <!-- HEADER / NAVBAR -->
+  <header class="site-header">
+    <div class="header-logo">
+      <span class="logo-emoji">🎭</span>
+      <span class="logo-text">Politicle Theatre</span>
+    </div>
+    <nav class="header-nav">
+      <a href="#about" class="nav-link">
+        <span class="lang-en">About Us</span>
+        <span class="lang-th">เกี่ยวกับคณะละคร</span>
+      </a>
+      <a href="#plays" class="nav-link">
+        <span class="lang-en">Past Productions</span>
+        <span class="lang-th">ผลงานที่ผ่านมา</span>
+      </a>
+      <a href="#contact" class="nav-link">
+        <span class="lang-en">Contact Us</span>
+        <span class="lang-th">ติดต่อเรา</span>
+      </a>
+      <a href="../index.html" class="btn-nav">
+        <span>🎫</span>
+        <span class="lang-en">Buy Tickets</span>
+        <span class="lang-th">ซื้อตั๋วรอบปัจจุบัน</span>
+      </a>
+      <button class="lang-switch-btn" onclick="toggleLanguage()">
+        <span class="lang-en">TH</span>
+        <span class="lang-th">EN</span>
+      </button>
+    </nav>
+  </header>
+
+  <!-- SECTION: CURRENT SHOW HIGHLIGHT -->
+  <section class="section container" id="current-show">
+    <div class="section-header">
+      <span class="section-tag">
+        <span class="lang-en">NOW ON STAGE</span>
+        <span class="lang-th">จัดแสดงขณะนี้</span>
+      </span>
+      <h2 class="section-title">
+        <span class="lang-en">Current Show</span>
+        <span class="lang-th">ผลงานจัดแสดงขณะนี้</span>
+      </h2>
+    </div>
+    
+    <div class="showcase-card" onclick="openModal('dialog-1932')">
+      <div class="showcase-visual">
+        <div class="poster-mock" style="background-image: url('../assets/poster-1932.jpg');">
+          <div class="poster-overlay"></div>
+        </div>
+      </div>
+      <div class="showcase-details">
+        <span class="show-status">
+          <span class="lang-en">🔥 Booking Open</span>
+          <span class="lang-th">🔥 กำลังเปิดจองบัตร</span>
+        </span>
+        <h3 class="show-title">
+          <span class="lang-en">What I Wish I Knew in 1932</span>
+          <span class="lang-th">น่าจะรู้อย่างนี้ตั้งแต่ปี 2475</span>
+        </h3>
+        <p class="show-desc">
+          <span class="lang-en">Travel back to 1925 Paris, France, and follow the lives of young Siamese students who would later lead the revolution of 1932. A coming-of-age dark comedy theatrical production that dives deep into humanity, love, friendship, dreams, and conflicts before they rose to change a nation's history.</span>
+          <span class="lang-th">ย้อนเวลากลับไปยังปี พ.ศ. 2468 ณ กรุงปารีส ประเทศฝรั่งเศส ร่วมเดินทางไปกับชีวิตของกลุ่มนักเรียนไทยหนุ่มสาว ผู้ที่ต่อมาจะกลายเป็นผู้ก่อการเปลี่ยนแปลงการปกครองในปี 2475 ละครเวทีแนว Coming-of-Age ปนตลกร้าย ที่จะพาคุณไปเจาะลึกความเป็นมนุษย์ ความรัก มิตรภาพ ความฝัน และความขัดแย้งของพวกเขาก่อนจะลุกขึ้นมาเปลี่ยนประวัติศาสตร์ชาติ</span>
+        </p>
+        <div class="show-meta-grid">
+          <div class="meta-item">
+            <span class="mi-label">
+              <span class="lang-en">Director & Playwright</span>
+              <span class="lang-th">ผู้กำกับ & บทละคร</span>
+            </span>
+            <span class="mi-val">
+              <span class="lang-en">Natthapat Mardech</span>
+              <span class="lang-th">ณัฐภัทร มาเดช</span>
+            </span>
+          </div>
+          <div class="meta-item">
+            <span class="mi-label">
+              <span class="lang-en">Venue</span>
+              <span class="lang-th">สถานที่จัดแสดง</span>
+            </span>
+            <span class="mi-val">
+              <span class="lang-en">Rooftop, River City Bangkok</span>
+              <span class="lang-th">ดาดฟ้า ณ River City Bangkok</span>
+            </span>
+          </div>
+        </div>
+        <div style="display: flex; gap: 12px; align-items: center; margin-top: 12px; flex-wrap: wrap;">
+          <a href="../index.html" class="btn-primary" onclick="event.stopPropagation();">
+            <span>🎫</span>
+            <span class="lang-en">Book Tickets Now</span>
+            <span class="lang-th">จองบัตรได้ที่นี่</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION: PAST PLAYS -->
+  <section class="section container" id="plays">
+    <div class="section-header">
+      <span class="section-tag">
+        <span class="lang-en">PAST PRODUCTIONS</span>
+        <span class="lang-th">ผลงานที่ผ่านมา</span>
+      </span>
+      <h2 class="section-title">
+        <span class="lang-en">Our Past Productions</span>
+        <span class="lang-th">ผลงานที่ผ่านมาของเรา</span>
+      </h2>
+    </div>
+
+    <div class="plays-grid">
+      <!-- PLAY 1 -->
+      <div class="play-card" onclick="openModal('dialog-lost-decade')">
+        <div class="play-visual visual-lost-decade">
+          <span class="pv-tag">2025 Production</span>
+        </div>
+        <div class="play-info">
+          <h3 class="play-title">
+            <span>The Lost Decade of Us</span><br/>
+            <span class="play-subtitle">
+              <span class="lang-en">I Wish There Was No Politics</span>
+              <span class="lang-th">อยากให้โลกนี้ไม่มีการเมือง</span>
+            </span>
+          </h3>
+          <p class="play-desc">
+            <span class="lang-en">Former bestselling romance novelist Jane shifts her genre to politics, only to find her friends and ex-lover—once active campaigners—have completely turned their backs on politics. She must search for answers.</span>
+            <span class="lang-th">เมื่อ 'เจน' อดีตนักเขียนนิยายรัก Bestseller หันมาจับงานเขียนด้านการเมือง แต่ต้องแปลกใจเมื่อเหล่าเพื่อนและอดีตคนรักผู้เคยตื่นตัวกลับหันหลังให้การเมืองโดยสิ้นเชิง เธอจึงต้องออกค้นหาคำตอบ</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- PLAY 2 -->
+      <div class="play-card" onclick="openModal('dialog-rashomon')">
+        <div class="play-visual visual-rashomon">
+          <span class="pv-tag">2025 Production</span>
+        </div>
+        <div class="play-info">
+          <h3 class="play-title">
+            <span>Rashomon 6 Oct</span><br/>
+            <span class="play-subtitle">
+              <span class="lang-en">The Rashomon of History</span>
+              <span class="lang-th">ราโชมอนแห่งประวัติศาสตร์</span>
+            </span>
+          </h3>
+          <p class="play-desc">
+            <span class="lang-en">From Akutagawa's unresolved tragedy to state violence. A young man returns to the crime scene searching for truth, only to confront multiple versions of reality and an ideological test of non-violence.</span>
+            <span class="lang-th">จากโศกนาฏกรรมที่ยังไม่ถูกคลี่คลายของ อะคุตะงะวะ สู่เหตุการณ์ความรุนแรงโดยรัฐ เมื่อชายหนุ่มกลับมายังจุดเกิดเหตุเพื่อค้นหาความจริง ทว่ากลับต้องเผชิญกับความจริงหลายชุดและการต่อสู้ทางอุดมการณ์</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION: ABOUT US -->
+  <section class="section container" id="about">
+    <div class="about-grid">
+      <div class="about-text">
+        <span class="section-tag">
+          <span class="lang-en">WHO WE ARE</span>
+          <span class="lang-th">ประวัติคณะ</span>
+        </span>
+        <h2 class="section-title" style="text-align: left;">
+          <span class="lang-en">History of Politicle Theatre</span>
+          <span class="lang-th">ประวัติคณะ Politicle Theatre</span>
+        </h2>
+        <p>
+          <span class="lang-en"><strong>Politicle Theatre</strong> is an alternative theater company of the new generation, founded to create performing arts that are intensely focused on Thai society and politics. We aim to use theater as a bridge for ideas, bringing historical issues that are sometimes overlooked, dusting them off, and telling them from the perspective of ordinary human hearts.</span>
+          <span class="lang-th"><strong>Politicle Theatre</strong> คือคณะละครทางเลือกของคนรุ่นใหม่ที่ก่อตั้งขึ้นเพื่อสร้างสรรค์ผลงานศิลปะการแสดงที่เข้มข้นไปด้วยประเด็นสังคมและการเมืองไทย เรามุ่งหมายที่จะใช้ละครเวทีเป็นสะพานเชื่อมความคิด ดึงประเด็นประวัติศาสตร์ที่บางครั้งอาจถูกละเลย นำมาปัดฝุ่นและเล่าใหม่ในมุมมองที่เห็นหัวใจและความเป็นมนุษย์ของตัวละคร</span>
+        </p>
+        <p>
+          <span class="lang-en">We do not offer pre-packaged answers. Each of our works is designed to invite the audience to ask questions, debate, and contemplate together long after the curtains close.</span>
+          <span class="lang-th">พวกเราไม่ได้เสนอคำตอบที่สำเร็จรูป แต่ละผลงานของเราถูกออกแบบมาเพื่อชวนให้ผู้ชมได้ร่วมตั้งคำถาม ถกเถียง และขบคิดร่วมกันภายหลังจากที่ม่านการแสดงปิดตัวลง</span>
+        </p>
+      </div>
+      <div class="about-stats">
+        <div class="stat-card">
+          <span class="stat-num">3+</span>
+          <span class="stat-label">
+            <span class="lang-en">Major Productions</span>
+            <span class="lang-th">ผลงานละครเวทีใหญ่</span>
+          </span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num">100%</span>
+          <span class="stat-label">
+            <span class="lang-en">Social Reflection</span>
+            <span class="lang-th">ความตั้งใจสะท้อนสังคม</span>
+          </span>
+        </div>
+        <div class="stat-card" style="grid-column: span 2;">
+          <span class="stat-num">Bangkok Theatre Festival</span>
+          <span class="stat-label">
+            <span class="lang-en">Part of the Art Festivals</span>
+            <span class="lang-th">ร่วมเป็นส่วนหนึ่งของเทศกาลศิลปะ</span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION: CONTACT & FOLLOW -->
+  <section class="section container" id="contact">
+    <div class="contact-card">
+      <span class="section-tag">
+        <span class="lang-en">CONNECT WITH US</span>
+        <span class="lang-th">ช่องทางติดต่อ</span>
+      </span>
+      <h2 class="contact-title">
+        <span class="lang-en">Follow Our News & Shows</span>
+        <span class="lang-th">ติดตามข่าวสารและการแสดง</span>
+      </h2>
+      <p class="contact-sub">
+        <span class="lang-en">Follow our updates, showtimes, and behind-the-scenes rehearsals through our main channels.</span>
+        <span class="lang-th">ร่วมติดตามความเคลื่อนไหว รอบการแสดง และเบื้องหลังการซ้อมของพวกเราได้ผ่านช่องทางหลัก</span>
+      </p>
+      
+      <div class="contact-channels">
+        <a href="https://www.facebook.com/politicle.theatre" target="_blank" class="channel-btn btn-facebook">
+          <span>👥 Facebook Page</span>
+          <strong>Politicle Theatre</strong>
+        </a>
+        <a href="https://www.instagram.com/politicle.theatre?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" class="channel-btn btn-instagram">
+          <span>📸 Instagram</span>
+          <strong>@politicletheatre</strong>
+        </a>
+        <a href="mailto:politicle.theatre@gmail.com" class="channel-btn btn-email">
+          <span>✉️ Email</span>
+          <strong>politicle.theatre@gmail.com</strong>
+        </a>
+      </div>
+      <div class="contact-footer">
+        <span class="lang-en">Or ask for booking details at Line/Email:</span>
+        <span class="lang-th">หรือติดต่อสอบถามข้อมูลการจองบัตรได้ที่ Line/Email:</span>
+        <strong>politicle.theatre@gmail.com</strong>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <p>© 2026 Politicle Theatre. All rights reserved. Designed for history lovers.</p>
+  </footer>
+
+  <!-- MODAL DIALOGS -->
+  
+  <!-- Dialog: 1932 -->
+  <dialog id="dialog-1932" class="play-dialog">
+    <div class="dialog-content">
+      <button class="dialog-close" onclick="closeModal('dialog-1932')">&times;</button>
+      <div class="dialog-body-grid">
+        <div class="dialog-poster-wrapper">
+          <img src="../assets/poster-1932.jpg" alt="น่าจะรู้อย่างนี้ตั้งแต่ปี 2475" class="dialog-poster-img clickable-poster" onclick="openLightboxSingle('../assets/poster-1932.jpg')" />
+        </div>
+        <div class="dialog-info-wrapper">
+          <span class="dialog-tag">
+            <span class="lang-en">NOW ON STAGE</span>
+            <span class="lang-th">จัดแสดงขณะนี้</span>
+          </span>
+          <h2 class="dialog-title">
+            <span class="lang-en">What I Wish I Knew in 1932</span>
+            <span class="lang-th">น่าจะรู้อย่างนี้ตั้งแต่ปี 2475</span>
+          </h2>
+          <h3 class="dialog-subtitle">WHAT I WISH I KNEW IN 1932</h3>
+          
+          <div class="dialog-section">
+            <h4>
+              <span class="lang-en">Synopsis</span>
+              <span class="lang-th">เรื่องย่อ</span>
+            </h4>
+            <p>
+              <span class="lang-en">Travel back to 1925 Paris, France, and follow the lives of young Siamese students who would later lead the revolution of 1932. A coming-of-age dark comedy theatrical production that dives deep into humanity, love, friendship, dreams, and conflicts before they rose to change a nation's history.</span>
+              <span class="lang-th">ย้อนเวลากลับไปยังปี พ.ศ. 2468 ณ กรุงปารีส ประเทศฝรั่งเศส ร่วมเดินทางไปกับชีวิตของกลุ่มนักเรียนไทยหนุ่มสาว ผู้ที่ต่อมาจะกลายเป็นผู้ก่อการเปลี่ยนแปลงการปกครองในปี 2475 ละครเวทีแนว Coming-of-Age ปนตลกร้าย ที่จะพาคุณไปเจาะลึกความเป็นมนุษย์ ความรัก มิตรภาพ ความฝัน และความขัดแย้งของพวกเขาก่อนจะลุกขึ้นมาเปลี่ยนประวัติศาสตร์ชาติ</span>
+            </p>
+          </div>
+          
+          <div class="dialog-section">
+            <h4>
+              <span class="lang-en">Production Team</span>
+              <span class="lang-th">รายชื่อทีมงาน</span>
+            </h4>
+            <ul class="crew-list">
+              <li>
+                <span class="lang-en"><strong>Playwright & Director:</strong> Natthapat Mardech</span>
+                <span class="lang-th"><strong>บทละครและกำกับการแสดง:</strong> ณัฐภัทร มาเดช</span>
+              </li>
+              <li>
+                <span class="lang-en"><strong>Producer:</strong> Nawapol Tantiwetchakul</span>
+                <span class="lang-th"><strong>ผู้อำนวยการผลิต:</strong> นวพล ตันติเวชกุล</span>
+              </li>
+              <li>
+                <span class="lang-en"><strong>Lighting Designer:</strong> Thanawich Phongsiwan</span>
+                <span class="lang-th"><strong>ออกแบบแสง:</strong> ธนวิชญ์ พงษ์ศิริ</span>
+              </li>
+              <li>
+                <span class="lang-en"><strong>Costume Designer:</strong> Nichakon Wongwiwat</span>
+                <span class="lang-th"><strong>ออกแบบเครื่องแต่งกาย:</strong> ณิชากร วงศ์วิวัฒน์</span>
+              </li>
+              <li>
+                <span class="lang-en"><strong>Cast:</strong> Prach Phattanakul (as Pradit), Sirin Rattanaphanich (as Mali), Warut Techawiboon (as Dan)</span>
+                <span class="lang-th"><strong>นักแสดงนำ:</strong> ปราชญ์ พัฒนากุล (รับบท ประดิษฐ์), สิรินทร์ รัตนพาณิชย์ (รับบท มะลิ), วรุตม์ เตชะวิบูลย์ (รับบท แดน)</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="dialog-section">
+            <h4>
+              <span class="lang-en">Characters</span>
+              <span class="lang-th">แนะนำตัวละคร</span>
+            </h4>
+            <div class="character-grid">
+              <div class="character-card">
+                <div class="character-avatar" style="background-image: url('../assets/char-pradit.jpg');" onclick="openLightbox('#dialog-1932 .character-avatar', 0)"></div>
+                <span class="char-name">
+                  <span class="lang-en">Pradit</span>
+                  <span class="lang-th">ประดิษฐ์</span>
+                </span>
+                <span class="actor-name">
+                  <span class="lang-en">Prach P.</span>
+                  <span class="lang-th">ปราชญ์ พัฒนากุล</span>
+                </span>
+              </div>
+              <div class="character-card">
+                <div class="character-avatar" style="background-image: url('../assets/char-mali.jpg');" onclick="openLightbox('#dialog-1932 .character-avatar', 1)"></div>
+                <span class="char-name">
+                  <span class="lang-en">Mali</span>
+                  <span class="lang-th">มะลิ</span>
+                </span>
+                <span class="actor-name">
+                  <span class="lang-en">Sirin R.</span>
+                  <span class="lang-th">สิรินทร์ รัตนพาณิชย์</span>
+                </span>
+              </div>
+              <div class="character-card">
+                <div class="character-avatar" style="background-image: url('../assets/char-dan.jpg');" onclick="openLightbox('#dialog-1932 .character-avatar', 2)"></div>
+                <span class="char-name">
+                  <span class="lang-en">Dan</span>
+                  <span class="lang-th">แดน</span>
+                </span>
+                <span class="actor-name">
+                  <span class="lang-en">Warut T.</span>
+                  <span class="lang-th">วรุตม์ เตชะวิบูลย์</span>
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="dialog-section">
+            <h4>
+              <span class="lang-en">Production Photos</span>
+              <span class="lang-th">ภาพการแสดง</span>
+            </h4>
+            <div class="photo-gallery" id="gallery-1932">
+              <div class="gallery-photo" style="background-image: url('../assets/scene-1932-1.jpg');" onclick="openLightbox('#gallery-1932 .gallery-photo', 0)"></div>
+            </div>
+          </div>
+          
+          <div class="dialog-actions">
+            <a href="../index.html" class="btn-primary" onclick="closeModal('dialog-1932')">
+              <span>🎫</span>
+              <span class="lang-en">Book Tickets Now</span>
+              <span class="lang-th">จองบัตรชมละครรอบปัจจุบัน</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Dialog: Lost Decade -->
+  <dialog id="dialog-lost-decade" class="play-dialog">
+    <div class="dialog-content">
+      <button class="dialog-close" onclick="closeModal('dialog-lost-decade')">&times;</button>
+      <div class="dialog-body-grid">
+        <div class="dialog-poster-wrapper">
+          <img src="../assets/poster-lost-decade.jpg" alt="The Lost Decade of Us" class="dialog-poster-img clickable-poster" onclick="openLightboxSingle('../assets/poster-lost-decade.jpg')" />
+        </div>
+        <div class="dialog-info-wrapper">
+          <span class="dialog-tag">2025 Production</span>
+          <h2 class="dialog-title">The Lost Decade of Us</h2>
+          <h3 class="dialog-subtitle">
+            <span class="lang-en">I Wish There Was No Politics</span>
+            <span class="lang-th">อยากให้โลกนี้ไม่มีการเมือง</span>
+          </h3>
+          
+          <div class="dialog-section">
+            <h4>
+              <span class="lang-en">Synopsis</span>
+              <span class="lang-th">เรื่องย่อ</span>
+            </h4>
+            <p>
+              <span class="lang-en">"I've done more than enough. The past ten years have been a lost decade for me."<br/><br/>'Jane', a former bestselling romance novelist, unexpectedly shifts her focus to political writing and calls for public activism. However, she is stunned to find that those around her—both friends and her former lover who were once passionate activists—have completely abandoned their interest and turned their backs on politics. Jane must search for answers as to why these people have lost all hope, and why they believe their past ten years were a 'lost decade'.</span>
+              <span class="lang-th">"กูทำมามากพอแล้วว่ะ สิบปีที่ผ่านมามันเป็นทศวรรษที่สูญหายของกูไปแล้ว"<br/><br/>'เจน' อดีตนักเขียนนิยายรัก Bestseller ที่วันหนึ่งเธอกลับลุกขึ้นมาเปลี่ยนแนวและมาจับงานเขียนด้านการเมืองและเรียกร้องให้ทุกคนตื่นตัว ทว่า เธอกลับต้องประหลาดใจ เมื่อเหล่าผู้คนรอบตัวของเธอ ทั้งเพื่อนและอดีตคนรักผู้เคยตื่นตัว กลับละทิ้งซึ่งความสนใจและหันหลังให้กับการเมืองโดยสิ้นเชิง เจนจึงต้องหาคำตอบให้ได้ว่าทำไมคนเหล่านี้จึงหมดหวังกับการเมือง และเหตุใดพวกเขาจึงคิดว่าสิบปีที่ผ่านมาของพวกเขาเป็น 'ทศวรรษที่สูญหาย'</span>
+            </p>
+          </div>
+          
+          <div class="dialog-section">
+            <h4>
+              <span class="lang-en">Production Team</span>
+              <span class="lang-th">รายชื่อทีมงาน</span>
+            </h4>
+            <ul class="crew-list">
+              <li>
+                <span class="lang-en"><strong>Playwright & Director:</strong> Natthapat Mardech</span>
+                <span class="lang-th"><strong>บทละครและกำกับการแสดง:</strong> ณัฐภัทร มาเดช</span>
+              </li>
+              <li>
+                <span class="lang-en"><strong>Cast:</strong> Boonyada Techamanachai, Rawisara Boonnop, Danuphat Saewa, Natthapat Mardech, Sirorot Emathi Surathachaiwat</span>
+                <span class="lang-th"><strong>นักแสดงนำ:</strong> บุญญาดา เตชมานะชัย, รวิสรา บุญนพ, ดนุภัทร แซ่หว้า, ณัฐภัทร มาเดช, สิโรรส เอ็มอธิ สุรฐาชัยวัฒน์</span>
+              </li>
+            </ul>
+            
+            <details class="additional-crew-details">
+              <summary class="crew-summary">
+                <span class="lang-en">
+                  <span class="text-closed">More ▾</span>
+                  <span class="text-open">Less ▴</span>
+                </span>
+                <span class="lang-th">
+                  <span class="text-closed">เพิ่มเติม ▾</span>
+                  <span class="text-open">ย่อ ▴</span>
+                </span>
+              </summary>
+              <ul class="crew-list additional-list">
+                <li>
+                  <span class="lang-en"><strong>Producer:</strong> Janista Raksa</span>
+                  <span class="lang-th"><strong>ผู้อำนวยการผลิต:</strong> จณิสตา รักษา</span>
+                </li>
+                <li>
+                  <span class="lang-en"><strong>Assistant Producer:</strong> Sirada Mueansamai</span>
+                  <span class="lang-th"><strong>ผู้ช่วยผู้อำนวยการผลิต:</strong> ศิรดา เหมือนสมัย</span>
+                </li>
+                <li>
+                  <span class="lang-en"><strong>Project Advisor:</strong> Jiraphat Sathiandee</span>
+                  <span class="lang-th"><strong>ที่ปรึกษาโครงการ:</strong> จิรภัทร เสถียรดี</span>
+                </li>
+                <li>
+                  <span class="lang-en"><strong>Stage Manager:</strong> Thaksaporn Butsing</span>
+                  <span class="lang-th"><strong>ผู้จัดการเวที (SM):</strong> ทักษพร บุตรสิงห์</span>
+                </li>
+                <li>
+                  <span class="lang-en"><strong>Stage Crew:</strong> Sirada Mueansamai, Sorawit Supphalerttrakul, Jaturon Karamahoto, Thanathat Jetchamras</span>
+                  <span class="lang-th"><strong>ทีมงานเวที (Crew):</strong> ศิรดา เหมือนสมัย, สรวิชญ์ ศุภเลิศตระกูล, จาตุรนต์ การามะห้องโต, ธนธรรศ เจตน์จำรัส</span>
+                </li>
+                <li>
+                  <span class="lang-en"><strong>Lighting Designer:</strong> Sorawit Supphalerttrakul</span>
+                  <span class="lang-th"><strong>ออกแบบแสง:</strong> สรวิชญ์ ศุภเลิศตระกูล</span>
+                </li>
+                <li>
+                  <span class="lang-en"><strong>Lighting Assistant:</strong> Pimphandao Inthawong</span>
+                  <span class="lang-th"><strong>ผู้ช่วยออกแบบแสง:</strong> พิมพันดาว อินทะวงษ์</span>
+                </li>
+                <li>
+                  <span class="lang-en"><strong>Public Relations:</strong> Jiraphat Sathiandee, Thaksaporn Butsing, Sasisupang Promsorn, Kanticha Sanguandee</span>
+                  <span class="lang-th"><strong>ประชาสัมพันธ์ (PR):</strong> จิรภัทร เสถียรดี, ทักษพร บุตรสิงห์, ศศิสุภางค์ พรหมศร, กัญฐิชา สงวนดี</span>
+                </li>
+                <li>
+                  <span class="lang-en"><strong>Graphic Designers:</strong> Janista Raksa, Sarin Unchee</span>
+                  <span class="lang-th"><strong>ออกแบบกราฟิก:</strong> จณิสตา รักษา, สารินทร์ อุ่นจี้</span>
+                </li>
+                <li>
+                  <span class="lang-en"><strong>Costume:</strong> Jirapa Paking</span>
+                  <span class="lang-th"><strong>เครื่องแต่งกาย:</strong> จิราภา ประกิ่ง</span>
+                </li>
+                <li>
+                  <span class="lang-en"><strong>Makeup:</strong> Jaturon Karamahoto</span>
+                  <span class="lang-th"><strong>แต่งหน้า:</strong> จาตุรนต์ การามะโหโต</span>
+                </li>
+                <li>
+                  <span class="lang-en"><strong>Hair Stylist:</strong> Sasisupang Promsorn</span>
+                  <span class="lang-th"><strong>ทำผม:</strong> ศศิสุภางค์ พรหมศร</span>
+                </li>
+              </ul>
+            </details>
+          </div>
+
+          <div class="dialog-section">
+            <h4>
+              <span class="lang-en">Characters</span>
+              <span class="lang-th">แนะนำตัวละคร</span>
+            </h4>
+            <div class="character-grid">
+              <div class="character-card">
+                <div class="character-avatar" style="background-image: url('../assets/char-lost-writer.jpg');" onclick="openLightbox('#dialog-lost-decade .character-avatar', 0)"></div>
+                <span class="char-name">
+                  <span class="lang-en">Jane</span>
+                  <span class="lang-th">เจน</span>
+                </span>
+                <span class="actor-name">
+                  <span class="lang-en">Boonyada T.</span>
+                  <span class="lang-th">บุญญาดา เตชมานะชัย</span>
+                </span>
+              </div>
+              <div class="character-card">
+                <div class="character-avatar" style="background-image: url('../assets/char-lost-activist.jpg');" onclick="openLightbox('#dialog-lost-decade .character-avatar', 1)"></div>
+                <span class="char-name">
+                  <span class="lang-en">Niw</span>
+                  <span class="lang-th">นิ้ว</span>
+                </span>
+                <span class="actor-name">
+                  <span class="lang-en">Rawisara B.</span>
+                  <span class="lang-th">รวิสรา บุญนพ</span>
+                </span>
+              </div>
+              <div class="character-card">
+                <div class="character-avatar" style="background-image: url('../assets/char-lost-lawyer.jpg');" onclick="openLightbox('#dialog-lost-decade .character-avatar', 2)"></div>
+                <span class="char-name">
+                  <span class="lang-en">Jet</span>
+                  <span class="lang-th">เจต</span>
+                </span>
+                <span class="actor-name">
+                  <span class="lang-en">Danuphat S.</span>
+                  <span class="lang-th">ดนุภัทร แซ่หว้า</span>
+                </span>
+              </div>
+              <div class="character-card">
+                <div class="character-avatar" style="background-image: url('../assets/char-lost-journalist.jpg');" onclick="openLightbox('#dialog-lost-decade .character-avatar', 3)"></div>
+                <span class="char-name">
+                  <span class="lang-en">Nueng</span>
+                  <span class="lang-th">หนึ่ง</span>
+                </span>
+                <span class="actor-name">
+                  <span class="lang-en">Natthapat M.</span>
+                  <span class="lang-th">ณัฐภัทร มาเดช</span>
+                </span>
+              </div>
+              <div class="character-card">
+                <div class="character-avatar" style="background-image: url('../assets/char-lost-editor.jpg');" onclick="openLightbox('#dialog-lost-decade .character-avatar', 4)"></div>
+                <span class="char-name">
+                  <span class="lang-en">B.G.</span>
+                  <span class="lang-th">บก.</span>
+                </span>
+                <span class="actor-name">
+                  <span class="lang-en">Sirorot Emathi S.</span>
+                  <span class="lang-th">สิโรรส เอ็มอธิ สุรฐาชัยวัฒน์</span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="dialog-section">
+            <h4>
+              <span class="lang-en">Production Photos</span>
+              <span class="lang-th">ภาพการแสดง</span>
+            </h4>
+            <div class="photo-gallery" id="gallery-lost-decade">
+              <div class="gallery-photo" style="background-image: url('../assets/scene-lost-2.jpg');" onclick="openLightbox('#gallery-lost-decade .gallery-photo', 0)"></div>
+              <div class="gallery-photo" style="background-image: url('../assets/scene-lost-3.jpg');" onclick="openLightbox('#gallery-lost-decade .gallery-photo', 1)"></div>
+              <div class="gallery-photo" style="background-image: url('../assets/scene-lost-4.jpg');" onclick="openLightbox('#gallery-lost-decade .gallery-photo', 2)"></div>
+              <div class="gallery-photo" style="background-image: url('../assets/scene-lost-5.jpg');" onclick="openLightbox('#gallery-lost-decade .gallery-photo', 3)"></div>
+              <div class="gallery-photo" style="background-image: url('../assets/scene-lost-7.jpg');" onclick="openLightbox('#gallery-lost-decade .gallery-photo', 4)"></div>
+              <div class="gallery-photo" style="background-image: url('../assets/scene-lost-8.jpg');" onclick="openLightbox('#gallery-lost-decade .gallery-photo', 5)"></div>
+              <div class="gallery-photo" style="background-image: url('../assets/scene-lost-9.jpg');" onclick="openLightbox('#gallery-lost-decade .gallery-photo', 6)"></div>
+              <div class="gallery-photo" style="background-image: url('../assets/scene-lost-10.jpg');" onclick="openLightbox('#gallery-lost-decade .gallery-photo', 7)"></div>
+              <div class="gallery-photo" style="background-image: url('../assets/scene-lost-11.jpg');" onclick="openLightbox('#gallery-lost-decade .gallery-photo', 8)"></div>
+              <div class="gallery-photo" style="background-image: url('../assets/scene-lost-12.jpg');" onclick="openLightbox('#gallery-lost-decade .gallery-photo', 9)"></div>
+              <div class="gallery-photo" style="background-image: url('../assets/scene-lost-13.jpg');" onclick="openLightbox('#gallery-lost-decade .gallery-photo', 10)"></div>
+              <div class="gallery-photo" style="background-image: url('../assets/scene-lost-1.jpg');" onclick="openLightbox('#gallery-lost-decade .gallery-photo', 11)"></div>
+              <div class="gallery-photo" style="background-image: url('../assets/scene-lost-6.jpg');" onclick="openLightbox('#gallery-lost-decade .gallery-photo', 12)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Dialog: Rashomon -->
+  <dialog id="dialog-rashomon" class="play-dialog">
+    <div class="dialog-content">
+      <button class="dialog-close" onclick="closeModal('dialog-rashomon')">&times;</button>
+      <div class="dialog-body-grid">
+        <div class="dialog-poster-wrapper">
+          <img src="../assets/poster-rashomon.jpg" alt="Rashomon 6 ตุลา" class="dialog-poster-img clickable-poster" onclick="openLightboxSingle('../assets/poster-rashomon.jpg')" />
+        </div>
+        <div class="dialog-info-wrapper">
+          <span class="dialog-tag">2025 Production</span>
+          <h2 class="dialog-title">Rashomon 6 Oct</h2>
+          <h3 class="dialog-subtitle">
+            <span class="lang-en">The Rashomon of History</span>
+            <span class="lang-th">ราโชมอนแห่งประวัติศาสตร์</span>
+          </h3>
+          
+          <div class="dialog-section">
+            <h4>
+              <span class="lang-en">Synopsis</span>
+              <span class="lang-th">เรื่องย่อ</span>
+            </h4>
+            <p>
+              <span class="lang-en">From an unresolved tragedy penned by Ryunosuke Akutagawa, to state-sponsored violence where truth and justice remain unrevealed.<br/><br/>Years after the violence of 'that day', a young man returns to the 'crime scene' to search for the 'truth'. However, he is met with multiple versions of truth as each witness tells a completely different story. Who should he believe? Which version of truth should he hold onto?<br/><br/>Along with facing an ideological test: can he remain committed to non-violent resistance when facing an opposing side that is ready to use violence against them without hesitation?</span>
+              <span class="lang-th">จากโศกนาฏกรรมที่ยังไม่ถูกคลี่คลายจากปลายปากกาของ 'ริวโนะสุเกะ อะคุตะงะวะ' สู่เหตุการณ์ความรุนแรงโดยรัฐที่ความจริงและความยุติธรรมยังไม่ปรากฏ<br/><br/>หลายปีผ่านไปหลังความรุนแรงที่เกิดขึ้นใน 'วันนั้น' ชายหนุ่มเดินทางกลับมายัง 'จุดเกิดเหตุ' เพื่อหาว่า 'ความจริง' คืออะไร ทว่า เขาต้องพบกับความจริงหลายชุด เมื่อผู้ให้การแต่ละคนต่างเล่าเรื่องที่เกิดขึ้นแตกต่างกันอย่างสิ้นเชิง แล้วเขาควรจะเชื่อใคร ความจริงชุดไหนที่เขาควรจะยึดถือ<br/><br/>รวมไปถึงการเผชิญหน้ากับบททดสอบทางอุดมการณ์ ว่าเขาจะยึดมั่นในหลักการต่อสู้อย่างสงบและสันติวิธีได้หรือไม่ เมื่อต้องเผชิญหน้ากับฝั่งตรงข้ามที่พร้อมจะใช้ความรุนแรงต่อพวกเขาอย่างไม่ลังเล</span>
+            </p>
+          </div>
+          
+          <div class="dialog-section">
+            <h4>
+              <span class="lang-en">Production Team</span>
+              <span class="lang-th">รายชื่อทีมงาน</span>
+            </h4>
+            <ul class="crew-list">
+              <li>
+                <span class="lang-en"><strong>Playwright & Director:</strong> Natthapat Mardech</span>
+                <span class="lang-th"><strong>บทละครและกำกับการแสดง:</strong> ณัฐภัทร มาเดช</span>
+              </li>
+              <li>
+                <span class="lang-en"><strong>Sound Designer:</strong> Mintra Poonsap</span>
+                <span class="lang-th"><strong>ออกแบบเสียง:</strong> มินทรา พูลทรัพย์</span>
+              </li>
+              <li>
+                <span class="lang-en"><strong>Cast:</strong> Natthapat Mardech, Rawisara Boonnop, Jaturon Karamahito, Boonyada Techamanachai</span>
+                <span class="lang-th"><strong>นักแสดงนำ:</strong> ณัฐภัทร มาเดช, รวิสรา บุญนพ, จาตุรนต์ การามหิโต, บุญญาดา เตชมานะชัย</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="dialog-section">
+            <h4>
+              <span class="lang-en">Characters</span>
+              <span class="lang-th">แนะนำตัวละคร</span>
+            </h4>
+            <div class="character-grid">
+              <div class="character-card">
+                <div class="character-avatar" style="background-image: url('../assets/char-rashomon-khem.jpg');" onclick="openLightbox('#dialog-rashomon .character-avatar', 0)"></div>
+                <span class="char-name">
+                  <span class="lang-en">Khem</span>
+                  <span class="lang-th">เข้ม</span>
+                </span>
+                <span class="actor-name">
+                  <span class="lang-en">Natthapat M.</span>
+                  <span class="lang-th">ณัฐภัทร มาเดช</span>
+                </span>
+              </div>
+              <div class="character-card">
+                <div class="character-avatar" style="background-image: url('../assets/char-rashomon-ratch.jpg');" onclick="openLightbox('#dialog-rashomon .character-avatar', 1)"></div>
+                <span class="char-name">
+                  <span class="lang-en">Ratch</span>
+                  <span class="lang-th">รัช</span>
+                </span>
+                <span class="actor-name">
+                  <span class="lang-en">Rawisara B.</span>
+                  <span class="lang-th">รวิสรา บุญนพ</span>
+                </span>
+              </div>
+              <div class="character-card">
+                <div class="character-avatar" style="background-image: url('../assets/char-rashomon-chat.jpg');" onclick="openLightbox('#dialog-rashomon .character-avatar', 2)"></div>
+                <span class="char-name">
+                  <span class="lang-en">Chat</span>
+                  <span class="lang-th">ชาติ</span>
+                </span>
+                <span class="actor-name">
+                  <span class="lang-en">Jaturon K.</span>
+                  <span class="lang-th">จาตุรนต์ การามหิโต</span>
+                </span>
+              </div>
+              <div class="character-card">
+                <div class="character-avatar" style="background-image: url('../assets/char-rashomon-maem.jpg');" onclick="openLightbox('#dialog-rashomon .character-avatar', 3)"></div>
+                <span class="char-name">
+                  <span class="lang-en">Maem</span>
+                  <span class="lang-th">แหม่ม</span>
+                </span>
+                <span class="actor-name">
+                  <span class="lang-en">Boonyada T.</span>
+                  <span class="lang-th">บุญญาดา เตชมานะชัย</span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="dialog-section">
+            <h4>
+              <span class="lang-en">Production Photos</span>
+              <span class="lang-th">ภาพการแสดง</span>
+            </h4>
+            <div class="photo-gallery" id="gallery-rashomon">
+              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-1.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 0)"></div>
+              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-2.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 1)"></div>
+              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-3.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 2)"></div>
+              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-4.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 3)"></div>
+              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-5.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 4)"></div>
+              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-6.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 5)"></div>
+              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-7.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 6)"></div>
+              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-8.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 7)"></div>
+              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-9.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 8)"></div>
+              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-10.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 9)"></div>
+              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-11.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 10)"></div>
+              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-12.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 11)"></div>
+              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-13.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 12)"></div>
+              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-14.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 13)"></div>
+              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-15.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 14)"></div>
+              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-16.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 15)"></div>
+              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-17.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 16)"></div>
+              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-18.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 17)"></div>
+              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-19.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 18)"></div>
+              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-20.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 19)"></div>
+              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-21.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 20)"></div>
+              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-22.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 21)"></div>
+              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-23.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 22)"></div>
+              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-24.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 23)"></div>
+              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-25.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 24)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- LIGHTBOX DIALOG -->
+  <dialog id="lightbox-dialog" class="lightbox-dialog">
+    <div class="lightbox-content-wrapper">
+      <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+      <button class="lightbox-nav lightbox-prev" onclick="changeLightboxImage(-1)">&#10094;</button>
+      <button class="lightbox-nav lightbox-next" onclick="changeLightboxImage(1)">&#10095;</button>
+      <div class="lightbox-img-container">
+        <img id="lightbox-img" src="" alt="Enlarged photo" />
+      </div>
+    </div>
+  </dialog>
+
+  <!-- MODAL & LIGHTBOX JAVASCRIPT -->
+  <script>
+    // Dialog controls
+    function openModal(id) {
+      const dialog = document.getElementById(id);
+      if (dialog) {
+        dialog.showModal();
+        document.body.style.overflow = 'hidden';
+      }
+    }
+    
+    function closeModal(id) {
+      const dialog = document.getElementById(id);
+      if (dialog) {
+        dialog.close();
+        document.body.style.overflow = '';
+      }
+    }
+
+    // Close modal if user clicks outside of the dialog-content
+    window.addEventListener('click', function(e) {
+      document.querySelectorAll('dialog').forEach(dialog => {
+        if (e.target === dialog && dialog.id !== 'lightbox-dialog') {
+          dialog.close();
+          document.body.style.overflow = '';
+        }
+      });
+    });
+
+    // Lightbox controls
+    let currentGalleryImages = [];
+    let currentImageIndex = 0;
+
+    function openLightbox(gallerySelector, startIndex) {
+      // Find all images in the active gallery
+      const elements = document.querySelectorAll(gallerySelector);
+      const images = Array.from(elements).map(el => {
+        const bg = el.style.backgroundImage;
+        return bg.replace(/url\(['"]?(.*?)['"]?\)/i, '$1');
+      });
+      
+      currentGalleryImages = images;
+      currentImageIndex = startIndex;
+      
+      updateLightboxImage();
+      
+      const lightbox = document.getElementById('lightbox-dialog');
+      if (lightbox) {
+        const showNav = images.length > 1 ? 'flex' : 'none';
+        document.querySelector('.lightbox-prev').style.display = showNav;
+        document.querySelector('.lightbox-next').style.display = showNav;
+        lightbox.showModal();
+      }
+    }
+
+    function openLightboxSingle(imgSrc) {
+      currentGalleryImages = [imgSrc];
+      currentImageIndex = 0;
+      updateLightboxImage();
+      
+      const lightbox = document.getElementById('lightbox-dialog');
+      if (lightbox) {
+        document.querySelector('.lightbox-prev').style.display = 'none';
+        document.querySelector('.lightbox-next').style.display = 'none';
+        lightbox.showModal();
+      }
+    }
+
+    document.getElementById('lightbox-dialog').addEventListener('click', function(e) {
+      const imgContainer = document.querySelector('.lightbox-img-container');
+      const prevBtn = document.querySelector('.lightbox-prev');
+      const nextBtn = document.querySelector('.lightbox-next');
+      if (e.target !== imgContainer && e.target !== prevBtn && e.target !== nextBtn && !imgContainer.contains(e.target)) {
+        closeLightbox();
+      }
+    });
+
+    function updateLightboxImage() {
+      const imgEl = document.getElementById('lightbox-img');
+      if (imgEl && currentGalleryImages.length > 0) {
+        imgEl.src = currentGalleryImages[currentImageIndex];
+      }
+    }
+
+    function changeLightboxImage(direction) {
+      if (currentGalleryImages.length === 0) return;
+      currentImageIndex = (currentImageIndex + direction + currentGalleryImages.length) % currentGalleryImages.length;
+      updateLightboxImage();
+    }
+
+    function closeLightbox() {
+      const lightbox = document.getElementById('lightbox-dialog');
+      if (lightbox) {
+        lightbox.close();
+      }
+    }
+
+    // Keyboard navigation for lightbox
+    document.addEventListener('keydown', function(e) {
+      const lightbox = document.getElementById('lightbox-dialog');
+      if (lightbox && lightbox.open) {
+        if (e.key === 'ArrowRight') {
+          changeLightboxImage(1);
+        } else if (e.key === 'ArrowLeft') {
+          changeLightboxImage(-1);
+        } else if (e.key === 'Escape') {
+          closeLightbox();
+        }
+      }
+    });
+
+    // Language Toggle logic
+    function toggleLanguage() {
+      const html = document.documentElement;
+      const currentLang = html.getAttribute('lang');
+      const newLang = currentLang === 'en' ? 'th' : 'en';
+      html.setAttribute('lang', newLang);
+      localStorage.setItem('preferred-lang', newLang);
+    }
+
+    // Auto-scroll to Current Show on load/refresh if no hash is present
+    window.addEventListener('load', () => {
+      if (!window.location.hash) {
+        const currentShowSec = document.getElementById('current-show');
+        if (currentShowSec) {
+          setTimeout(() => {
+            currentShowSec.scrollIntoView({ behavior: 'smooth' });
+          }, 150);
+        }
+      }
+    });
+  </script>
+
+</body>
+</html>

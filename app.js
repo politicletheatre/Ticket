@@ -6,7 +6,7 @@
 const CONFIG = {
   showName: 'น่าจะรู้อย่างนี้ตั้งแต่ปี 2475',
   showNameEn: 'What I Wish I Knew When I was back in 1932',
-  venue: 'KINJAI CONTEMPORARY',
+  venue: 'KINJAI CONTEMPORARY (ถนนราชวิถี)',
   dates: '16–25 ตุลาคม 2569',
   maxQty: 10,
   slotCapacity: 50, // ← จำนวนที่นั่งสูงสุดต่อรอบ
@@ -55,21 +55,30 @@ async function fetchGlobalConfig() {
       const res = await fetch(`${CONFIG.APPS_SCRIPT_URL}?action=getSettings`);
       if (res.ok) {
         const data = await res.json();
-        if (typeof data.earlybird_enabled === 'boolean') {
-          GLOBAL_EARLYBIRD_ENABLED = data.earlybird_enabled;
+        if (data) {
+          if (typeof data.earlybird_enabled !== 'undefined') {
+            GLOBAL_EARLYBIRD_ENABLED = (data.earlybird_enabled === true || data.earlybird_enabled === 'true');
+          }
           // บันทึกยอดจองกลาง (Central Stock) ลงเครื่องเพื่อใช้คำนวณที่นั่งเหลือจริง
           if (data.soldCounts) {
             localStorage.setItem('theater_sold_counts', JSON.stringify(data.soldCounts));
           }
           // บันทึกค่า Capacity ที่ปรับปรุงจาก Sheets ลงใน localStorage 'theater_stock'
-          const stockOverride = {};
+          const stock = JSON.parse(localStorage.getItem('theater_stock') || '{}');
           Object.keys(data).forEach(key => {
             if (key.startsWith('capacity|')) {
               const slotKey = key.replace('capacity|', '');
-              stockOverride[slotKey] = Number(data[key]);
+              const parsedVal = parseInt(data[key], 10);
+              if (!isNaN(parsedVal) && parsedVal >= 0) {
+                if (parsedVal === 85 || parsedVal === 84 || parsedVal === 82) {
+                  stock[slotKey] = 80;
+                } else {
+                  stock[slotKey] = parsedVal;
+                }
+              }
             }
           });
-          localStorage.setItem('theater_stock', JSON.stringify(stockOverride));
+          localStorage.setItem('theater_stock', JSON.stringify(stock));
           return;
         }
       }
@@ -122,8 +131,11 @@ function getSlotKey(dateId, slot) {
 function getSlotCapacity(dateId, slot) {
   const stock = JSON.parse(localStorage.getItem('theater_stock') || '{}');
   const key   = getSlotKey(dateId, slot);
-  // If staff has set a capacity, use it; else fall back to CONFIG
-  return (typeof stock[key] === 'number') ? stock[key] : CONFIG.slotCapacity;
+  const val   = Number(stock[key]);
+  if (!isNaN(val) && val > 0 && val !== 85) {
+    return val;
+  }
+  return CONFIG.slotCapacity;
 }
 
 function getSoldCountForSlot(dateId, slot) {
@@ -134,9 +146,13 @@ function getSoldCountForSlot(dateId, slot) {
   
   // ดึงยอดจองบนเครื่องของลูกค้าเองมาร่วมคำนวณด้วยเพื่อความแม่นยำ
   const localTickets = JSON.parse(localStorage.getItem('theater_tickets') || '{}');
-  const localSold = Object.values(localTickets).filter(t =>
-    t.showDateId === dateId && t.showSlot === slot && !t.cancelled
-  ).length;
+  const localSold = Object.values(localTickets).filter(t => {
+    if (t.cancelled) return false;
+    if (t.showDateId && t.showSlot) {
+      return t.showDateId === dateId && t.showSlot === slot;
+    }
+    return t.showDate === showDateLabel;
+  }).length;
 
   // ใช้ยอดจากส่วนกลาง (Sheets) เป็นหลัก หรือใช้ยอดจากเครื่องหากส่วนกลางยังไม่ได้ประสานข้อมูล
   const centralSold = typeof syncedSold[showDateLabel] === 'number' ? syncedSold[showDateLabel] : 0;
@@ -275,12 +291,7 @@ function updateProgress(view) {
 function renderSchedule() {
   const container = document.getElementById('date-grid');
   let html = '';
-  let currentWeek = null;
   CONFIG.schedule.forEach(d => {
-    if (d.week !== currentWeek) {
-      currentWeek = d.week;
-      html += `<div class="week-label">✨ สัปดาห์ที่ ${d.week}</div>`;
-    }
     // Check if any slot still has seats
     const hasAvail = d.slots.some(s => getRemainingSeats(d.id, s) > 0);
     html += `
@@ -330,7 +341,6 @@ function renderSlotGrid(dateId) {
   const dateObj = CONFIG.schedule.find(d => d.id === dateId);
   if (!dateObj) return;
   document.getElementById('slot-grid').innerHTML = dateObj.slots.map(slot => {
-    const label     = slot === '14:00' ? 'รอบบ่าย' : 'รอบเย็น';
     const remaining = getRemainingSeats(dateId, slot);
     const isFull    = remaining <= 0;
 
@@ -345,7 +355,6 @@ function renderSlotGrid(dateId) {
               ${onclickAttr}
               ${disabledAttr}>
         <span class="slot-time">${slot}</span>
-        <span class="slot-label">${label} น.</span>
         ${seatBadge}
       </button>`;
   }).join('');
@@ -390,8 +399,8 @@ function renderTicketTypes() {
          onclick="selectType('${t.id}')">
       <div class="ticket-type-info">
         <div class="ticket-type-name">${t.name}</div>
-        <div class="ticket-type-desc">${t.desc}</div>
-        <span class="ticket-type-badge badge-${t.badge}">${t.badgeText}</span>
+        ${t.desc ? `<div class="ticket-type-desc">${t.desc}</div>` : ''}
+        ${t.badgeText ? `<span class="ticket-type-badge badge-${t.badge}">${t.badgeText}</span>` : ''}
       </div>
       <div style="display:flex;align-items:center;gap:16px">
         <div class="ticket-type-price">${fmt(t.price)}<span> บาท</span></div>
@@ -423,8 +432,7 @@ function updateStepBackButtons() {
 
   const btnSlot = document.getElementById('back-to-slot');
   if (btnSlot) {
-    const slotLabel = state.selectedSlot === '14:00' ? 'รอบบ่าย 14:00' :
-                      state.selectedSlot === '19:30' ? 'รอบเย็น 19:30' : (state.selectedSlot || '');
+    const slotLabel = state.selectedSlot ? `${state.selectedSlot}` : '';
     btnSlot.textContent = state.selectedSlot ? `← ${slotLabel}` : '← เปลี่ยนรอบ';
   }
 
@@ -843,44 +851,76 @@ function downloadTicket(idx) {
   if (!ticket || !srcCanvas) return;
 
   const tc  = document.createElement('canvas');
-  tc.width  = 400; tc.height = 500;
+  tc.width  = 400; tc.height = 540;
   const ctx = tc.getContext('2d');
 
-  ctx.fillStyle = '#1a0d2e';
+  // Background: Deep dark / black
+  ctx.fillStyle = '#0f0f11';
   ctx.fillRect(0, 0, tc.width, tc.height);
-  ctx.strokeStyle = '#d4a017';
-  ctx.lineWidth   = 3;
-  ctx.strokeRect(12, 12, tc.width - 24, tc.height - 24);
 
-  ctx.fillStyle  = '#fde68a';
-  ctx.font       = 'bold 18px sans-serif';
+  // Border: Sleek graphite border
+  ctx.strokeStyle = '#27272a';
+  ctx.lineWidth   = 2;
+  ctx.strokeRect(10, 10, tc.width - 20, tc.height - 20);
+
+  // Top Red Accent Line
+  ctx.fillStyle = '#ff3b30';
+  ctx.fillRect(20, 14, tc.width - 40, 3);
+
+  // Header Titles
+  ctx.fillStyle  = '#ffffff';
+  ctx.font       = 'bold 19px sans-serif';
   ctx.textAlign  = 'center';
-  ctx.fillText(CONFIG.showName, tc.width / 2, 56);
-  ctx.fillStyle  = '#c4b5fd';
-  ctx.font       = '12px sans-serif';
-  ctx.fillText(CONFIG.showNameEn, tc.width / 2, 80);
+  ctx.fillText('น่าจะรู้อย่างนี้ตั้งแต่ปี 2475', tc.width / 2, 50);
 
+  ctx.fillStyle  = '#ff3b30';
+  ctx.font       = 'bold 11px sans-serif';
+  ctx.fillText('What I Wish I Knew When I was back in 1932', tc.width / 2, 72);
+
+  // QR Code Box (White background card for 100% scan contrast)
   const qrCanvas = srcCanvas.querySelector('canvas');
   if (qrCanvas) {
-    const qrSize = 200;
-    ctx.drawImage(qrCanvas, (tc.width - qrSize) / 2, 100, qrSize, qrSize);
+    const qrSize = 190;
+    const boxPadding = 10;
+    const boxSize = qrSize + boxPadding * 2;
+    const boxX = (tc.width - boxSize) / 2;
+    const boxY = 92;
+
+    ctx.fillStyle = '#ffffff';
+    if (ctx.roundRect) {
+      ctx.beginPath();
+      ctx.roundRect(boxX, boxY, boxSize, boxSize, 12);
+      ctx.fill();
+    } else {
+      ctx.fillRect(boxX, boxY, boxSize, boxSize);
+    }
+
+    ctx.drawImage(qrCanvas, (tc.width - qrSize) / 2, boxY + boxPadding, qrSize, qrSize);
   }
 
+  // Info details
   ctx.fillStyle = '#ffffff';
-  ctx.font      = 'bold 15px sans-serif';
-  ctx.fillText(ticket.name, tc.width / 2, 330);
-  ctx.fillStyle = '#c4b5fd';
+  ctx.font      = 'bold 16px sans-serif';
+  ctx.fillText(ticket.name || '', tc.width / 2, 340);
+
+  ctx.fillStyle = '#d4d4d8';
   ctx.font      = '13px sans-serif';
-  ctx.fillText(`ประเภท: ${ticket.type}`, tc.width / 2, 355);
-  ctx.fillText(`ใบที่ ${ticket.ticketNum} / ${state.currentOrder.qty}`, tc.width / 2, 378);
-  ctx.fillStyle = '#6b7280';
-  ctx.font      = '11px monospace';
-  ctx.fillText(ticket.ticketId, tc.width / 2, 410);
+  ctx.fillText(`ประเภท: ${ticket.type}`, tc.width / 2, 365);
+  ctx.fillText(`ใบที่ ${ticket.ticketNum} / ${state.currentOrder.qty}`, tc.width / 2, 388);
+
   if (ticket.showDate) {
-    ctx.fillStyle = '#d4a017';
-    ctx.font      = 'bold 11px sans-serif';
-    ctx.fillText(ticket.showDate, tc.width / 2, 448);
+    ctx.fillStyle = '#ff453a';
+    ctx.font      = 'bold 13px sans-serif';
+    ctx.fillText(ticket.showDate, tc.width / 2, 416);
   }
+
+  ctx.fillStyle = '#71717a';
+  ctx.font      = '11px monospace';
+  ctx.fillText(ticket.ticketId, tc.width / 2, 444);
+
+  ctx.fillStyle = '#52525b';
+  ctx.font      = '10px sans-serif';
+  ctx.fillText('KINJAI CONTEMPORARY (ถนนราชวิถี)', tc.width / 2, 470);
 
   const link    = document.createElement('a');
   link.download = `ticket-${ticket.ticketId}.png`;
@@ -958,6 +998,24 @@ function showToast(msg, type = '') {
 
 // ─── INIT ─────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+  // Auto-migrate legacy stock values to 80
+  try {
+    const stock = JSON.parse(localStorage.getItem('theater_stock') || '{}');
+    let changed = false;
+    CONFIG.schedule.forEach(d => {
+      d.slots.forEach(slot => {
+        const key = getSlotKey(d.id, slot);
+        if (stock[key] === 85 || stock[key] === 84 || stock[key] === 82 || typeof stock[key] !== 'number') {
+          stock[key] = 80;
+          changed = true;
+        }
+      });
+    });
+    if (changed) {
+      localStorage.setItem('theater_stock', JSON.stringify(stock));
+    }
+  } catch(e){}
+
   // Load global config asynchronously in the background (Non-blocking page load!)
   fetchGlobalConfig().then(() => {
     // If the customer is on the ticket selection step, silently refresh numbers
@@ -968,15 +1026,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Poster
   const posterEl = document.getElementById('poster-img');
-  if (window.POSTER_BASE64) {
-    posterEl.src = 'data:image/png;base64,' + window.POSTER_BASE64;
-  } else {
-    posterEl.src = 'assets/poster.png';
+  if (posterEl) {
+    posterEl.src = 'assets/poster.jpg?v=3';
     posterEl.onerror = () => {
-      posterEl.style.display = 'none';
-      const wrap = posterEl.parentElement;
-      wrap.style.cssText = 'background:linear-gradient(135deg,#2d1654,#4a2080,#1a0d2e);border-radius:24px;min-height:400px;display:flex;align-items:center;justify-content:center';
-      wrap.innerHTML += '<div style="font-size:5rem;opacity:.4">🎭</div>';
+      posterEl.src = 'assets/poster.png?v=3';
     };
   }
 
@@ -991,7 +1044,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const header = document.querySelector('.site-header');
     if (!header) return;
     header.style.background = window.scrollY > 20
-      ? 'rgba(13, 7, 24, 0.98)'
-      : 'rgba(13, 7, 24, 0.8)';
+      ? 'rgba(255, 255, 255, 0.96)'
+      : 'rgba(255, 255, 255, 0.85)';
   });
 });
