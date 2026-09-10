@@ -1,7 +1,7 @@
 function getSS() {
   if (typeof SPREADSHEET_ID !== 'undefined' && SPREADSHEET_ID && SPREADSHEET_ID !== 'YOUR_SPREADSHEET_ID_HERE') {
     try {
-      return getSS();
+      return SpreadsheetApp.openById(SPREADSHEET_ID);
     } catch(e) {}
   }
   return SpreadsheetApp.getActiveSpreadsheet();
