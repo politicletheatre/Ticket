@@ -1,3 +1,11 @@
+function getSS() {
+  if (typeof SPREADSHEET_ID !== 'undefined' && SPREADSHEET_ID && SPREADSHEET_ID !== 'YOUR_SPREADSHEET_ID_HERE') {
+    try {
+      return getSS();
+    } catch(e) {}
+  }
+  return SpreadsheetApp.getActiveSpreadsheet();
+}
 /**
  * ============================================================
  * Google Apps Script — น่าจะรู้อย่างนี้ตั้งแต่ปี 2475 Theater Ticket Backend (Updated & Optimized)
@@ -48,7 +56,7 @@ function doPost(e) {
 
     // 1. จัดการอัปเดตการตั้งค่าส่วนกลาง (เช่น เปิด/ปิด Early Bird)
     if (data.action === 'updateSetting') {
-      const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+      const ss = getSS();
       const settingsSheet = getOrCreateSettings(ss);
       const key = data.key;
       const value = String(data.value);
@@ -71,7 +79,7 @@ function doPost(e) {
 
     // 2. จัดการบันทึกการเช็คอิน / ยกเลิกเช็คอิน / ยกเลิกตั๋ว / กู้คืนตั๋ว รายใบ
     if (data.action === 'checkin' || data.action === 'undoCheckin' || data.action === 'cancelTicket' || data.action === 'restoreTicket') {
-      const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+      const ss = getSS();
       const ticketsSheet = getOrCreateSheet(ss, SHEET_TICKETS, []);
       const ticketId = data.ticketId;
       
@@ -125,7 +133,7 @@ function doPost(e) {
 
     // 3. จัดการยกเลิกคำสั่งซื้อ / กู้คืนคำสั่งซื้อ (ทั้งออร์เดอร์)
     if (data.action === 'cancelOrder' || data.action === 'restoreOrder') {
-      const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+      const ss = getSS();
       const ticketsSheet = getOrCreateSheet(ss, SHEET_TICKETS, []);
       const orderId = data.orderId;
       
@@ -153,7 +161,7 @@ function doPost(e) {
 
     // 3.1 จัดการลบตั๋วถาวร (Permanent Delete Ticket)
     if (data.action === 'deleteTicket') {
-      const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+      const ss = getSS();
       const ticketsSheet = getOrCreateSheet(ss, SHEET_TICKETS, []);
       const ticketId = data.ticketId;
       const orderId = data.orderId;
@@ -204,7 +212,7 @@ function doPost(e) {
 
     // 3.2 จัดการลบคำสั่งซื้อถาวรทั้งออร์เดอร์ (Permanent Delete Order)
     if (data.action === 'deleteOrder') {
-      const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+      const ss = getSS();
       const ordersSheet = getOrCreateSheet(ss, SHEET_ORDERS, []);
       const ticketsSheet = getOrCreateSheet(ss, SHEET_TICKETS, []);
       const orderId = data.orderId;
@@ -236,7 +244,7 @@ function doPost(e) {
 
     // 4. จัดการแก้ไขข้อมูลลูกค้า (จาก Staff Edit Modal)
     if (data.action === 'saveEdit') {
-      const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+      const ss = getSS();
       const ordersSheet = getOrCreateSheet(ss, SHEET_ORDERS, []);
       const ticketsSheet = getOrCreateSheet(ss, SHEET_TICKETS, []);
       const orderId = data.orderId;
@@ -310,7 +318,7 @@ function doGet(e) {
 
   try {
     const action = e.parameter.action;
-    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const ss = getSS();
 
     // 1. ดึงเฉพาะการตั้งค่าส่วนกลาง (เช่น เช็คสถานะ Early Bird ในหน้าจองลูกค้า + ยอดจองกลางเพื่อคำนวณที่นั่งเหลือ)
     if (action === 'getSettings') {
@@ -611,7 +619,7 @@ function doGet(e) {
 
 // ─── HANDLE NEW ORDER ─────────────────────────────────────────────────────
 function handleNewOrder(data) {
-  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const ss = getSS();
   
   // ── บันทึกไฟล์รูปสลิปลง Google Drive (ถ้ามีแนบมา) ──
   let slipUrl = '—';
