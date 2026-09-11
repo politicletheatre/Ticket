@@ -1692,6 +1692,13 @@ body::before {
     max-width: 270px;
     width: 100%;
   }
+  .hero-synopsis {
+    font-size: 0.94rem;
+    line-height: 1.85;
+    margin: 12px auto 20px;
+    width: 100%;
+    max-width: 360px;
+  }
   .hero-title {
     font-size: 1.4rem;
     line-height: 1.35;
