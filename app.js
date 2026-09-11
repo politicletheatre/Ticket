@@ -4,7 +4,7 @@
 
 // ─── CONFIG ───────────────────────────────────────────────────────────────
 const CONFIG = {
-  showName: 'NO TIME TO BLIND น่าจะรู้อย่างนี้ตั้งแต่ปี 2475',
+  showName: 'น่าจะรู้อย่างนี้ตั้งแต่ปี 2475 NO TIME TO BLIND',
   showNameEn: 'NO TIME TO BLIND',
   venue: 'KINJAI CONTEMPORARY (MRT สิรินธร)',
   dates: '16–25 ตุลาคม 2569',
