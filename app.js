@@ -25,11 +25,13 @@ const CONFIG = {
   ],
 
   ticketTypes: [
-    { id:'earlybird', name:'Early Bird',  desc:'สำหรับผู้ที่จองก่อน 30 ก.ย. 2569', price:590, badge:'early',   badgeText:'🐦 Early Bird', available:true },
-    { id:'regular',   name:'บัตรปกติ', desc:'ราคาปกติ — ที่นั่งทั่วไป',        price:790, badge:'regular', badgeText:'🎭 Regular',    available:true },
-    { id:'quota-free', name:'โควต้าฟรี', desc:'โควต้าพิเศษสำหรับทีมงาน/ Staff', price:0,   badge:'quota',   badgeText:'🎟️ โควต้าฟรี', available:false },
-    { id:'quota-earlybird', name:'โควต้าราคา Early Bird', desc:'โควต้าพิเศษราคา Early Bird', price:590, badge:'quota', badgeText:'🎟️ โควต้า Early Bird', available:false },
-    { id:'quota-spon', name:'โควต้า Spon', desc:'โควต้าพิเศษสำหรับสปอนเซอร์', price:0, badge:'quota', badgeText:'🎟️ โควต้า Spon', available:false },
+    { id:'pro-after-6', name:'PRO AFTER 6', desc:'โปรโมชั่นพิเศษ PRO AFTER 6', price:350, badge:'promo',   badgeText:'🔥 PRO AFTER 6', available:false },
+    { id:'earlybird',   name:'EARLYBIRD',   desc:'โปรโมชั่น Early Bird ราคาพิเศษ', price:390, badge:'early',   badgeText:'🐦 EARLYBIRD',   available:true },
+    { id:'pro-6-oct',   name:'PRO 6 ตุลา',  desc:'โปรโมชั่นพิเศษ PRO 6 ตุลา',   price:590, badge:'promo',   badgeText:'⭐ PRO 6 ตุลา',  available:false },
+    { id:'regular',     name:'REGULAR',     desc:'บัตรราคาปกติ',               price:690, badge:'regular', badgeText:'🎭 REGULAR',     available:true },
+    { id:'quota-free',      name:'โควต้าฟรี', desc:'โควต้าพิเศษสำหรับทีมงาน/ Staff', price:0,   badge:'quota', badgeText:'🎟️ โควต้าฟรี', available:false },
+    { id:'quota-earlybird', name:'โควต้าราคา Early Bird', desc:'โควต้าพิเศษราคา Early Bird', price:390, badge:'quota', badgeText:'🎟️ โควต้า Early Bird', available:false },
+    { id:'quota-spon',      name:'โควต้า Spon', desc:'โควต้าพิเศษสำหรับสปอนเซอร์', price:0, badge:'quota', badgeText:'🎟️ โควต้า Spon', available:false },
   ],
 
   bankAccount: {
@@ -40,8 +42,23 @@ const CONFIG = {
   },
 };
 
-// ─── GLOBAL CONFIG (Early Bird state shared across all devices) ───────────
-let GLOBAL_EARLYBIRD_ENABLED = true; // default: enabled
+// ─── GLOBAL CONFIG (Ticket Types & Pricing state shared across devices) ──────
+let GLOBAL_TICKET_CONFIG = {
+  'pro-after-6': { enabled: false, price: 350 },
+  'earlybird':   { enabled: true,  price: 390 },
+  'pro-6-oct':   { enabled: false, price: 590 },
+  'regular':     { enabled: true,  price: 690 },
+};
+// Legacy compatibility
+let GLOBAL_EARLYBIRD_ENABLED = true;
+
+function getActiveTicketType(typeId) {
+  const base = CONFIG.ticketTypes.find(t => t.id === typeId);
+  if (!base) return null;
+  const cfg = GLOBAL_TICKET_CONFIG[typeId];
+  const price = (cfg && typeof cfg.price === 'number') ? cfg.price : base.price;
+  return { ...base, price };
+}
 
 // JSONBin settings — must match staff.html
 const _JSONBIN_BIN_ID  = '6a1e8f65f5f4af5e29abf2ff';
@@ -49,6 +66,14 @@ const _JSONBIN_API_KEY = '$2a$10$l/R8BGxkz/nlfuPduNbrQe7Vojq21Ta25o8eij5mNFVDeGw
 const _JSONBIN_CONFIGURED = _JSONBIN_BIN_ID !== 'YOUR_BIN_ID_HERE' && _JSONBIN_API_KEY !== 'YOUR_API_KEY_HERE';
 
 async function fetchGlobalConfig() {
+  // Load cached ticket config if available
+  const cachedTicketCfg = localStorage.getItem('theater_ticket_config');
+  if (cachedTicketCfg) {
+    try {
+      GLOBAL_TICKET_CONFIG = { ...GLOBAL_TICKET_CONFIG, ...JSON.parse(cachedTicketCfg) };
+    } catch(e) {}
+  }
+
   try {
     // 1. ลองดึงสถานะจาก Google Apps Script ก่อน (เป็น API ส่วนกลางที่อัปเดตทันที)
     if (CONFIG.APPS_SCRIPT_URL && CONFIG.APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
@@ -56,9 +81,24 @@ async function fetchGlobalConfig() {
       if (res.ok) {
         const data = await res.json();
         if (data) {
-          if (typeof data.earlybird_enabled !== 'undefined') {
-            GLOBAL_EARLYBIRD_ENABLED = (data.earlybird_enabled === true || data.earlybird_enabled === 'true');
+          // ซิงค์การตั้งค่าประเภทบัตรและราคา (Ticket Types & Pricing)
+          if (data.ticket_config) {
+            try {
+              const parsed = typeof data.ticket_config === 'string' ? JSON.parse(data.ticket_config) : data.ticket_config;
+              if (parsed && typeof parsed === 'object') {
+                GLOBAL_TICKET_CONFIG = { ...GLOBAL_TICKET_CONFIG, ...parsed };
+                localStorage.setItem('theater_ticket_config', JSON.stringify(GLOBAL_TICKET_CONFIG));
+              }
+            } catch (err) {}
+          } else {
+            // Legacy / individual toggles
+            if (typeof data.earlybird_enabled !== 'undefined') {
+              const eb = (data.earlybird_enabled === true || data.earlybird_enabled === 'true');
+              GLOBAL_EARLYBIRD_ENABLED = eb;
+              if (GLOBAL_TICKET_CONFIG['earlybird']) GLOBAL_TICKET_CONFIG['earlybird'].enabled = eb;
+            }
           }
+
           // บันทึกยอดจองกลาง (Central Stock) ลงเครื่องเพื่อใช้คำนวณที่นั่งเหลือจริง
           if (data.soldCounts) {
             localStorage.setItem('theater_sold_counts', JSON.stringify(data.soldCounts));
@@ -93,6 +133,7 @@ async function fetchGlobalConfig() {
         const data = await res.json();
         if (typeof data.record?.earlybird_enabled === 'boolean') {
           GLOBAL_EARLYBIRD_ENABLED = data.record.earlybird_enabled;
+          if (GLOBAL_TICKET_CONFIG['earlybird']) GLOBAL_TICKET_CONFIG['earlybird'].enabled = data.record.earlybird_enabled;
           return;
         }
       }
@@ -104,10 +145,11 @@ async function fetchGlobalConfig() {
       const cfg = await res2.json();
       if (typeof cfg.earlybird_enabled === 'boolean') {
         GLOBAL_EARLYBIRD_ENABLED = cfg.earlybird_enabled;
+        if (GLOBAL_TICKET_CONFIG['earlybird']) GLOBAL_TICKET_CONFIG['earlybird'].enabled = cfg.earlybird_enabled;
       }
     }
   } catch (e) {
-    // ออฟไลน์: ใช้ค่าเริ่มต้นที่เป็น true
+    // ออฟไลน์: ใช้ค่าเริ่มต้น
   }
 }
 
@@ -384,16 +426,40 @@ function selectSlot(slot) {
 }
 
 function renderTicketTypes() {
-  const container  = document.getElementById('ticket-types');
-  const remaining  = state.selectedDateId && state.selectedSlot
-    ? getRemainingSeats(state.selectedDateId, state.selectedSlot)
-    : CONFIG.slotCapacity;
+  const container = document.getElementById('ticket-types');
+  if (!container) return;
 
-  const isEarlyBirdDisabled = !GLOBAL_EARLYBIRD_ENABLED;
+  // กรองเฉพาะประเภทบัตรที่แอดมินเปิดขายในขณะนั้น (ผ่าน Staff Portal / Google Sheets)
+  const activeTypes = CONFIG.ticketTypes.filter(t => {
+    // บัตรโควต้าภายในสำหรับทีมงานจะไม่นำมาแสดงในหน้าจองของลูกค้า
+    if (t.id.startsWith('quota-')) return false;
 
-  container.innerHTML = CONFIG.ticketTypes
-    .filter(t => t.available && !(t.id === 'earlybird' && isEarlyBirdDisabled))
-    .map(t => `
+    // ตรวจสอบสถานะเปิด/ปิดจาก GLOBAL_TICKET_CONFIG
+    if (GLOBAL_TICKET_CONFIG[t.id]) {
+      return GLOBAL_TICKET_CONFIG[t.id].enabled === true;
+    }
+    return t.available === true;
+  }).map(t => {
+    // ปรับราคาตามที่กำหนดไว้ใน GLOBAL_TICKET_CONFIG (ถ้ามี)
+    const cfg = GLOBAL_TICKET_CONFIG[t.id];
+    const price = (cfg && typeof cfg.price === 'number') ? cfg.price : t.price;
+    return { ...t, price };
+  });
+
+  // หากประเภทบัตรที่เลือกไว้ปัจจุบันถูกปิดขาย ให้เลือกบัตรประเภทแรกที่ยังเปิดขายอัตโนมัติ
+  if (state.selectedTypeId && !activeTypes.some(t => t.id === state.selectedTypeId)) {
+    state.selectedTypeId = activeTypes.length > 0 ? activeTypes[0].id : null;
+  }
+
+  if (activeTypes.length === 0) {
+    container.innerHTML = `
+      <div style="padding: 24px; text-align: center; color: #fca5a5; background: rgba(239,68,68,0.08); border: 1px dashed rgba(239,68,68,0.3); border-radius: var(--radius-md);">
+        ⚠️ ขออภัย ขณะนี้ยังไม่เปิดจำหน่ายบัตร หรือบัตรทุกประเภทปิดการขายชั่วคราว
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = activeTypes.map(t => `
     <div class="ticket-type-card ${state.selectedTypeId === t.id ? 'selected' : ''}"
          id="tc-${t.id}"
          onclick="selectType('${t.id}')">
@@ -438,7 +504,7 @@ function updateStepBackButtons() {
 
   const btnType = document.getElementById('back-to-type');
   if (btnType) {
-    const type = CONFIG.ticketTypes.find(t => t.id === state.selectedTypeId);
+    const type = getActiveTicketType(state.selectedTypeId);
     btnType.textContent = type ? `← ${type.name}` : '← เปลี่ยนประเภท';
   }
 }
@@ -554,7 +620,7 @@ function changeQty(delta) {
 }
 
 function updateSummary() {
-  const type = CONFIG.ticketTypes.find(t => t.id === state.selectedTypeId);
+  const type = getActiveTicketType(state.selectedTypeId);
   if (!type) return;
   const total   = type.price * state.qty;
   const dateObj = CONFIG.schedule.find(d => d.id === state.selectedDateId);
@@ -607,7 +673,7 @@ function renderPaymentQR() {
 
 // ─── RECAP ────────────────────────────────────────────────────────────────
 function renderRecap() {
-  const type = CONFIG.ticketTypes.find(t => t.id === state.selectedTypeId);
+  const type = getActiveTicketType(state.selectedTypeId);
   if (!type) return;
   document.getElementById('recap-type').textContent  = type.name;
   document.getElementById('recap-qty').textContent   = `${state.qty} ใบ`;
@@ -622,7 +688,7 @@ async function submitOrder(event) {
   const phone = cleanThaiPhone(document.getElementById('f-phone').value.trim());
   const email = document.getElementById('f-email').value.trim();
   const note  = document.getElementById('f-note').value.trim();
-  const type  = CONFIG.ticketTypes.find(t => t.id === state.selectedTypeId);
+  const type  = getActiveTicketType(state.selectedTypeId);
 
   if (!type)              return showToast('❌ กรุณาเลือกประเภทบัตร', 'error');
   if (!state.slipBase64) return showToast('❌ กรุณาแนบสลิปการโอนเงิน', 'error');

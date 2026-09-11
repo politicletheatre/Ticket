@@ -552,24 +552,167 @@
     .btn-booking-submit:active {
       transform: scale(0.98);
     }
-    /* Switch toggle styling */
-    .switch input:checked + .slider {
-      background-color: var(--success);
-      border-color: var(--success);
+    /* ══ TICKET TYPES & PRICING MANAGEMENT ══════════════════════════════ */
+    .ticket-types-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 18px;
     }
-    .switch .slider:before {
+    .ticket-setting-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1.5px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.25s ease;
+      flex-wrap: wrap;
+    }
+    .ticket-setting-item.active {
+      background: rgba(34, 197, 94, 0.04);
+      border-color: rgba(34, 197, 94, 0.35);
+    }
+    .ticket-setting-item.inactive {
+      opacity: 0.6;
+      background: rgba(255, 255, 255, 0.015);
+      border-color: rgba(255, 255, 255, 0.05);
+    }
+    .tsi-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1 1 240px;
+    }
+    .tsi-badge {
+      display: inline-block;
+      align-self: flex-start;
+      padding: 2px 10px;
+      border-radius: 50px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .tsi-badge-promo {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fcd34d;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+    }
+    .tsi-badge-early {
+      background: rgba(34, 197, 94, 0.15);
+      color: #86efac;
+      border: 1px solid rgba(34, 197, 94, 0.35);
+    }
+    .tsi-badge-regular {
+      background: rgba(255, 59, 48, 0.15);
+      color: #ff8078;
+      border: 1px solid rgba(255, 59, 48, 0.35);
+    }
+    .tsi-name {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 0.5px;
+    }
+    .tsi-desc {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .tsi-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .tsi-price-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-items: flex-end;
+    }
+    .tsi-price-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .tsi-price-input {
+      width: 105px;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1.5px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      padding: 8px 12px;
+      color: #ffd166;
+      font-family: inherit;
+      font-size: 1.1rem;
+      font-weight: 700;
+      text-align: right;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+    .tsi-price-input:focus {
+      border-color: #ffd166;
+      box-shadow: 0 0 0 2px rgba(255, 209, 102, 0.2);
+    }
+    .tsi-toggle-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 120px;
+    }
+    .tsi-status-text {
+      font-size: 0.82rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .tsi-status-on {
+      color: #86efac;
+    }
+    .tsi-status-off {
+      color: #94a3b8;
+    }
+
+    /* Switch Component */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 52px;
+      height: 28px;
+      flex-shrink: 0;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(255, 255, 255, 0.15);
+      transition: .3s;
+      border-radius: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .slider:before {
       position: absolute;
       content: "";
-      height: 18px;
-      width: 18px;
+      height: 20px;
+      width: 20px;
       left: 3px;
-      bottom: 2.5px;
+      bottom: 3px;
       background-color: white;
+      transition: .3s;
       border-radius: 50%;
-      transition: .4s;
+    }
+    .switch input:checked + .slider {
+      background-color: #22c55e;
+      border-color: #22c55e;
     }
     .switch input:checked + .slider:before {
-      transform: translateX(23px);
+      transform: translateX(24px);
     }
   </style>
 </head>
@@ -702,11 +845,15 @@
         <div class="edit-form-group">
           <label>ประเภทบัตร</label>
           <select id="edit-type">
-            <option value="QT SPON">🎟️ QT SPON (0 บาท)</option>
+            <option value="PRO AFTER 6">🔥 PRO AFTER 6 (350 บาท)</option>
+            <option value="EARLYBIRD">🐦 EARLYBIRD (390 บาท)</option>
+            <option value="PRO 6 ตุลา">⭐ PRO 6 ตุลา (590 บาท)</option>
+            <option value="REGULAR">🎭 REGULAR (690 บาท)</option>
+            <option value="Early Bird">🐦 Early Bird (เดิม 590 บาท)</option>
+            <option value="บัตรปกติ">🎭 บัตรปกติ (เดิม 790 บาท)</option>
             <option value="QT FREE">🎟️ QT FREE (0 บาท)</option>
+            <option value="QT SPON">🎟️ QT SPON (0 บาท)</option>
             <option value="QT DISCOUNT">🎟️ QT DISCOUNT (590 บาท)</option>
-            <option value="บัตรปกติ">🎭 บัตรปกติ (790 บาท)</option>
-            <option value="Early Bird">🐦 Early Bird (590 บาท)</option>
             <option value="บัตรโควต้า">🎟️ บัตรโควต้า (0 บาท)</option>
           </select>
         </div>
@@ -827,7 +974,13 @@
       <div class="booking-group">
         <label for="sb-type">ประเภทบัตร <span style="color:var(--error)">*</span></label>
         <select id="sb-type" onchange="updateQuotaBookingPrice()">
+          <option value="PRO AFTER 6">🔥 PRO AFTER 6 (350 บาท)</option>
+          <option value="EARLYBIRD">🐦 EARLYBIRD (390 บาท)</option>
+          <option value="PRO 6 ตุลา">⭐ PRO 6 ตุลา (590 บาท)</option>
+          <option value="REGULAR">🎭 REGULAR (690 บาท)</option>
           <option value="QT FREE">🎟️ QT FREE (0 บาท)</option>
+          <option value="QT SPON">🎟️ QT SPON (0 บาท)</option>
+          <option value="QT DISCOUNT">🎟️ QT DISCOUNT (590 บาท)</option>
         </select>
       </div>
       <div class="booking-group">
@@ -855,6 +1008,27 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
         ยืนยันออกตั๋วโควต้าทีมงาน
       </button>
+    </div>
+  </div>
+
+  <!-- TICKET PRICING & TYPES MANAGEMENT -->
+  <div class="card" id="ticket-pricing-card">
+    <div class="card-header" style="align-items:flex-start">
+      <div>
+        <span class="card-title">🎟️ จัดการประเภทบัตรและราคาที่เปิดขาย (Ticket Types & Pricing)</span>
+        <div style="font-size:0.8rem;color:var(--muted);margin-top:4px">
+          สวิตช์เปิด/ปิดประเภทบัตรที่จะให้แสดงบนหน้าจองของลูกค้า และกำหนดราคาขายต่อใบ
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <span id="ticket-config-sync-status" style="font-size:0.75rem;color:#86efac;font-weight:600">● ซิงค์เรียบร้อย</span>
+        <button class="btn btn-check" onclick="saveAllTicketConfigs(true)" style="font-size:0.78rem;padding:5px 12px;background:rgba(34,197,94,0.15);border-color:rgba(34,197,94,0.3);color:#86efac;">
+          💾 บันทึกการตั้งค่า
+        </button>
+      </div>
+    </div>
+    <div class="ticket-types-grid" id="ticket-types-management-list">
+      <div style="text-align:center;padding:24px;color:var(--muted)">⏳ กำลังโหลดการตั้งค่าบัตร...</div>
     </div>
   </div>
 
@@ -915,16 +1089,34 @@ const JSONBIN_READ_URL  = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`
 const JSONBIN_WRITE_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
 
 
+const STAFF_TICKET_DEFS = [
+  { id: 'pro-after-6', name: 'PRO AFTER 6', desc: 'โปรโมชั่นพิเศษ PRO AFTER 6', defaultPrice: 350, badge: 'promo',   badgeText: '🔥 PRO AFTER 6' },
+  { id: 'earlybird',   name: 'EARLYBIRD',   desc: 'โปรโมชั่น Early Bird ราคาพิเศษ', defaultPrice: 390, badge: 'early',   badgeText: '🐦 EARLYBIRD' },
+  { id: 'pro-6-oct',   name: 'PRO 6 ตุลา',  desc: 'โปรโมชั่นพิเศษ PRO 6 ตุลา',   defaultPrice: 590, badge: 'promo',   badgeText: '⭐ PRO 6 ตุลา' },
+  { id: 'regular',     name: 'REGULAR',     desc: 'บัตรราคาปกติ',               defaultPrice: 690, badge: 'regular', badgeText: '🎭 REGULAR' },
+];
+
+let _ticketConfig = {
+  'pro-after-6': { enabled: false, price: 350 },
+  'earlybird':   { enabled: true,  price: 390 },
+  'pro-6-oct':   { enabled: false, price: 590 },
+  'regular':     { enabled: true,  price: 690 },
+};
+
 const TICKET_TYPES = {
+  'PRO AFTER 6': 350,
+  'EARLYBIRD': 390,
+  'Early Bird': 390,
+  'PRO 6 ตุลา': 590,
+  'REGULAR': 690,
+  'บัตรปกติ': 690,
   'QT SPON': 0,
   'QT FREE': 0,
   'QT DISCOUNT': 590,
-  'บัตรปกติ':  790,
-  'Early Bird': 590,
-  'บัตรโควต้า': 0,
   'โควต้าฟรี': 0,
-  'โควต้าราคา Early Bird': 590,
+  'โควต้าราคา Early Bird': 390,
   'โควต้า Spon': 0,
+  'บัตรโควต้า': 0,
 };
 
 // ตารางรอบการแสดง (ต้องตรงกับ app.js)
@@ -1095,118 +1287,203 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 
-let _earlybirdEnabled = true;
+let _ticketSaveTimeout = null;
 
 async function initSettings() {
-  const toggle      = document.getElementById('toggle-earlybird');
-  const statusText  = document.getElementById('earlybird-status-text');
-  const setupNotice = document.getElementById('jsonbin-setup-notice');
-  if (!toggle) return;
+  // 1. โหลดจาก localStorage ก่อน
+  const cached = localStorage.getItem('theater_ticket_config');
+  if (cached) {
+    try {
+      _ticketConfig = { ..._ticketConfig, ...JSON.parse(cached) };
+    } catch(e) {}
+  }
 
-  let loaded = false;
-  // 1. ลองโหลดผ่าน Google Sheets APPS_SCRIPT_URL
+  // 2. ดึงจาก Google Sheets APPS_SCRIPT_URL
   if (typeof APPS_SCRIPT_URL !== 'undefined' && APPS_SCRIPT_URL && APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
     try {
       const res = await fetch(`${APPS_SCRIPT_URL}?action=getSettings`);
       if (res.ok) {
         const data = await res.json();
-        if (typeof data.earlybird_enabled === 'boolean') {
-          _earlybirdEnabled = data.earlybird_enabled;
-          loaded = true;
+        if (data && data.ticket_config) {
+          const parsed = typeof data.ticket_config === 'string' ? JSON.parse(data.ticket_config) : data.ticket_config;
+          if (parsed && typeof parsed === 'object') {
+            _ticketConfig = { ..._ticketConfig, ...parsed };
+            localStorage.setItem('theater_ticket_config', JSON.stringify(_ticketConfig));
+          }
+        } else if (data && typeof data.earlybird_enabled !== 'undefined') {
+          // Legacy support
+          const eb = (data.earlybird_enabled === true || data.earlybird_enabled === 'true');
+          if (_ticketConfig['earlybird']) _ticketConfig['earlybird'].enabled = eb;
         }
-      }
-    } catch (e) { /* offline */ }
-  }
 
-  // 2. Fallback: ดึงจากแหล่งสำรองเดิม
-  if (!loaded) {
-    if (!JSONBIN_CONFIGURED) {
-      if (setupNotice) setupNotice.style.display = 'block';
-      // Fallback: read from config.json (static file)
-      try {
-        const res = await fetch('../config.json?t=' + Date.now());
-        if (res.ok) { const cfg = await res.json(); _earlybirdEnabled = cfg.earlybird_enabled !== false; }
-      } catch (e) { /* offline */ }
-    } else {
-      // Read live from JSONBin
-      try {
-        const res = await fetch(JSONBIN_READ_URL, { headers: { 'X-Master-Key': JSONBIN_API_KEY } });
-        if (res.ok) { const data = await res.json(); _earlybirdEnabled = data.record?.earlybird_enabled !== false; }
-      } catch (e) { /* offline */ }
+        // ซิงค์ราคาเข้า TICKET_TYPES
+        STAFF_TICKET_DEFS.forEach(d => {
+          if (_ticketConfig[d.id] && typeof _ticketConfig[d.id].price === 'number') {
+            TICKET_TYPES[d.name] = _ticketConfig[d.id].price;
+          }
+        });
+      }
+    } catch (e) {
+      console.warn('Load settings failed:', e);
     }
   }
 
-  toggle.checked = _earlybirdEnabled;
-  _refreshEarlybirdStatus(false);
+  renderTicketTypesManagement();
 }
 
-function _refreshEarlybirdStatus(saving) {
-  const statusText = document.getElementById('earlybird-status-text');
-  if (!statusText) return;
-  
-  const ok = (JSONBIN_CONFIGURED || (typeof APPS_SCRIPT_URL !== 'undefined' && APPS_SCRIPT_URL && APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_HERE'));
+function renderTicketTypesManagement() {
+  const container = document.getElementById('ticket-types-management-list');
+  if (!container) return;
 
-  if (saving) {
-    statusText.textContent = '⏳ กำลังบันทึก...';
-    statusText.style.color = '#94a3b8';
-  } else if (_earlybirdEnabled) {
-    statusText.textContent = ok ? '✅ เปิดอยู่ — ทุกเครื่องเห็นเหมือนกัน' : '✅ เปิดอยู่ (เฉพาะเครื่องนี้)';
-    statusText.style.color = '#86efac';
-  } else {
-    statusText.textContent = ok ? '🚫 ปิดอยู่ — ทุกเครื่องเห็นเหมือนกัน' : '🚫 ปิดอยู่ (เฉพาะเครื่องนี้)';
-    statusText.style.color = '#fca5a5';
+  container.innerHTML = STAFF_TICKET_DEFS.map(t => {
+    const cfg = _ticketConfig[t.id] || { enabled: false, price: t.defaultPrice };
+    const isEnabled = cfg.enabled === true;
+    const currentPrice = typeof cfg.price === 'number' ? cfg.price : t.defaultPrice;
+
+    return `
+      <div class="ticket-setting-item ${isEnabled ? 'active' : 'inactive'}" id="tsi-${t.id}">
+        <div class="tsi-left">
+          <span class="tsi-badge tsi-badge-${t.badge}">${t.badgeText}</span>
+          <div class="tsi-name">${t.name}</div>
+          <div class="tsi-desc">${t.desc}</div>
+        </div>
+        <div class="tsi-right">
+          <div class="tsi-price-wrap">
+            <label class="tsi-price-label">ราคาขาย (บาท)</label>
+            <input type="number" class="tsi-price-input" id="price-${t.id}" value="${currentPrice}" min="0" step="10" onchange="onTicketFieldChange('${t.id}')" />
+          </div>
+          <div class="tsi-toggle-wrap">
+            <label class="switch">
+              <input type="checkbox" id="toggle-${t.id}" ${isEnabled ? 'checked' : ''} onchange="onTicketFieldChange('${t.id}')" />
+              <span class="slider"></span>
+            </label>
+            <span class="tsi-status-text ${isEnabled ? 'tsi-status-on' : 'tsi-status-off'}" id="status-text-${t.id}">
+              ${isEnabled ? '🟢 เปิดขาย' : '⚪ ปิดขาย'}
+            </span>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function onTicketFieldChange(typeId) {
+  const toggle = document.getElementById(`toggle-${typeId}`);
+  const priceInput = document.getElementById(`price-${typeId}`);
+  const statusText = document.getElementById(`status-text-${typeId}`);
+  const itemCard = document.getElementById(`tsi-${typeId}`);
+
+  if (!toggle || !priceInput) return;
+
+  const isEnabled = toggle.checked;
+  const price = Math.max(0, parseInt(priceInput.value, 10) || 0);
+
+  _ticketConfig[typeId] = { enabled: isEnabled, price: price };
+
+  // อัปเดตสไตล์ UI ทันที
+  if (itemCard) {
+    if (isEnabled) {
+      itemCard.classList.add('active');
+      itemCard.classList.remove('inactive');
+    } else {
+      itemCard.classList.remove('active');
+      itemCard.classList.add('inactive');
+    }
   }
+
+  if (statusText) {
+    statusText.textContent = isEnabled ? '🟢 เปิดขาย' : '⚪ ปิดขาย';
+    statusText.className = `tsi-status-text ${isEnabled ? 'tsi-status-on' : 'tsi-status-off'}`;
+  }
+
+  // อัปเดตตารางคำนวณราคาของระบบออกตั๋วโควต้า
+  const def = STAFF_TICKET_DEFS.find(d => d.id === typeId);
+  if (def) {
+    TICKET_TYPES[def.name] = price;
+    updateQuotaBookingPrice();
+  }
+
+  // บันทึกลง localStorage ทันที
+  localStorage.setItem('theater_ticket_config', JSON.stringify(_ticketConfig));
+
+  // ส่งบันทึกขึ้น Google Apps Script อัตโนมัติ (Debounced)
+  const syncStatus = document.getElementById('ticket-config-sync-status');
+  if (syncStatus) {
+    syncStatus.textContent = '⏳ กำลังบันทึก...';
+    syncStatus.style.color = '#fde047';
+  }
+
+  clearTimeout(_ticketSaveTimeout);
+  _ticketSaveTimeout = setTimeout(() => {
+    saveAllTicketConfigs(false);
+  }, 600);
 }
 
-async function toggleEarlyBirdSale(enabled) {
-  _earlybirdEnabled = enabled;
-  
-  const hasAppScript = typeof APPS_SCRIPT_URL !== 'undefined' && APPS_SCRIPT_URL && APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_HERE';
-  _refreshEarlybirdStatus(hasAppScript || JSONBIN_CONFIGURED);
+async function saveAllTicketConfigs(showToastMsg) {
+  const syncStatus = document.getElementById('ticket-config-sync-status');
+  if (syncStatus) {
+    syncStatus.textContent = '⏳ กำลังบันทึกไปยัง Sheets...';
+    syncStatus.style.color = '#fde047';
+  }
 
-  // 1. ลองบันทึกผ่าน Google Sheets
+  // เก็บค่าล่าสุดจากฟอร์ม
+  STAFF_TICKET_DEFS.forEach(d => {
+    const toggle = document.getElementById(`toggle-${d.id}`);
+    const priceInput = document.getElementById(`price-${d.id}`);
+    if (toggle && priceInput) {
+      _ticketConfig[d.id] = {
+        enabled: toggle.checked,
+        price: Math.max(0, parseInt(priceInput.value, 10) || 0)
+      };
+      TICKET_TYPES[d.name] = _ticketConfig[d.id].price;
+    }
+  });
+
+  localStorage.setItem('theater_ticket_config', JSON.stringify(_ticketConfig));
+
+  const hasAppScript = typeof APPS_SCRIPT_URL !== 'undefined' && APPS_SCRIPT_URL && APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_HERE';
   if (hasAppScript) {
     try {
+      // บันทึก ticket_config เต็มรูปแบบ
       await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'updateSetting', key: 'earlybird_enabled', value: enabled }),
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({
+          action: 'updateSetting',
+          key: 'ticket_config',
+          value: JSON.stringify(_ticketConfig)
+        }),
       });
-      _refreshEarlybirdStatus(false);
-      showToastStaff(enabled ? '✅ เปิด Early Bird — ทุกเครื่องเห็นแล้ว (Sheets)!' : '🚫 ปิด Early Bird — ทุกเครื่องเห็นแล้ว (Sheets)!');
+
+      // ส่ง legacy earlybird_enabled ไปด้วยเพื่อให้ระบบเดิมทำงานสอดคล้องกัน
+      if (_ticketConfig['earlybird']) {
+        fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({
+            action: 'updateSetting',
+            key: 'earlybird_enabled',
+            value: _ticketConfig['earlybird'].enabled
+          }),
+        }).catch(() => {});
+      }
+
+      if (syncStatus) {
+        syncStatus.textContent = '✅ ซิงค์สำเร็จ มีผลทันที';
+        syncStatus.style.color = '#86efac';
+      }
+      if (showToastMsg) showToastStaff('✅ บันทึกการตั้งค่าบัตรและราคาเรียบร้อย มีผลกับหน้าเว็บทันที');
       return;
     } catch (err) {
-      console.warn('Apps Script update setting failed:', err);
+      console.warn('Save ticket config failed:', err);
     }
   }
 
-  // 2. สำรองเดิม: บันทึกผ่าน JSONBin หรือ localStorage ท้องถิ่น
-  if (!JSONBIN_CONFIGURED) {
-    localStorage.setItem('theater_disable_earlybird', (!enabled).toString());
-    _refreshEarlybirdStatus(false);
-    showToastStaff(enabled ? '✅ เปิด (เฉพาะเครื่องนี้)' : '🚫 ปิด (เฉพาะเครื่องนี้)');
-    return;
+  if (syncStatus) {
+    syncStatus.textContent = '💾 บันทึกลงเครื่องแล้ว (โหมดออฟไลน์)';
+    syncStatus.style.color = '#93c5fd';
   }
-
-  try {
-    const res = await fetch(JSONBIN_WRITE_URL, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_API_KEY, 'X-Bin-Versioning': 'false' },
-      body: JSON.stringify({ earlybird_enabled: enabled }),
-    });
-    if (res.ok) {
-      _refreshEarlybirdStatus(false);
-      showToastStaff(enabled ? '✅ เปิด Early Bird — ทุกเครื่องเห็นแล้ว!' : '🚫 ปิด Early Bird — ทุกเครื่องเห็นแล้ว!');
-    } else {
-      throw new Error('HTTP ' + res.status);
-    }
-  } catch (err) {
-    _earlybirdEnabled = !enabled; // revert UI
-    document.getElementById('toggle-earlybird').checked = _earlybirdEnabled;
-    _refreshEarlybirdStatus(false);
-    showToastStaff('❌ บันทึกไม่สำเร็จ: ' + err.message);
-  }
+  if (showToastMsg) showToastStaff('💾 บันทึกการตั้งค่าลงเครื่องเรียบร้อยแล้ว');
 }
 
 
@@ -1795,12 +2072,22 @@ async function syncAllFromSheets(silent = false) {
         localStorage.setItem('theater_tickets', JSON.stringify(normalizedTickets));
         localStorage.setItem('theater_orders', JSON.stringify(normalizedOrders));
         
-        // อัปเดตสถานะ Early Bird ใน UI
-        if (typeof data.earlybird_enabled === 'boolean') {
-          _earlybirdEnabled = data.earlybird_enabled;
-          const toggle = document.getElementById('toggle-earlybird');
-          if (toggle) toggle.checked = _earlybirdEnabled;
-          _refreshEarlybirdStatus(false);
+        // อัปเดตการตั้งค่าประเภทบัตรและราคา (Ticket Types & Pricing)
+        const rawTicketCfg = data.ticket_config || (data.settings && data.settings.ticket_config);
+        if (rawTicketCfg) {
+          try {
+            const parsed = typeof rawTicketCfg === 'string' ? JSON.parse(rawTicketCfg) : rawTicketCfg;
+            if (parsed && typeof parsed === 'object') {
+              _ticketConfig = { ..._ticketConfig, ...parsed };
+              localStorage.setItem('theater_ticket_config', JSON.stringify(_ticketConfig));
+              renderTicketTypesManagement();
+            }
+          } catch(e) {}
+        } else if (typeof data.earlybird_enabled === 'boolean') {
+          if (_ticketConfig['earlybird']) {
+            _ticketConfig['earlybird'].enabled = data.earlybird_enabled;
+            renderTicketTypesManagement();
+          }
         }
 
         // อัปเดตค่า Capacity ที่แอดมินหรือสตาฟแก้ออนไลน์
