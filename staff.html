@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#ffffff" />
+  <meta name="theme-color" content="#08080a" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <title>🔐 Staff Check-in — น่าจะรู้อย่างนี้ตั้งแต่ปี 2475</title>
+  <title>🔐 Staff Check-in — NO TIME TO BLIND น่าจะรู้อย่างนี้ตั้งแต่ปี 2475</title>
   <meta name="robots" content="noindex, nofollow" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -15,10 +15,10 @@
 
   <style>
     :root {
-      --bg: #ffffff; --surface: #f5f5f5; --border: #dddddd;
-      --purple: #ff3b30; --purple-light: #ff6b60; --gold: #000000; --gold-light: #111111;
+      --bg: #08080a; --surface: rgba(255,255,255,0.05); --border: rgba(255,255,255,0.12);
+      --purple: #ff3b30; --purple-light: #ff6b60; --gold: #ffffff; --gold-light: #f4f4f5;
       --success: #22c55e; --warning: #f59e0b; --error: #ef4444;
-      --text: #111111; --muted: #555555; --radius: 16px;
+      --text: #ffffff; --muted: #8e8e96; --radius: 16px;
       --transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -27,7 +27,7 @@
     /* ══ PIN OVERLAY ══════════════════════════════════════════════ */
     #pin-overlay {
       position: fixed; inset: 0; z-index: 9999;
-      background: #ffffff;
+      background: #08080a;
       display: flex; align-items: center; justify-content: center;
     }
     #pin-overlay.hidden { display: none; }
@@ -733,8 +733,8 @@
 <header class="staff-header">
   <div class="staff-logo">
     <span class="logo-emoji">🎭</span>
-    <span class="logo-text logo-full">น่าจะรู้อย่างนี้ตั้งแต่ปี 2475</span>
-    <span class="logo-text logo-short">ปี 2475</span>
+    <span class="logo-text logo-full">NO TIME TO BLIND น่าจะรู้อย่างนี้ตั้งแต่ปี 2475</span>
+    <span class="logo-text logo-short">NO TIME TO BLIND</span>
   </div>
   <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
     <button id="btn-cloud-sync" onclick="syncAllFromSheets()" class="staff-link" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#fff; display:inline-flex; align-items:center; gap:6px; cursor:pointer; font-family:inherit; padding:6px 14px; border-radius:50px; font-size:0.8rem; font-weight:600; transition:all 0.2s">
@@ -2475,8 +2475,8 @@ async function submitQuotaBooking() {
                   (ticketType === 'QT DISCOUNT' ? 'qt-discount' : 
                   (ticketType === 'QT SPON' ? 'qt-spon' : 
                   (ticketType === 'QT FREE' || ticketType === 'บัตรโควต้า' ? 'qt-free' : 'regular'))),
-      show:       'น่าจะรู้อย่างนี้ตั้งแต่ปี 2475',
-      venue:      'KINJAI CONTEMPORARY (ถนนราชวิถี)',
+      show:       'NO TIME TO BLIND น่าจะรู้อย่างนี้ตั้งแต่ปี 2475',
+      venue:      'KINJAI CONTEMPORARY (MRT สิรินธร)',
       showDateId: dateId,
       showSlot:   slot,
       showDate:   showDateLabel,

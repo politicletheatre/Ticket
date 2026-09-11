@@ -4,9 +4,9 @@
 
 // ─── CONFIG ───────────────────────────────────────────────────────────────
 const CONFIG = {
-  showName: 'น่าจะรู้อย่างนี้ตั้งแต่ปี 2475',
-  showNameEn: 'What I Wish I Knew When I was back in 1932',
-  venue: 'KINJAI CONTEMPORARY (ถนนราชวิถี)',
+  showName: 'NO TIME TO BLIND น่าจะรู้อย่างนี้ตั้งแต่ปี 2475',
+  showNameEn: 'NO TIME TO BLIND',
+  venue: 'KINJAI CONTEMPORARY (MRT สิรินธร)',
   dates: '16–25 ตุลาคม 2569',
   maxQty: 10,
   slotCapacity: 50, // ← จำนวนที่นั่งสูงสุดต่อรอบ
@@ -868,14 +868,14 @@ function downloadTicket(idx) {
   ctx.fillRect(20, 14, tc.width - 40, 3);
 
   // Header Titles
-  ctx.fillStyle  = '#ffffff';
-  ctx.font       = 'bold 19px sans-serif';
-  ctx.textAlign  = 'center';
-  ctx.fillText('น่าจะรู้อย่างนี้ตั้งแต่ปี 2475', tc.width / 2, 50);
-
   ctx.fillStyle  = '#ff3b30';
-  ctx.font       = 'bold 11px sans-serif';
-  ctx.fillText('What I Wish I Knew When I was back in 1932', tc.width / 2, 72);
+  ctx.font       = 'bold 16px sans-serif';
+  ctx.textAlign  = 'center';
+  ctx.fillText('NO TIME TO BLIND', tc.width / 2, 48);
+
+  ctx.fillStyle  = '#ffffff';
+  ctx.font       = 'bold 15px sans-serif';
+  ctx.fillText('น่าจะรู้อย่างนี้ตั้งแต่ปี 2475', tc.width / 2, 72);
 
   // QR Code Box (White background card for 100% scan contrast)
   const qrCanvas = srcCanvas.querySelector('canvas');
@@ -920,7 +920,7 @@ function downloadTicket(idx) {
 
   ctx.fillStyle = '#52525b';
   ctx.font      = '10px sans-serif';
-  ctx.fillText('KINJAI CONTEMPORARY (ถนนราชวิถี)', tc.width / 2, 470);
+  ctx.fillText('KINJAI CONTEMPORARY (MRT สิรินธร)', tc.width / 2, 470);
 
   const link    = document.createElement('a');
   link.download = `ticket-${ticket.ticketId}.png`;
@@ -1044,7 +1044,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const header = document.querySelector('.site-header');
     if (!header) return;
     header.style.background = window.scrollY > 20
-      ? 'rgba(255, 255, 255, 0.96)'
-      : 'rgba(255, 255, 255, 0.85)';
+      ? 'rgba(8, 8, 10, 0.96)'
+      : 'rgba(8, 8, 10, 0.85)';
   });
 });
