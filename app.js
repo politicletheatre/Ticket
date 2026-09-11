@@ -1066,13 +1066,29 @@ function initBackwardClock() {
   const baseSecAngle = startS * 6;
 
   const startTimeMs = Date.now();
+  let lastElapsed = 0;
 
   function updateHands(elapsedSeconds) {
-    // Continuously decreasing angles so CSS transition always rotates counter-clockwise
-    // without ever doing a 360-degree forward spin when crossing 12 o'clock
+    // 1. Second hand rotates counter-clockwise (backward)
     const secAngle = baseSecAngle - (elapsedSeconds * 6);
-    const minAngle = baseMinAngle - (elapsedSeconds * (6 / 60));
-    const hourAngle = baseHourAngle - (elapsedSeconds * (30 / 3600));
+
+    // 2. Minute hand and Hour hand advance forward in real-time
+    const minAngle = baseMinAngle + (elapsedSeconds * (6 / 60));
+    const hourAngle = baseHourAngle + (elapsedSeconds * (30 / 3600));
+
+    // Snap hands without multiple rapid spins if browser tab was backgrounded/suspended
+    if (Math.abs(elapsedSeconds - lastElapsed) > 2) {
+      secondHand.style.transition = 'none';
+      minuteHand.style.transition = 'none';
+      hourHand.style.transition = 'none';
+      void secondHand.offsetWidth;
+      setTimeout(() => {
+        secondHand.style.transition = '';
+        minuteHand.style.transition = '';
+        hourHand.style.transition = '';
+      }, 50);
+    }
+    lastElapsed = elapsedSeconds;
 
     secondHand.style.transform = `rotate(${secAngle}deg)`;
     minuteHand.style.transform = `rotate(${minAngle}deg)`;

@@ -360,6 +360,16 @@ body::before {
   dominant-baseline: central;
 }
 
+.clock-label-year {
+  font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: 2.2px;
+  fill: #ffffff;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
 .clock-hand {
   transform-box: view-box;
   transform-origin: 200px 200px;
