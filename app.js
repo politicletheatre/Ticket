@@ -1024,14 +1024,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }).catch(err => console.warn('Background config fetch failed:', err));
 
-  // Poster
-  const posterEl = document.getElementById('poster-img');
-  if (posterEl) {
-    posterEl.src = 'assets/poster.jpg?v=3';
-    posterEl.onerror = () => {
-      posterEl.src = 'assets/poster.png?v=3';
-    };
-  }
+  // Initialize Analog Backward Clock
+  initBackwardClock();
 
   const labels = ['เลือกบัตร', 'ข้อมูล', 'ยืนยัน'];
   document.querySelectorAll('.progress-step span').forEach((el, i) => {
@@ -1048,3 +1042,59 @@ document.addEventListener('DOMContentLoaded', () => {
       : 'rgba(8, 8, 10, 0.85)';
   });
 });
+
+/**
+ * Analog Clock that ticks backward based on real-time clock beat
+ * NO TIME TO BLIND — Time-travel backwards to 2475
+ */
+function initBackwardClock() {
+  const hourHand = document.getElementById('clock-hour-hand');
+  const minuteHand = document.getElementById('clock-minute-hand');
+  const secondHand = document.getElementById('clock-second-hand');
+
+  if (!hourHand || !minuteHand || !secondHand) return;
+
+  // Read real-world start time
+  const now = new Date();
+  const startH = now.getHours() % 12;
+  const startM = now.getMinutes();
+  const startS = now.getSeconds();
+
+  // Base angles for forward clock (12 o'clock = 0 deg)
+  const baseHourAngle = (startH + startM / 60 + startS / 3600) * 30;
+  const baseMinAngle = (startM + startS / 60) * 6;
+  const baseSecAngle = startS * 6;
+
+  const startTimeMs = Date.now();
+
+  function updateHands(elapsedSeconds) {
+    // Continuously decreasing angles so CSS transition always rotates counter-clockwise
+    // without ever doing a 360-degree forward spin when crossing 12 o'clock
+    const secAngle = baseSecAngle - (elapsedSeconds * 6);
+    const minAngle = baseMinAngle - (elapsedSeconds * (6 / 60));
+    const hourAngle = baseHourAngle - (elapsedSeconds * (30 / 3600));
+
+    secondHand.style.transform = `rotate(${secAngle}deg)`;
+    minuteHand.style.transform = `rotate(${minAngle}deg)`;
+    hourHand.style.transform = `rotate(${hourAngle}deg)`;
+  }
+
+  // Initial position at 0 elapsed
+  updateHands(0);
+
+  // Synchronize precisely to the millisecond turn of the real-world clock second
+  const msToNextSecond = 1000 - (Date.now() % 1000);
+
+  setTimeout(() => {
+    // First beat aligned with real second change
+    const initialElapsed = Math.max(1, Math.round((Date.now() - startTimeMs) / 1000));
+    updateHands(initialElapsed);
+
+    // Regular interval ticking backward on every real clock beat
+    setInterval(() => {
+      const elapsed = Math.round((Date.now() - startTimeMs) / 1000);
+      updateHands(elapsed);
+    }, 1000);
+  }, msToNextSecond);
+}
+

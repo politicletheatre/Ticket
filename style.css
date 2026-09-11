@@ -80,6 +80,7 @@ body::before {
 .header-logo {
   display: flex;
   align-items: center;
+  gap: 8px;
   text-decoration: none;
   cursor: pointer;
   transition: var(--transition);
@@ -88,11 +89,17 @@ body::before {
   opacity: 0.85;
   transform: scale(1.02);
 }
-.header-logo-img {
-  height: 36px;
-  width: auto;
-  object-fit: contain;
-  display: block;
+.logo-emoji {
+  font-size: 1.35rem;
+  line-height: 1;
+  display: inline-block;
+}
+.logo-text {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+  display: inline-block;
 }
 
 .header-nav { display: flex; gap: 20px; align-items: center; }
@@ -307,24 +314,122 @@ body::before {
   border: none;
   box-shadow: none;
 }
-.poster-glow {
-  display: none !important;
-}
-.poster-img {
-  position: relative;
-  z-index: 1;
+.backward-clock-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
   width: 100%;
-  max-width: 460px;
-  border-radius: var(--radius-lg);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45), 0 8px 20px rgba(0, 0, 0, 0.25);
-  border: none;
-  outline: none;
-  animation: float 6s ease-in-out infinite;
+  max-width: 400px;
+  position: relative;
+  animation: floatClock 8s ease-in-out infinite;
 }
 
-@keyframes float {
+@keyframes floatClock {
   0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-12px); }
+  50% { transform: translateY(-8px); }
+}
+
+.clock-dial {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  box-shadow:
+    0 25px 60px rgba(0, 0, 0, 0.95),
+    0 0 40px rgba(255, 59, 48, 0.22),
+    inset 0 0 25px rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  background: #08080a;
+}
+
+.clock-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+
+.clock-numeral {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 20px;
+  font-weight: 700;
+  fill: #ffffff;
+  text-anchor: middle;
+  dominant-baseline: central;
+  letter-spacing: 0.5px;
+}
+
+.clock-label-top {
+  font-family: 'Sarabun', sans-serif;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 2.4px;
+  fill: #ff3b30;
+  text-anchor: middle;
+}
+
+.clock-label-sub {
+  font-family: 'Sarabun', sans-serif;
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+  fill: #d4d4d8;
+  text-anchor: middle;
+  opacity: 0.85;
+}
+
+.clock-hand {
+  transform-box: view-box;
+  transform-origin: 200px 200px;
+}
+
+#clock-hour-hand {
+  transition: transform 0.25s ease-out;
+}
+
+#clock-minute-hand {
+  transition: transform 0.25s ease-out;
+}
+
+#clock-second-hand {
+  transition: transform 0.18s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+
+.clock-badge-bottom {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50px;
+  backdrop-filter: blur(10px);
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff3b30;
+  box-shadow: 0 0 10px #ff3b30;
+  animation: pulseBeat 1.8s infinite;
+}
+
+@keyframes pulseBeat {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.8); }
+}
+
+.clock-status-text {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: 0.5px;
 }
 
 .show-info {
@@ -366,18 +471,22 @@ body::before {
 }
 
 .info-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
   gap: 24px;
-  max-width: 960px;
+  max-width: 800px;
   margin: 0 auto 48px;
+  flex-wrap: wrap;
 }
 
 .info-card {
+  flex: 1 1 320px;
+  max-width: 370px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: var(--radius-lg);
-  padding: 32px 20px;
+  padding: 34px 24px;
   text-align: center;
   backdrop-filter: blur(10px);
   transition: var(--transition);
@@ -1496,8 +1605,8 @@ body::before {
   .hero-content { align-items: center; }
   .hero-meta { justify-content: center; }
   .hero-poster { order: -1; }
-  .poster-img { max-width: 320px; }
-  .info-grid { grid-template-columns: 1fr; }
+  .backward-clock-card { max-width: 320px; }
+  .info-grid { flex-direction: column; align-items: center; }
 }
 
 @media (max-width: 600px) {
@@ -1509,8 +1618,14 @@ body::before {
     padding: 8px 16px;
     gap: 8px;
   }
-  .header-logo-img {
-    height: 28px;
+  .header-logo {
+    gap: 6px;
+  }
+  .logo-emoji {
+    font-size: 1.15rem;
+  }
+  .logo-text {
+    font-size: 0.92rem;
   }
   /* Nav row */
   .header-nav {
@@ -1563,8 +1678,8 @@ body::before {
     border: none;
     box-shadow: none;
   }
-  .poster-img {
-    max-width: 260px;
+  .backward-clock-card {
+    max-width: 270px;
     width: 100%;
   }
   .hero-title {
