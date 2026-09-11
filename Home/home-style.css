@@ -85,6 +85,12 @@ body {
   font-size: 1.3rem;
   letter-spacing: 0.5px;
 }
+.header-logo-img {
+  height: 38px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
 .logo-emoji {
   font-size: 1.5rem;
 }
