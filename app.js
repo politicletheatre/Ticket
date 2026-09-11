@@ -9,7 +9,7 @@ const CONFIG = {
   venue: 'KINJAI CONTEMPORARY (MRT สิรินธร)',
   dates: '16–25 ตุลาคม 2569',
   maxQty: 10,
-  slotCapacity: 50, // ← จำนวนที่นั่งสูงสุดต่อรอบ
+  slotCapacity: 65, // ← จำนวนที่นั่งสูงสุดต่อรอบ (ค่าพื้นฐานเริ่มต้น 65)
 
   // ⬇️ ใส่ URL ของ Google Apps Script ที่ deploy แล้วตรงนี้
   APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxeeLAYpMzpwMlp_o41YAON1IdBalgtFZqEyJ4z_R1UKUCypwQGutr7DgvMHZtCipT1xw/exec',
@@ -110,8 +110,8 @@ async function fetchGlobalConfig() {
               const slotKey = key.replace('capacity|', '');
               const parsedVal = parseInt(data[key], 10);
               if (!isNaN(parsedVal) && parsedVal >= 0) {
-                if (parsedVal === 85 || parsedVal === 84 || parsedVal === 82) {
-                  stock[slotKey] = 80;
+                if (parsedVal === 85 || parsedVal === 84 || parsedVal === 82 || parsedVal === 80 || parsedVal === 50) {
+                  stock[slotKey] = 65;
                 } else {
                   stock[slotKey] = parsedVal;
                 }
@@ -174,7 +174,7 @@ function getSlotCapacity(dateId, slot) {
   const stock = JSON.parse(localStorage.getItem('theater_stock') || '{}');
   const key   = getSlotKey(dateId, slot);
   const val   = Number(stock[key]);
-  if (!isNaN(val) && val > 0 && val !== 85) {
+  if (!isNaN(val) && val > 0 && val !== 85 && val !== 80 && val !== 50) {
     return val;
   }
   return CONFIG.slotCapacity;
