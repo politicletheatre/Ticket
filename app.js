@@ -27,7 +27,7 @@ const CONFIG = {
   ticketTypes: [
     { id:'pro-after-6', name:'PRO AFTER 6', desc:'โปรโมชั่นพิเศษ PRO AFTER 6', price:350, badge:'promo',   badgeText:'🔥 PRO AFTER 6', available:false },
     { id:'earlybird',   name:'EARLYBIRD',   desc:'โปรโมชั่น Early Bird ราคาพิเศษ', price:390, badge:'early',   badgeText:'🐦 EARLYBIRD',   available:true },
-    { id:'student',     name:'Student',     desc:'บัตรราคานักเรียน', note:'(กรุณานำบัตรนักเรียน นักศึกษามาแสดง ณ จุดลงทะเบียน)', price:450, badge:'student', badgeText:'🎓 STUDENT', available:true },
+    { id:'student',     name:'STUDENT',     desc:'บัตรราคานักเรียน', note:'(กรุณานำบัตรนักเรียน นักศึกษามาแสดง ณ จุดลงทะเบียน)', price:450, badge:'student', badgeText:'🎓 STUDENT', available:true },
     { id:'pro-6-oct',   name:'PRO 6 ตุลา',  desc:'โปรโมชั่นพิเศษ PRO 6 ตุลา',   price:590, badge:'promo',   badgeText:'⭐ PRO 6 ตุลา',  available:false },
     { id:'regular',     name:'REGULAR',     desc:'บัตรราคาปกติ',               price:690, badge:'regular', badgeText:'🎭 REGULAR',     available:true },
     { id:'quota-free',      name:'โควต้าฟรี', desc:'โควต้าพิเศษสำหรับทีมงาน/ Staff', price:0,   badge:'quota', badgeText:'🎟️ โควต้าฟรี', available:false },

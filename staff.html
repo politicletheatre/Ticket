@@ -587,13 +587,17 @@
       flex: 1 1 240px;
     }
     .tsi-badge {
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
       align-self: flex-start;
+      width: fit-content;
+      max-width: fit-content;
       padding: 2px 10px;
       border-radius: 50px;
       font-size: 0.72rem;
       font-weight: 700;
       letter-spacing: 0.5px;
+      white-space: nowrap;
     }
     .tsi-badge-promo {
       background: rgba(245, 158, 11, 0.15);
@@ -852,7 +856,7 @@
           <select id="edit-type">
             <option value="PRO AFTER 6">🔥 PRO AFTER 6 (350 บาท)</option>
             <option value="EARLYBIRD">🐦 EARLYBIRD (390 บาท)</option>
-            <option value="Student">🎓 Student (450 บาท)</option>
+            <option value="STUDENT">🎓 STUDENT (450 บาท)</option>
             <option value="PRO 6 ตุลา">⭐ PRO 6 ตุลา (590 บาท)</option>
             <option value="REGULAR">🎭 REGULAR (690 บาท)</option>
             <option value="Early Bird">🐦 Early Bird (เดิม 590 บาท)</option>
@@ -982,7 +986,7 @@
         <select id="sb-type" onchange="updateQuotaBookingPrice()">
           <option value="PRO AFTER 6">🔥 PRO AFTER 6 (350 บาท)</option>
           <option value="EARLYBIRD">🐦 EARLYBIRD (390 บาท)</option>
-          <option value="Student">🎓 Student (450 บาท)</option>
+          <option value="STUDENT">🎓 STUDENT (450 บาท)</option>
           <option value="PRO 6 ตุลา">⭐ PRO 6 ตุลา (590 บาท)</option>
           <option value="REGULAR">🎭 REGULAR (690 บาท)</option>
           <option value="QT FREE">🎟️ QT FREE (0 บาท)</option>
@@ -1099,7 +1103,7 @@ const JSONBIN_WRITE_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
 const STAFF_TICKET_DEFS = [
   { id: 'pro-after-6', name: 'PRO AFTER 6', desc: 'โปรโมชั่นพิเศษ PRO AFTER 6', defaultPrice: 350, badge: 'promo',   badgeText: '🔥 PRO AFTER 6' },
   { id: 'earlybird',   name: 'EARLYBIRD',   desc: 'โปรโมชั่น Early Bird ราคาพิเศษ', defaultPrice: 390, badge: 'early',   badgeText: '🐦 EARLYBIRD' },
-  { id: 'student',     name: 'Student',     desc: 'บัตรราคานักเรียน (กรุณานำบัตรนักเรียน นักศึกษามาแสดง ณ จุดลงทะเบียน)', defaultPrice: 450, badge: 'student', badgeText: '🎓 STUDENT' },
+  { id: 'student',     name: 'STUDENT',     desc: 'บัตรราคานักเรียน (กรุณานำบัตรนักเรียน นักศึกษามาแสดง ณ จุดลงทะเบียน)', defaultPrice: 450, badge: 'student', badgeText: '🎓 STUDENT' },
   { id: 'pro-6-oct',   name: 'PRO 6 ตุลา',  desc: 'โปรโมชั่นพิเศษ PRO 6 ตุลา',   defaultPrice: 590, badge: 'promo',   badgeText: '⭐ PRO 6 ตุลา' },
   { id: 'regular',     name: 'REGULAR',     desc: 'บัตรราคาปกติ',               defaultPrice: 690, badge: 'regular', badgeText: '🎭 REGULAR' },
 ];
