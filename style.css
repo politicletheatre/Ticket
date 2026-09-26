@@ -218,7 +218,7 @@ body::before {
   font-size: 1.02rem;
   line-height: 1.85;
   color: #ffffff;
-  max-width: 580px;
+  max-width: 620px;
 }
 .hero-synopsis p {
   color: #ffffff;
@@ -227,6 +227,12 @@ body::before {
   font-weight: 700;
   color: #ffffff;
   text-shadow: 0 0 1px rgba(255, 255, 255, 0.8);
+}
+.synopsis-desktop {
+  display: block;
+}
+.synopsis-mobile {
+  display: none;
 }
 
 .hero-meta {
@@ -1618,6 +1624,15 @@ body::before {
   .hero-poster { order: -1; }
   .backward-clock-card { max-width: 320px; }
   .info-grid { flex-direction: column; align-items: center; }
+}
+
+@media (max-width: 768px) {
+  .synopsis-desktop {
+    display: none;
+  }
+  .synopsis-mobile {
+    display: block;
+  }
 }
 
 @media (max-width: 600px) {
