@@ -466,10 +466,10 @@ function renderTicketTypes() {
          id="tc-${t.id}"
          onclick="selectType('${t.id}')">
       <div class="ticket-type-info">
-        <div class="ticket-type-name">${t.name}</div>
+        <div class="ticket-type-name">${(t.name || '').toUpperCase()}</div>
         ${t.desc ? `<div class="ticket-type-desc">${t.desc}</div>` : ''}
         ${t.note ? `<div class="ticket-type-note">${t.note}</div>` : ''}
-        ${t.badgeText ? `<span class="ticket-type-badge badge-${t.badge}">${t.badgeText}</span>` : ''}
+        ${t.badgeText ? `<span class="ticket-type-badge badge-${t.badge}" style="display:inline-flex;align-items:center;align-self:flex-start;width:fit-content;max-width:fit-content;white-space:nowrap;">${t.badgeText}</span>` : ''}
       </div>
       <div style="display:flex;align-items:center;gap:16px">
         <div class="ticket-type-price">${fmt(t.price)}<span> บาท</span></div>
