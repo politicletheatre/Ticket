@@ -568,6 +568,9 @@ async function doSearch() {
                    <div class="ticket-info-row"><span class="tl">ประเภทบัตร</span><span class="tv">${esc(ticket.type || '—')}</span></div>
                    <div class="ticket-info-row"><span class="tl">ผู้ถือบัตร</span><span class="tv">${esc(ticket.name || '—')}</span></div>
                  </div>
+                 ${(ticket.typeId === 'student' || String(ticket.type).toLowerCase().includes('student'))
+                   ? `<div style="font-size:0.75rem;color:#fcd34d;padding:6px 10px;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.3);border-radius:6px;margin:8px 0;text-align:center;line-height:1.4;">⚠️ กรุณานำบัตรนักเรียน นักศึกษามาแสดง ณ จุดลงทะเบียน</div>`
+                   : ''}
                   <button class="btn-download-qr" onclick="downloadQR('${esc(ticket.ticketId)}')">📥 ดาวน์โหลด QR Code</button>
                   <button class="btn-download-qr" style="margin-top:6px;background:rgba(212,160,23,0.1);border-color:rgba(212,160,23,0.25);color:var(--gold-light)" onclick="regenerateSingleQR('${esc(ticket.ticketId)}')">🔄 เจน QR Code อีกครั้ง</button>`
             }
@@ -794,6 +797,12 @@ function downloadQR(ticketId) {
   ctx.fillStyle = '#52525b';
   ctx.font      = '10px sans-serif';
   ctx.fillText('KINJAI CONTEMPORARY (MRT สิรินธร)', tc.width / 2, 470);
+
+  if (ticket.typeId === 'student' || String(ticket.type).toLowerCase().includes('student')) {
+    ctx.fillStyle = '#fcd34d';
+    ctx.font      = '10px sans-serif';
+    ctx.fillText('* กรุณานำบัตรนักเรียน นักศึกษามาแสดง ณ จุดลงทะเบียน', tc.width / 2, 492);
+  }
 
   const link = document.createElement('a');
   link.download = `ticket-${ticketId}.png`;

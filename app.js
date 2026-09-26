@@ -27,6 +27,7 @@ const CONFIG = {
   ticketTypes: [
     { id:'pro-after-6', name:'PRO AFTER 6', desc:'โปรโมชั่นพิเศษ PRO AFTER 6', price:350, badge:'promo',   badgeText:'🔥 PRO AFTER 6', available:false },
     { id:'earlybird',   name:'EARLYBIRD',   desc:'โปรโมชั่น Early Bird ราคาพิเศษ', price:390, badge:'early',   badgeText:'🐦 EARLYBIRD',   available:true },
+    { id:'student',     name:'Student',     desc:'บัตรราคานักเรียน', note:'(กรุณานำบัตรนักเรียน นักศึกษามาแสดง ณ จุดลงทะเบียน)', price:450, badge:'student', badgeText:'🎓 STUDENT', available:true },
     { id:'pro-6-oct',   name:'PRO 6 ตุลา',  desc:'โปรโมชั่นพิเศษ PRO 6 ตุลา',   price:590, badge:'promo',   badgeText:'⭐ PRO 6 ตุลา',  available:false },
     { id:'regular',     name:'REGULAR',     desc:'บัตรราคาปกติ',               price:690, badge:'regular', badgeText:'🎭 REGULAR',     available:true },
     { id:'quota-free',      name:'โควต้าฟรี', desc:'โควต้าพิเศษสำหรับทีมงาน/ Staff', price:0,   badge:'quota', badgeText:'🎟️ โควต้าฟรี', available:false },
@@ -46,6 +47,7 @@ const CONFIG = {
 let GLOBAL_TICKET_CONFIG = {
   'pro-after-6': { enabled: false, price: 350 },
   'earlybird':   { enabled: true,  price: 390 },
+  'student':     { enabled: true,  price: 450 },
   'pro-6-oct':   { enabled: false, price: 590 },
   'regular':     { enabled: true,  price: 690 },
 };
@@ -466,6 +468,7 @@ function renderTicketTypes() {
       <div class="ticket-type-info">
         <div class="ticket-type-name">${t.name}</div>
         ${t.desc ? `<div class="ticket-type-desc">${t.desc}</div>` : ''}
+        ${t.note ? `<div class="ticket-type-note">${t.note}</div>` : ''}
         ${t.badgeText ? `<span class="ticket-type-badge badge-${t.badge}">${t.badgeText}</span>` : ''}
       </div>
       <div style="display:flex;align-items:center;gap:16px">
@@ -628,6 +631,18 @@ function updateSummary() {
   const showEl = document.getElementById('sum-show');
   if (showEl) showEl.textContent = showLabel;
   document.getElementById('sum-type').textContent  = type.name;
+
+  const noteRow = document.getElementById('sum-note-row');
+  const noteEl  = document.getElementById('sum-note');
+  if (noteRow && noteEl) {
+    if (type.note) {
+      noteEl.textContent = type.note;
+      noteRow.style.display = 'flex';
+    } else {
+      noteRow.style.display = 'none';
+    }
+  }
+
   document.getElementById('sum-price').textContent = `${fmt(type.price)} บาท`;
   document.getElementById('sum-qty').textContent   = `${state.qty} ใบ`;
   document.getElementById('sum-total').textContent = `${fmt(total)} บาท`;
@@ -676,6 +691,18 @@ function renderRecap() {
   const type = getActiveTicketType(state.selectedTypeId);
   if (!type) return;
   document.getElementById('recap-type').textContent  = type.name;
+
+  const recapNoteRow = document.getElementById('recap-note-row');
+  const recapNoteEl  = document.getElementById('recap-note');
+  if (recapNoteRow && recapNoteEl) {
+    if (type.note) {
+      recapNoteEl.textContent = type.note;
+      recapNoteRow.style.display = 'block';
+    } else {
+      recapNoteRow.style.display = 'none';
+    }
+  }
+
   document.getElementById('recap-qty').textContent   = `${state.qty} ใบ`;
   document.getElementById('recap-total').textContent = `${fmt(type.price * state.qty)} บาท`;
 }
@@ -864,6 +891,9 @@ function renderConfirmation() {
       <div id="qr-ticket-${idx}" class="qr-container"></div>
       <div class="ticket-card-title">${CONFIG.showName}</div>
       <div class="ticket-card-type">${ticket.type}</div>
+      ${ticket.typeId === 'student' || String(ticket.type).toLowerCase().includes('student')
+        ? `<div style="font-size:0.75rem;color:#fcd34d;padding:4px 8px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);border-radius:6px;margin:4px 0 8px 0;text-align:center;">⚠️ กรุณานำบัตรนักเรียน นักศึกษามาแสดง ณ จุดลงทะเบียน</div>`
+        : ''}
       <div class="ticket-card-id">${ticket.ticketId}</div>
       <button class="btn-download-ticket" onclick="downloadTicket(${idx})">📥 ดาวน์โหลดใบนี้</button>
       <button class="btn-download-ticket" style="margin-top:6px;background:rgba(212,160,23,0.1);border-color:rgba(212,160,23,0.25);color:var(--gold-light)" onclick="regenerateConfirmationQR(${idx})">🔄 เจน QR Code อีกครั้ง</button>
@@ -987,6 +1017,12 @@ function downloadTicket(idx) {
   ctx.fillStyle = '#52525b';
   ctx.font      = '10px sans-serif';
   ctx.fillText('KINJAI CONTEMPORARY (MRT สิรินธร)', tc.width / 2, 470);
+
+  if (ticket.typeId === 'student' || String(ticket.type).toLowerCase().includes('student')) {
+    ctx.fillStyle = '#fcd34d';
+    ctx.font      = '10px sans-serif';
+    ctx.fillText('* กรุณานำบัตรนักเรียน นักศึกษามาแสดง ณ จุดลงทะเบียน', tc.width / 2, 492);
+  }
 
   const link    = document.createElement('a');
   link.download = `ticket-${ticket.ticketId}.png`;

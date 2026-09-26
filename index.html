@@ -305,6 +305,10 @@
         <span class="summary-label">ประเภท</span>
         <span class="summary-val" id="sum-type">—</span>
       </div>
+      <div class="summary-row" id="sum-note-row" style="display:none;">
+        <span class="summary-label">หมายเหตุ</span>
+        <span class="summary-val ticket-summary-note" id="sum-note"></span>
+      </div>
       <div class="summary-row">
         <span class="summary-label">ราคาต่อใบ</span>
         <span class="summary-val" id="sum-price">—</span>
@@ -372,6 +376,9 @@
         <span id="recap-qty" class="recap-detail">—</span>
         <span class="recap-sep">·</span>
         <span id="recap-total" class="recap-total">—</span>
+      </div>
+      <div id="recap-note-row" style="display:none; font-size:0.78rem; color:#fcd34d; margin-top:6px; line-height:1.4;">
+        <span id="recap-note"></span>
       </div>
       <div class="recap-edit-row">
         <button class="btn-recap-edit" id="btn-edit-slot" onclick="goToEditSlot()">
