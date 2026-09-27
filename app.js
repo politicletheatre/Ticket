@@ -1129,6 +1129,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize Analog Backward Clock
   initBackwardClock();
 
+  // Initialize Early Bird Digital Countdown
+  initEarlyBirdCountdown();
+
   const labels = ['เลือกบัตร', 'ข้อมูล', 'ยืนยัน'];
   document.querySelectorAll('.progress-step span').forEach((el, i) => {
     el.textContent = labels[i];
@@ -1144,6 +1147,45 @@ document.addEventListener('DOMContentLoaded', () => {
       : 'rgba(8, 8, 10, 0.85)';
   });
 });
+
+/**
+ * Digital Countdown Timer for Early Bird
+ * นับถอยหลังเวลาสิ้นสุด Early Bird: วันนี้จนถึงวันที่ 3 ตุลาคม (23:59:59 GMT+7)
+ */
+function initEarlyBirdCountdown() {
+  const daysEl = document.getElementById('cd-days');
+  const hoursEl = document.getElementById('cd-hours');
+  const minutesEl = document.getElementById('cd-minutes');
+  const secondsEl = document.getElementById('cd-seconds');
+
+  if (!daysEl || !hoursEl || !minutesEl || !secondsEl) return;
+
+  function update() {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    // Target: October 3, 23:59:59 (0-indexed month: 9 = October)
+    const target = new Date(currentYear, 9, 3, 23, 59, 59, 999);
+
+    let diff = target.getTime() - now.getTime();
+    if (diff < 0) diff = 0;
+
+    const totalSec = Math.floor(diff / 1000);
+    const days = Math.floor(totalSec / 86400);
+    const hours = Math.floor((totalSec % 86400) / 3600);
+    const minutes = Math.floor((totalSec % 3600) / 60);
+    const seconds = totalSec % 60;
+
+    const pad = (n) => String(n).padStart(2, '0');
+
+    daysEl.textContent = pad(days);
+    hoursEl.textContent = pad(hours);
+    minutesEl.textContent = pad(minutes);
+    secondsEl.textContent = pad(seconds);
+  }
+
+  update();
+  setInterval(update, 1000);
+}
 
 /**
  * Analog Clock that ticks backward based on real-time clock beat
