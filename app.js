@@ -1280,6 +1280,9 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('qty-minus').disabled = true;
+
+  // Check URL hash or query params to auto-open directions modal (Deep Linking)
+  checkDirectionsUrl();
 });
 
 /**
@@ -1393,11 +1396,32 @@ function initBackwardClock() {
 }
 
 // ─── DIRECTIONS MODAL & LIGHTBOX ──────────────────────────────────────────────
-function openDirectionsModal() {
+function checkDirectionsUrl() {
+  const hash = (window.location.hash || '').toLowerCase();
+  const search = window.location.search || '';
+  const params = new URLSearchParams(search);
+  if (
+    hash === '#directions' || 
+    hash === '#direction' || 
+    hash === '#map' || 
+    hash === '#location' ||
+    params.has('directions') || 
+    params.get('modal') === 'directions'
+  ) {
+    setTimeout(() => {
+      openDirectionsModal(false);
+    }, 150);
+  }
+}
+
+function openDirectionsModal(updateHash = true) {
   const modal = document.getElementById('directions-modal');
   if (!modal) return;
   modal.style.display = 'flex';
   document.body.classList.add('modal-open');
+  if (updateHash && window.location.hash.toLowerCase() !== '#directions') {
+    history.replaceState(null, '', '#directions');
+  }
   setTimeout(() => {
     const closeBtn = modal.querySelector('.btn-directions-close');
     if (closeBtn) closeBtn.focus();
@@ -1409,6 +1433,23 @@ function closeDirectionsModal() {
   if (!modal) return;
   modal.style.display = 'none';
   document.body.classList.remove('modal-open');
+  const hash = (window.location.hash || '').toLowerCase();
+  if (hash === '#directions' || hash === '#direction' || hash === '#map' || hash === '#location') {
+    history.replaceState(null, '', window.location.pathname + window.location.search);
+  }
+}
+
+function copyDirectionsLink() {
+  const url = window.location.origin + window.location.pathname.replace(/\/$/, '') + '/#directions';
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(() => {
+      showToast('📋 คัดลอกลิงก์วิธีการเดินทางเรียบร้อยแล้ว!');
+    }).catch(() => {
+      prompt('คัดลอกลิงก์ด้านล่างเพื่อแชร์ได้เลยครับ:', url);
+    });
+  } else {
+    prompt('คัดลอกลิงก์ด้านล่างเพื่อแชร์ได้เลยครับ:', url);
+  }
 }
 
 function handleDirectionsBackdropClick(e) {
@@ -1444,9 +1485,24 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+// Listen to browser forward/back and hash changes
+window.addEventListener('hashchange', () => {
+  const hash = (window.location.hash || '').toLowerCase();
+  if (hash === '#directions' || hash === '#direction' || hash === '#map' || hash === '#location') {
+    openDirectionsModal(false);
+  } else {
+    const modal = document.getElementById('directions-modal');
+    if (modal && modal.style.display !== 'none') {
+      closeDirectionsModal();
+    }
+  }
+});
+
 // Expose globally for onclick handlers
+window.checkDirectionsUrl = checkDirectionsUrl;
 window.openDirectionsModal = openDirectionsModal;
 window.closeDirectionsModal = closeDirectionsModal;
+window.copyDirectionsLink = copyDirectionsLink;
 window.handleDirectionsBackdropClick = handleDirectionsBackdropClick;
 window.openDirectionsLightbox = openDirectionsLightbox;
 window.closeDirectionsLightbox = closeDirectionsLightbox;
