@@ -1138,14 +1138,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('qty-minus').disabled = true;
-
-  window.addEventListener('scroll', () => {
-    const header = document.querySelector('.site-header');
-    if (!header) return;
-    header.style.background = window.scrollY > 20
-      ? 'rgba(8, 8, 10, 0.96)'
-      : 'rgba(8, 8, 10, 0.85)';
-  });
 });
 
 /**
