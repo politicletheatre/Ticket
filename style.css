@@ -577,6 +577,10 @@ body::before {
   text-align: center;
   box-shadow: 0 4px 15px rgba(40, 30, 20, 0.05);
   transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 .info-card:hover {
   transform: translateY(-4px);
@@ -1951,20 +1955,19 @@ body.modal-open {
 .info-card.info-card-interactive {
   cursor: pointer;
   position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  border: 1.5px solid rgba(40, 107, 110, 0.28);
 }
 .info-card.info-card-interactive:hover {
   transform: translateY(-5px);
-  border-color: #286b6e;
-  box-shadow: 0 10px 24px rgba(40, 107, 110, 0.18);
+  border-color: #c83e29;
+  box-shadow: 0 10px 28px rgba(200, 62, 41, 0.18);
 }
 .info-card-badge {
-  display: inline-block;
-  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   margin-top: 14px;
-  padding: 5px 14px;
+  padding: 6px 14px;
   background: rgba(40, 107, 110, 0.08);
   color: #286b6e;
   border: 1px solid rgba(40, 107, 110, 0.25);
@@ -1976,84 +1979,7 @@ body.modal-open {
 .info-card.info-card-interactive:hover .info-card-badge {
   background: #286b6e;
   color: #ffffff;
-}
-
-/* Directions Banner Card */
-.directions-banner-wrap {
-  max-width: 764px;
-  margin: -16px auto 44px;
-  padding: 0 12px;
-}
-.directions-banner {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  background: linear-gradient(135deg, #ffffff 0%, #fbf8f1 100%);
-  border: 2px solid rgba(40, 107, 110, 0.28);
-  border-radius: var(--radius-lg, 16px);
-  padding: 18px 24px;
-  cursor: pointer;
-  box-shadow: 0 6px 20px rgba(40, 30, 20, 0.06);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  text-align: left;
-}
-.directions-banner:hover {
-  border-color: #c83e29;
-  transform: translateY(-3px);
-  box-shadow: 0 12px 30px rgba(200, 62, 41, 0.16);
-}
-.directions-banner:active {
-  transform: scale(0.99);
-}
-.directions-banner-icon-box {
-  width: 54px;
-  height: 54px;
-  min-width: 54px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #286b6e 0%, #1a494c 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(40, 107, 110, 0.3);
-}
-.directions-banner-icon {
-  font-size: 1.8rem;
-  line-height: 1;
-}
-.directions-banner-text {
-  flex: 1;
-}
-.directions-banner-title {
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: #1c1917;
-  margin-bottom: 4px;
-  line-height: 1.35;
-}
-.directions-banner-desc {
-  font-size: 0.88rem;
-  color: #57534e;
-  line-height: 1.45;
-}
-.directions-banner-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: linear-gradient(135deg, #c83e29 0%, #a82e1c 100%);
-  color: #ffffff;
-  padding: 10px 18px;
-  border-radius: 24px;
-  font-size: 0.92rem;
-  font-weight: 700;
-  white-space: nowrap;
-  box-shadow: 0 4px 14px rgba(200, 62, 41, 0.25);
-  transition: all 0.2s ease;
-}
-.directions-banner:hover .directions-banner-btn {
-  background: linear-gradient(135deg, #d94a34 0%, #b83320 100%);
-  transform: translateX(2px);
-  box-shadow: 0 6px 18px rgba(200, 62, 41, 0.35);
+  border-color: #286b6e;
 }
 
 /* Modal Overlay */
@@ -2459,20 +2385,6 @@ body.modal-open {
 
 /* Mobile responsive adjustments */
 @media (max-width: 600px) {
-  .directions-banner {
-    flex-direction: column;
-    text-align: center;
-    gap: 12px;
-    padding: 18px 16px;
-  }
-  .directions-banner-icon-box {
-    margin: 0 auto;
-  }
-  .directions-banner-btn {
-    width: 100%;
-    justify-content: center;
-    padding: 12px;
-  }
   .directions-modal-header {
     padding: 14px 16px;
   }
