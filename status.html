@@ -814,6 +814,146 @@ function makeQR(elementId, text, size) {
   }
 }
 
+// ─── GENERATE DOWNLOADABLE TICKET IMAGE (WARM RETRO POSTER THEME) ──────────
+function generateTicketImageCanvas(ticket, qrCanvas, totalQty) {
+  const tc  = document.createElement('canvas');
+  tc.width  = 440;
+  tc.height = 560;
+  const ctx = tc.getContext('2d');
+
+  function drawRoundRect(c, x, y, w, h, r, fill, stroke) {
+    c.beginPath();
+    if (c.roundRect) {
+      c.roundRect(x, y, w, h, r);
+    } else {
+      c.rect(x, y, w, h);
+    }
+    if (fill) c.fill();
+    if (stroke) c.stroke();
+  }
+
+  // 1. Background: Warm cream poster paper
+  ctx.fillStyle = '#fbf8f1';
+  ctx.fillRect(0, 0, tc.width, tc.height);
+
+  // 2. Ticket Card Box
+  const cardX = 16, cardY = 16, cardW = tc.width - 32, cardH = tc.height - 32;
+  ctx.fillStyle   = '#ffffff';
+  ctx.strokeStyle = '#286b6e';
+  ctx.lineWidth   = 2;
+  drawRoundRect(ctx, cardX, cardY, cardW, cardH, 20, true, true);
+
+  // 3. Inner Decorative Border
+  ctx.strokeStyle = 'rgba(200, 62, 41, 0.25)';
+  ctx.lineWidth   = 1;
+  drawRoundRect(ctx, cardX + 5, cardY + 5, cardW - 10, cardH - 10, 16, false, true);
+
+  // 4. Top Accent Ribbon (Terracotta -> Coral -> Vintage Teal)
+  const grad = ctx.createLinearGradient(cardX + 6, cardY + 6, cardX + cardW - 6, cardY + 6);
+  grad.addColorStop(0, '#c83e29');
+  grad.addColorStop(0.4, '#e06d44');
+  grad.addColorStop(1, '#286b6e');
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  if (ctx.roundRect) {
+    ctx.roundRect(cardX + 6, cardY + 6, cardW - 12, 8, [12, 12, 0, 0]);
+    ctx.fill();
+  } else {
+    ctx.fillRect(cardX + 6, cardY + 6, cardW - 12, 8);
+  }
+
+  // 5. Header Titles
+  ctx.fillStyle  = '#1c1917';
+  ctx.font       = 'bold 18px "Sarabun", sans-serif';
+  ctx.textAlign  = 'center';
+  ctx.fillText('น่าจะรู้อย่างนี้ตั้งแต่ปี 2475', tc.width / 2, cardY + 42);
+
+  ctx.fillStyle  = '#286b6e';
+  ctx.font       = 'bold 13px "Sarabun", sans-serif';
+  ctx.fillText('NO TIME TO BLIND', tc.width / 2, cardY + 62);
+
+  // 6. Dotted Line Divider
+  ctx.strokeStyle = 'rgba(40, 107, 110, 0.22)';
+  ctx.lineWidth   = 1;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath();
+  ctx.moveTo(cardX + 24, cardY + 74);
+  ctx.lineTo(cardX + cardW - 24, cardY + 74);
+  ctx.stroke();
+  ctx.setLineDash([]); // Reset line dash
+
+  // 7. QR Code Box (Crisp White with subtle frame)
+  const qrSize     = 180;
+  const boxPadding = 12;
+  const boxSize    = qrSize + boxPadding * 2;
+  const boxX       = (tc.width - boxSize) / 2;
+  const boxY       = cardY + 86;
+
+  ctx.fillStyle   = '#ffffff';
+  ctx.strokeStyle = 'rgba(40, 107, 110, 0.22)';
+  ctx.lineWidth   = 1.5;
+  drawRoundRect(ctx, boxX, boxY, boxSize, boxSize, 14, true, true);
+
+  if (qrCanvas) {
+    ctx.drawImage(qrCanvas, (tc.width - qrSize) / 2, boxY + boxPadding, qrSize, qrSize);
+  }
+
+  // 8. Customer Name
+  ctx.fillStyle = '#1c1917';
+  ctx.font      = 'bold 17px "Sarabun", sans-serif';
+  ctx.fillText(ticket.name || 'ผู้ถือบัตร', tc.width / 2, boxY + boxSize + 28);
+
+  // 9. Ticket Type & Number Badge (Pill)
+  const qtyStr    = totalQty ? ` / ${totalQty}` : '';
+  const typeLabel = `${ticket.type} · ใบที่ ${ticket.ticketNum}${qtyStr}`;
+  ctx.font        = 'bold 12px "Sarabun", sans-serif';
+  const pillW     = ctx.measureText(typeLabel).width + 24;
+  const pillH     = 24;
+  const pillX     = (tc.width - pillW) / 2;
+  const pillY     = boxY + boxSize + 40;
+
+  ctx.fillStyle   = 'rgba(200, 62, 41, 0.09)';
+  ctx.strokeStyle = 'rgba(200, 62, 41, 0.3)';
+  ctx.lineWidth   = 1;
+  drawRoundRect(ctx, pillX, pillY, pillW, pillH, 12, true, true);
+
+  ctx.fillStyle = '#c83e29';
+  ctx.fillText(typeLabel, tc.width / 2, pillY + 16);
+
+  // 10. Show Date & Time
+  if (ticket.showDate) {
+    ctx.fillStyle = '#286b6e';
+    ctx.font      = 'bold 14px "Sarabun", sans-serif';
+    ctx.fillText(`📅 ${ticket.showDate}`, tc.width / 2, pillY + 45);
+  }
+
+  // 11. Ticket ID Code
+  ctx.fillStyle = '#78716c';
+  ctx.font      = '600 11px monospace';
+  ctx.fillText(ticket.ticketId, tc.width / 2, pillY + 66);
+
+  // 12. Venue
+  ctx.fillStyle = '#44403c';
+  ctx.font      = '11px "Sarabun", sans-serif';
+  ctx.fillText('📍 KINJAI CONTEMPORARY (MRT สิรินธร)', tc.width / 2, pillY + 87);
+
+  // 13. Student Reminder or Entrance Check-in Note
+  if (ticket.typeId === 'student' || String(ticket.type).toLowerCase().includes('student')) {
+    ctx.fillStyle = '#b45309';
+    ctx.font      = '600 10px "Sarabun", sans-serif';
+    ctx.fillText('* กรุณานำบัตรนักเรียน/นักศึกษามาแสดง ณ จุดลงทะเบียน', tc.width / 2, pillY + 107);
+    ctx.fillStyle = '#a8a29e';
+    ctx.font      = '10px "Sarabun", sans-serif';
+    ctx.fillText('โปรดแสดง QR Code นี้ที่หน้างานเพื่อเช็คอินเข้าชมการแสดง', tc.width / 2, pillY + 122);
+  } else {
+    ctx.fillStyle = '#a8a29e';
+    ctx.font      = '10px "Sarabun", sans-serif';
+    ctx.fillText('โปรดแสดง QR Code นี้ที่หน้างานเพื่อเช็คอินเข้าชมการแสดง', tc.width / 2, pillY + 109);
+  }
+
+  return tc;
+}
+
 /* ── DOWNLOAD QR ── */
 function downloadQR(ticketId) {
   const allTickets = JSON.parse(localStorage.getItem('theater_tickets') || '{}');
@@ -823,82 +963,11 @@ function downloadQR(ticketId) {
   const qrEl     = document.getElementById(`qr-status-${ticketId}`);
   const qrCanvas = qrEl?.querySelector('canvas');
 
-  const tc  = document.createElement('canvas');
-  tc.width  = 400; tc.height = 540;
-  const ctx = tc.getContext('2d');
+  const allOrders = JSON.parse(localStorage.getItem('theater_orders') || '[]');
+  const order     = allOrders.find(o => o.orderId === ticket.orderId);
+  const totalQty  = order?.qty || order?.tickets?.length || '';
 
-  // Background: Deep dark / black
-  ctx.fillStyle = '#0f0f11';
-  ctx.fillRect(0, 0, tc.width, tc.height);
-
-  // Border: Sleek graphite border
-  ctx.strokeStyle = '#27272a';
-  ctx.lineWidth   = 2;
-  ctx.strokeRect(10, 10, tc.width - 20, tc.height - 20);
-
-  // Top Red Accent Line
-  ctx.fillStyle = '#ff3b30';
-  ctx.fillRect(20, 14, tc.width - 40, 3);
-
-  // Header Titles
-  ctx.fillStyle  = '#ff3b30';
-  ctx.font       = 'bold 16px sans-serif';
-  ctx.textAlign  = 'center';
-  ctx.fillText('NO TIME TO BLIND', tc.width / 2, 48);
-
-  ctx.fillStyle  = '#ffffff';
-  ctx.font       = 'bold 15px sans-serif';
-  ctx.fillText('น่าจะรู้อย่างนี้ตั้งแต่ปี 2475', tc.width / 2, 72);
-
-  // QR Code Box (White background card for 100% scan contrast)
-  if (qrCanvas) {
-    const qrSize = 190;
-    const boxPadding = 10;
-    const boxSize = qrSize + boxPadding * 2;
-    const boxX = (tc.width - boxSize) / 2;
-    const boxY = 92;
-
-    ctx.fillStyle = '#ffffff';
-    if (ctx.roundRect) {
-      ctx.beginPath();
-      ctx.roundRect(boxX, boxY, boxSize, boxSize, 12);
-      ctx.fill();
-    } else {
-      ctx.fillRect(boxX, boxY, boxSize, boxSize);
-    }
-
-    ctx.drawImage(qrCanvas, (tc.width - qrSize) / 2, boxY + boxPadding, qrSize, qrSize);
-  }
-
-  // Info details
-  ctx.fillStyle = '#ffffff';
-  ctx.font      = 'bold 16px sans-serif';
-  ctx.fillText(ticket.name || '', tc.width / 2, 340);
-
-  ctx.fillStyle = '#d4d4d8';
-  ctx.font      = '13px sans-serif';
-  ctx.fillText(`ประเภท: ${ticket.type}`, tc.width / 2, 365);
-  ctx.fillText(`ใบที่ ${ticket.ticketNum}`, tc.width / 2, 388);
-
-  if (ticket.showDate) {
-    ctx.fillStyle = '#ff453a';
-    ctx.font      = 'bold 13px sans-serif';
-    ctx.fillText(ticket.showDate, tc.width / 2, 416);
-  }
-
-  ctx.fillStyle = '#71717a';
-  ctx.font      = '11px monospace';
-  ctx.fillText(ticketId, tc.width / 2, 444);
-
-  ctx.fillStyle = '#52525b';
-  ctx.font      = '10px sans-serif';
-  ctx.fillText('KINJAI CONTEMPORARY (MRT สิรินธร)', tc.width / 2, 470);
-
-  if (ticket.typeId === 'student' || String(ticket.type).toLowerCase().includes('student')) {
-    ctx.fillStyle = '#fcd34d';
-    ctx.font      = '10px sans-serif';
-    ctx.fillText('* กรุณานำบัตรนักเรียน นักศึกษามาแสดง ณ จุดลงทะเบียน', tc.width / 2, 492);
-  }
+  const tc = generateTicketImageCanvas(ticket, qrCanvas, totalQty);
 
   const link = document.createElement('a');
   link.download = `ticket-${ticketId}.png`;

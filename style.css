@@ -1574,8 +1574,8 @@ body::before {
 }
 
 .ticket-card {
-  background: var(--glass);
-  border: 1px solid var(--glass-border);
+  background: #ffffff;
+  border: 1.5px solid rgba(40, 107, 110, 0.2);
   border-radius: var(--radius-lg);
   padding: 24px 20px;
   display: flex;
@@ -1583,37 +1583,40 @@ body::before {
   align-items: center;
   gap: 12px;
   text-align: center;
-  backdrop-filter: blur(10px);
-  transition: border-color 0.3s;
+  box-shadow: 0 4px 20px rgba(40, 107, 110, 0.08);
+  transition: all 0.3s ease;
   position: relative;
   /* Each card fills the visible area */
   flex: 0 0 100%;
   min-width: 0;
 }
 .ticket-card.active-slide {
-  border-color: var(--purple-400);
-  box-shadow: var(--shadow-glow);
+  border-color: #286b6e;
+  box-shadow: 0 8px 30px rgba(40, 107, 110, 0.14);
 }
 
 .ticket-card-num {
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: var(--text-muted);
+  color: #78716c;
 }
 .ticket-card canvas {
   border-radius: var(--radius-sm);
-  border: 3px solid white;
+  border: 1.5px solid rgba(40, 107, 110, 0.2);
+  padding: 8px;
+  background: #ffffff;
+  box-shadow: 0 4px 14px rgba(40, 107, 110, 0.08);
 }
-.ticket-card-title { font-weight: 700; font-size: 1rem; color: var(--gold-300); }
-.ticket-card-type { font-size: 0.85rem; color: var(--text-muted); }
+.ticket-card-title { font-weight: 700; font-size: 1.05rem; color: #1c1917; }
+.ticket-card-type { font-size: 0.88rem; font-weight: 600; color: #c83e29; }
 .ticket-card-id {
-  font-size: 0.7rem;
-  color: var(--text-muted);
+  font-size: 0.75rem;
+  color: #78716c;
   font-family: monospace;
-  background: rgba(255,255,255,0.05);
-  padding: 4px 10px;
+  background: rgba(40, 107, 110, 0.08);
+  padding: 4px 12px;
   border-radius: 50px;
 }
 
@@ -1621,18 +1624,23 @@ body::before {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(255,59,48,0.06);
-  border: 1px solid rgba(255,59,48,0.2);
-  color: var(--gold-300);
+  background: linear-gradient(135deg, #286b6e, #36888c);
+  border: none;
+  color: #ffffff;
   border-radius: 50px;
-  padding: 8px 18px;
+  padding: 10px 22px;
   font-family: 'Sarabun', sans-serif;
-  font-size: 0.82rem;
-  font-weight: 600;
+  font-size: 0.85rem;
+  font-weight: 700;
   cursor: pointer;
   transition: var(--transition);
+  box-shadow: 0 4px 14px rgba(40, 107, 110, 0.25);
 }
-.btn-download-ticket:hover { background: rgba(255,59,48,0.12); }
+.btn-download-ticket:hover {
+  background: linear-gradient(135deg, #1f5658, #286b6e);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(40, 107, 110, 0.35);
+}
 
 /* Carousel controls */
 .carousel-controls {
