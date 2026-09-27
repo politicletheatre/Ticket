@@ -2089,25 +2089,20 @@ body.modal-open {
   border-radius: 3px;
 }
 
-/* Google Maps & Action Buttons */
-.directions-actions-row {
-  display: flex;
-  gap: 10px;
+/* Google Maps Primary Link */
+.directions-main-link-wrap {
   width: 100%;
-}
-.directions-actions-row .btn-google-maps {
-  flex: 1;
 }
 .btn-google-maps {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
   background: #ffffff;
   color: #286b6e;
   border: 2px solid #286b6e;
   border-radius: 12px;
-  padding: 12px 16px;
+  padding: 12px 18px;
   font-size: 0.95rem;
   font-weight: 700;
   text-decoration: none;
@@ -2119,30 +2114,6 @@ body.modal-open {
   color: #ffffff;
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(40, 107, 110, 0.25);
-}
-.btn-copy-directions {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  background: #ffffff;
-  color: #286b6e;
-  border: 2px solid rgba(40, 107, 110, 0.35);
-  border-radius: 12px;
-  padding: 12px 16px;
-  font-size: 0.9rem;
-  font-weight: 700;
-  cursor: pointer;
-  white-space: nowrap;
-  box-shadow: 0 3px 10px rgba(40, 107, 110, 0.08);
-  transition: all 0.2s ease;
-}
-.btn-copy-directions:hover {
-  background: #286b6e;
-  color: #ffffff;
-  border-color: #286b6e;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(40, 107, 110, 0.2);
 }
 
 /* Map Image Section */
@@ -2343,25 +2314,7 @@ body.modal-open {
   background: #f4eee1;
   border-top: 1px solid rgba(40, 107, 110, 0.16);
   display: flex;
-  align-items: center;
   justify-content: flex-end;
-  gap: 12px;
-}
-.btn-copy-directions-footer {
-  padding: 10px 18px;
-  background: transparent;
-  color: #286b6e;
-  border: 1px solid rgba(40, 107, 110, 0.35);
-  border-radius: 20px;
-  font-size: 0.88rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  margin-right: auto;
-}
-.btn-copy-directions-footer:hover {
-  background: rgba(40, 107, 110, 0.1);
-  border-color: #286b6e;
 }
 .btn-directions-dismiss {
   padding: 10px 24px;
@@ -2446,14 +2399,6 @@ body.modal-open {
     min-width: 38px;
     font-size: 1.4rem;
   }
-  .directions-actions-row {
-    flex-direction: column;
-  }
-  .directions-modal-footer {
-    flex-direction: column;
-    gap: 8px;
-  }
-  .btn-copy-directions-footer,
   .btn-directions-dismiss {
     width: 100%;
     text-align: center;

@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@500;600;700&family=Sarabun:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet" />
   <script src="assets/qrcodejs.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=20260928_dir4" />
+  <link rel="stylesheet" href="style.css?v=20260928_dir5" />
 </head>
 <body>
 
@@ -458,17 +458,13 @@
 
       <!-- Modal Body -->
       <div class="directions-modal-body">
-        <!-- Main Actions Row -->
-        <div class="directions-actions-row">
+        <!-- Main Map Link Button -->
+        <div class="directions-main-link-wrap">
           <a href="https://goo.gl/maps/6WNKMyNyo9WABoKQA" target="_blank" rel="noopener noreferrer" class="btn-google-maps">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            <span>เปิด Google Maps</span>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            <span>เปิดพิกัด KINJAI CONTEMPORARY ใน Google Maps</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
           </a>
-          <button type="button" class="btn-copy-directions" onclick="copyDirectionsLink()" title="คัดลอกลิงก์สำหรับแชร์ป๊อปอัปนี้">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            <span>คัดลอกลิงก์แชร์</span>
-          </button>
         </div>
 
         <!-- Map Image Preview -->
@@ -600,9 +596,6 @@
 
       <!-- Modal Footer -->
       <div class="directions-modal-footer">
-        <button type="button" class="btn-copy-directions-footer" onclick="copyDirectionsLink()">
-          🔗 คัดลอกลิงก์วิธีการเดินทาง
-        </button>
         <button type="button" class="btn-directions-dismiss" onclick="closeDirectionsModal()">
           ปิดหน้าต่าง
         </button>
@@ -623,6 +616,6 @@
 <div id="toast" class="toast"></div>
 
 <script src="assets/poster-data.js"></script>
-<script src="app.js?v=20260928_dir4"></script>
+<script src="app.js?v=20260928_dir5"></script>
 </body>
 </html>
