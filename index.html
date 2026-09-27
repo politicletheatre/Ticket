@@ -287,7 +287,7 @@
       </div>
     </div>
 
-    <button id="btn-to-info" class="btn-primary btn-full" style="display:none" onclick="goTo('info')">
+    <button id="btn-to-info" class="btn-primary btn-full" style="display:none" onclick="proceedToInfo()">
       ดำเนินการต่อ
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
     </button>
@@ -310,6 +310,10 @@
 
   <div class="info-container">
     <div class="order-recap">
+      <div id="recap-show-row" style="font-size:0.92rem; font-weight:700; color:#15803d; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+        <span>📅</span>
+        <span id="recap-show">—</span>
+      </div>
       <div class="recap-main-row">
         <span id="recap-type" class="recap-badge">—</span>
         <span id="recap-qty" class="recap-detail">—</span>
@@ -439,6 +443,6 @@
 <div id="toast" class="toast"></div>
 
 <script src="assets/poster-data.js"></script>
-<script src="app.js?v=20260927_map1"></script>
+<script src="app.js?v=20260927_fixslot1"></script>
 </body>
 </html>

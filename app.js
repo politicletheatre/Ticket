@@ -204,6 +204,7 @@ function getSoldCountForSlot(dateId, slot) {
 }
 
 function getRemainingSeats(dateId, slot) {
+  if (!dateId || !slot) return 0;
   return Math.max(0, getSlotCapacity(dateId, slot) - getSoldCountForSlot(dateId, slot));
 }
 
@@ -274,16 +275,7 @@ function goTo(view) {
     fetchGlobalConfig().then(() => {
       // อัปเดตเฉพาะยอดที่นั่งคงเหลือและรอบเวลาบนหน้าจอแบบเงียบๆ ไม่กระตุก
       if (document.querySelector('.view.active')?.id === 'view-ticket') {
-        const prevDateId = state.selectedDateId;
-        const prevSlot = state.selectedSlot;
-        const prevTypeId = state.selectedTypeId;
-        
         renderSchedule();
-        
-        // กู้คืนสถานะการเลือกเดิมของผู้ใช้
-        state.selectedDateId = prevDateId;
-        state.selectedSlot = prevSlot;
-        state.selectedTypeId = prevTypeId;
       }
     }).catch(e => console.warn('Background stock sync failed:', e));
     
@@ -295,7 +287,15 @@ function goTo(view) {
       }, 180);
     }
   }
-  if (view === 'info')    { renderRecap(); restoreForm(); }
+  if (view === 'info') {
+    if (!state.selectedDateId || !state.selectedSlot || !state.selectedTypeId) {
+      showToast('❌ กรุณาเลือกรอบการแสดงและประเภทบัตรก่อนดำเนินการต่อ', 'error');
+      goTo('ticket');
+      return;
+    }
+    renderRecap();
+    restoreForm();
+  }
   if (view === 'confirm' && state.currentOrder) renderConfirmation();
 }
 
@@ -355,9 +355,34 @@ function renderSchedule() {
     if (state.selectedSlot) {
       animateIn('type-section');
       renderTicketTypes();
-      if (state.selectedTypeId) { showQuantitySection(); updateSummary(); renderPaymentQR(); }
+      if (state.selectedTypeId) {
+        showQuantitySection();
+        updateSummary();
+        renderPaymentQR();
+      } else {
+        ['quantity-section','price-summary','payment-section'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.style.display = 'none';
+        });
+        const btnInfo = document.getElementById('btn-to-info');
+        if (btnInfo) btnInfo.style.display = 'none';
+      }
+    } else {
+      ['type-section','quantity-section','price-summary','payment-section'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      });
+      const btnInfo = document.getElementById('btn-to-info');
+      if (btnInfo) btnInfo.style.display = 'none';
     }
     updateStepBackButtons();
+  } else {
+    ['slot-section','type-section','quantity-section','price-summary','payment-section'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    });
+    const btnInfo = document.getElementById('btn-to-info');
+    if (btnInfo) btnInfo.style.display = 'none';
   }
 }
 
@@ -482,6 +507,10 @@ function renderTicketTypes() {
 }
 
 function selectType(typeId) {
+  if (!state.selectedDateId || !state.selectedSlot) {
+    showToast('❌ กรุณาเลือกวันและรอบเวลาก่อนเลือกประเภทบัตร', 'error');
+    return;
+  }
   state.selectedTypeId = typeId;
   document.querySelectorAll('.ticket-type-card').forEach(el => el.classList.remove('selected'));
   document.getElementById(`tc-${typeId}`)?.classList.add('selected');
@@ -560,6 +589,12 @@ function goToEditSlot() {
   state.selectedSlot   = null;
   state.selectedTypeId = null;
   state.qty            = 1;
+  ['type-section','quantity-section','price-summary','payment-section'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  const btnInfo = document.getElementById('btn-to-info');
+  if (btnInfo) btnInfo.style.display = 'none';
   goTo('ticket');
   setTimeout(() => {
     document.getElementById('slot-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -573,10 +608,27 @@ function goToEditQty() {
   // scrollIntoView จะถูกจัดการโดย goTo → renderSchedule → auto-scroll
 }
 
+function proceedToInfo() {
+  if (!state.selectedDateId) {
+    return showToast('❌ กรุณาเลือกวันที่ต้องการชม', 'error');
+  }
+  if (!state.selectedSlot) {
+    return showToast('❌ กรุณาเลือกรอบเวลาการแสดง', 'error');
+  }
+  const type = getActiveTicketType(state.selectedTypeId);
+  if (!type) {
+    return showToast('❌ กรุณาเลือกประเภทบัตร', 'error');
+  }
+  goTo('info');
+}
+
 function showQuantitySection() {
-  const remaining = state.selectedDateId && state.selectedSlot
-    ? getRemainingSeats(state.selectedDateId, state.selectedSlot)
-    : CONFIG.maxQty;
+  if (!state.selectedDateId || !state.selectedSlot || !state.selectedTypeId) {
+    const btnInfo = document.getElementById('btn-to-info');
+    if (btnInfo) btnInfo.style.display = 'none';
+    return;
+  }
+  const remaining = getRemainingSeats(state.selectedDateId, state.selectedSlot);
   const maxBuy = Math.min(CONFIG.maxQty, remaining);
 
   // Clamp current qty
@@ -692,6 +744,14 @@ function renderRecap() {
   if (!type) return;
   document.getElementById('recap-type').textContent  = type.name;
 
+  const dateObj = CONFIG.schedule.find(d => d.id === state.selectedDateId);
+  const showEl  = document.getElementById('recap-show');
+  if (showEl) {
+    showEl.textContent = (dateObj && state.selectedSlot)
+      ? `${dateObj.dateLabel} · ${state.selectedSlot} น.`
+      : '⚠️ ยังไม่ได้ระบุรอบเวลา';
+  }
+
   const recapNoteRow = document.getElementById('recap-note-row');
   const recapNoteEl  = document.getElementById('recap-note');
   if (recapNoteRow && recapNoteEl) {
@@ -711,13 +771,23 @@ function renderRecap() {
 async function submitOrder(event) {
   event.preventDefault();
 
+  if (!state.selectedDateId || !state.selectedSlot) {
+    showToast('❌ กรุณาเลือกรอบเวลาการแสดง', 'error');
+    goTo('ticket');
+    return;
+  }
+
   const name  = document.getElementById('f-name').value.trim();
   const phone = cleanThaiPhone(document.getElementById('f-phone').value.trim());
   const email = document.getElementById('f-email').value.trim();
   const note  = document.getElementById('f-note').value.trim();
   const type  = getActiveTicketType(state.selectedTypeId);
 
-  if (!type)              return showToast('❌ กรุณาเลือกประเภทบัตร', 'error');
+  if (!type) {
+    showToast('❌ กรุณาเลือกประเภทบัตร', 'error');
+    goTo('ticket');
+    return;
+  }
   if (!state.slipBase64) return showToast('❌ กรุณาแนบสลิปการโอนเงิน', 'error');
 
   // Check seats still available
@@ -728,7 +798,12 @@ async function submitOrder(event) {
 
   const orderId    = generateOrderId();
   const dateObj    = CONFIG.schedule.find(d => d.id === state.selectedDateId);
-  const showDateLabel = dateObj ? `${dateObj.dateLabel} · ${state.selectedSlot} น.` : '—';
+  if (!dateObj || !state.selectedSlot) {
+    showToast('❌ ข้อมูลรอบการแสดงไม่ถูกต้อง', 'error');
+    goTo('ticket');
+    return;
+  }
+  const showDateLabel = `${dateObj.dateLabel} · ${state.selectedSlot} น.`;
   const tickets    = [];
 
   for (let i = 1; i <= state.qty; i++) {
