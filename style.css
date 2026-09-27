@@ -1936,3 +1936,561 @@ body::before {
   .date-card { padding: 10px 4px; }
   .date-card-day { font-size: 1rem; }
 }
+
+/* =====================================================================
+   DIRECTIONS & MAP (วิธีการเดินทาง & แผนที่ KINJAI CONTEMPORARY)
+   ===================================================================== */
+
+/* Body scroll lock */
+body.modal-open {
+  overflow: hidden !important;
+  touch-action: none;
+}
+
+/* Info Card interactive state */
+.info-card.info-card-interactive {
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.info-card.info-card-interactive:hover {
+  transform: translateY(-5px);
+  border-color: #286b6e;
+  box-shadow: 0 10px 24px rgba(40, 107, 110, 0.18);
+}
+.info-card-badge {
+  display: inline-block;
+  align-self: center;
+  margin-top: 14px;
+  padding: 5px 14px;
+  background: rgba(40, 107, 110, 0.08);
+  color: #286b6e;
+  border: 1px solid rgba(40, 107, 110, 0.25);
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+.info-card.info-card-interactive:hover .info-card-badge {
+  background: #286b6e;
+  color: #ffffff;
+}
+
+/* Directions Banner Card */
+.directions-banner-wrap {
+  max-width: 764px;
+  margin: -16px auto 44px;
+  padding: 0 12px;
+}
+.directions-banner {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: linear-gradient(135deg, #ffffff 0%, #fbf8f1 100%);
+  border: 2px solid rgba(40, 107, 110, 0.28);
+  border-radius: var(--radius-lg, 16px);
+  padding: 18px 24px;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(40, 30, 20, 0.06);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  text-align: left;
+}
+.directions-banner:hover {
+  border-color: #c83e29;
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(200, 62, 41, 0.16);
+}
+.directions-banner:active {
+  transform: scale(0.99);
+}
+.directions-banner-icon-box {
+  width: 54px;
+  height: 54px;
+  min-width: 54px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #286b6e 0%, #1a494c 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(40, 107, 110, 0.3);
+}
+.directions-banner-icon {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+.directions-banner-text {
+  flex: 1;
+}
+.directions-banner-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1c1917;
+  margin-bottom: 4px;
+  line-height: 1.35;
+}
+.directions-banner-desc {
+  font-size: 0.88rem;
+  color: #57534e;
+  line-height: 1.45;
+}
+.directions-banner-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #c83e29 0%, #a82e1c 100%);
+  color: #ffffff;
+  padding: 10px 18px;
+  border-radius: 24px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(200, 62, 41, 0.25);
+  transition: all 0.2s ease;
+}
+.directions-banner:hover .directions-banner-btn {
+  background: linear-gradient(135deg, #d94a34 0%, #b83320 100%);
+  transform: translateX(2px);
+  box-shadow: 0 6px 18px rgba(200, 62, 41, 0.35);
+}
+
+/* Modal Overlay */
+.directions-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(18, 22, 22, 0.75);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 16px;
+  animation: dirFadeIn 0.22s ease-out;
+}
+@keyframes dirFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.directions-modal-container {
+  width: 100%;
+  max-width: 680px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.directions-modal-card {
+  background: #fbf8f1;
+  border-radius: 20px;
+  border: 2px solid #286b6e;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  max-height: 88vh;
+  overflow: hidden;
+  animation: dirPopIn 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes dirPopIn {
+  from { opacity: 0; transform: scale(0.94) translateY(12px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Modal Header */
+.directions-modal-header {
+  background: linear-gradient(135deg, #286b6e 0%, #1a494c 100%);
+  color: #ffffff;
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  border-bottom: 3px solid #c83e29;
+}
+.directions-modal-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.directions-modal-icon {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+.directions-modal-title {
+  font-size: 1.22rem;
+  font-weight: 700;
+  margin: 0;
+  color: #ffffff;
+  line-height: 1.3;
+}
+.directions-modal-subtitle {
+  font-size: 0.82rem;
+  color: #e0f2f1;
+  opacity: 0.92;
+  margin-top: 3px;
+}
+.btn-directions-close {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+.btn-directions-close:hover {
+  background: #c83e29;
+  border-color: #c83e29;
+  transform: rotate(90deg);
+}
+
+/* Modal Body */
+.directions-modal-body {
+  overflow-y: auto;
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  -webkit-overflow-scrolling: touch;
+}
+.directions-modal-body::-webkit-scrollbar {
+  width: 6px;
+}
+.directions-modal-body::-webkit-scrollbar-thumb {
+  background: rgba(40, 107, 110, 0.25);
+  border-radius: 3px;
+}
+
+/* Google Maps Primary Link */
+.directions-main-link-wrap {
+  width: 100%;
+}
+.btn-google-maps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #ffffff;
+  color: #286b6e;
+  border: 2px solid #286b6e;
+  border-radius: 12px;
+  padding: 12px 18px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 3px 10px rgba(40, 107, 110, 0.1);
+  transition: all 0.2s ease;
+}
+.btn-google-maps:hover {
+  background: #286b6e;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(40, 107, 110, 0.25);
+}
+
+/* Map Image Section */
+.directions-image-wrapper {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 2px solid rgba(40, 107, 110, 0.25);
+  background: #0f172a;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+.directions-image-wrapper:hover {
+  border-color: #c83e29;
+}
+.directions-map-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+.directions-image-wrapper:hover .directions-map-image {
+  transform: scale(1.02);
+}
+.directions-image-caption {
+  position: absolute;
+  bottom: 0;
+  inset-inline: 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.82) 50%, rgba(0, 0, 0, 0.94) 100%);
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 18px 14px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  letter-spacing: 0.2px;
+}
+
+/* Directions List */
+.directions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.directions-item {
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid rgba(40, 107, 110, 0.2);
+  padding: 16px 18px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  box-shadow: 0 2px 8px rgba(40, 30, 20, 0.04);
+}
+.directions-item-icon {
+  font-size: 1.6rem;
+  line-height: 1;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f4eee1;
+  border: 1px solid rgba(40, 107, 110, 0.15);
+}
+.directions-item-content {
+  flex: 1;
+}
+.directions-item-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+.directions-item-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1c1917;
+}
+.directions-recommend-badge {
+  background: #e8f5e9;
+  color: #2e7d32;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 12px;
+  border: 1px solid #c8e6c9;
+}
+.directions-item-desc {
+  font-size: 0.92rem;
+  color: #44403c;
+  line-height: 1.55;
+}
+
+/* Parking specifics */
+.parking-spots {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+.parking-spot-card {
+  background: #fbf8f1;
+  border: 1px solid rgba(40, 107, 110, 0.18);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+.parking-spot-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+.parking-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #286b6e;
+}
+.parking-spot-name {
+  font-size: 0.94rem;
+  color: #1c1917;
+}
+.parking-spot-detail {
+  font-size: 0.88rem;
+  color: #57534e;
+  line-height: 1.45;
+}
+.parking-time-warning {
+  color: #c83e29;
+  font-weight: 700;
+}
+.parking-map-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #286b6e;
+  text-decoration: none;
+  margin-top: 6px;
+  padding: 3px 8px;
+  background: rgba(40, 107, 110, 0.08);
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+.parking-map-btn:hover {
+  background: #286b6e;
+  color: #ffffff;
+}
+
+/* Parking Warning Callout */
+.parking-alert-box {
+  margin-top: 12px;
+  background: #fff5f5;
+  border: 1.5px solid #feb2b2;
+  border-left: 4px solid #e53e3e;
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: flex;
+  gap: 10px;
+  font-size: 0.88rem;
+  color: #9b2c2c;
+  line-height: 1.5;
+}
+.parking-alert-icon {
+  font-size: 1.2rem;
+  line-height: 1.2;
+}
+
+/* Bus Routes Chips */
+.bus-routes-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.bus-chip {
+  background: #f4eee1;
+  border: 1px solid rgba(40, 107, 110, 0.22);
+  color: #1c1917;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+/* Modal Footer */
+.directions-modal-footer {
+  padding: 14px 22px;
+  background: #f4eee1;
+  border-top: 1px solid rgba(40, 107, 110, 0.16);
+  display: flex;
+  justify-content: flex-end;
+}
+.btn-directions-dismiss {
+  padding: 10px 24px;
+  background: #286b6e;
+  color: #ffffff;
+  border: none;
+  border-radius: 20px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-directions-dismiss:hover {
+  background: #1c4b4d;
+}
+
+/* Lightbox Fullscreen */
+.directions-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 11000;
+  background: rgba(0, 0, 0, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: dirFadeIn 0.2s ease-out;
+}
+.directions-lightbox-inner {
+  position: relative;
+  max-width: 95vw;
+  max-height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.directions-lightbox-inner img {
+  max-width: 100%;
+  max-height: 88vh;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+}
+.directions-lightbox-close {
+  position: absolute;
+  top: -16px;
+  right: -16px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #c83e29;
+  color: #ffffff;
+  border: 2px solid #ffffff;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 600px) {
+  .directions-banner {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+    padding: 18px 16px;
+  }
+  .directions-banner-icon-box {
+    margin: 0 auto;
+  }
+  .directions-banner-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 12px;
+  }
+  .directions-modal-header {
+    padding: 14px 16px;
+  }
+  .directions-modal-title {
+    font-size: 1.1rem;
+  }
+  .directions-modal-body {
+    padding: 16px;
+    gap: 14px;
+  }
+  .directions-item {
+    padding: 14px;
+    gap: 12px;
+  }
+  .directions-item-icon {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    font-size: 1.4rem;
+  }
+}

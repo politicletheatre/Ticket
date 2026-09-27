@@ -1392,3 +1392,62 @@ function initBackwardClock() {
   }, msToNextSecond);
 }
 
+// ─── DIRECTIONS MODAL & LIGHTBOX ──────────────────────────────────────────────
+function openDirectionsModal() {
+  const modal = document.getElementById('directions-modal');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  document.body.classList.add('modal-open');
+  setTimeout(() => {
+    const closeBtn = modal.querySelector('.btn-directions-close');
+    if (closeBtn) closeBtn.focus();
+  }, 50);
+}
+
+function closeDirectionsModal() {
+  const modal = document.getElementById('directions-modal');
+  if (!modal) return;
+  modal.style.display = 'none';
+  document.body.classList.remove('modal-open');
+}
+
+function handleDirectionsBackdropClick(e) {
+  if (e.target && (e.target.id === 'directions-modal' || e.target.classList.contains('directions-modal-container'))) {
+    closeDirectionsModal();
+  }
+}
+
+function openDirectionsLightbox() {
+  const lb = document.getElementById('directions-lightbox');
+  if (!lb) return;
+  lb.style.display = 'flex';
+}
+
+function closeDirectionsLightbox() {
+  const lb = document.getElementById('directions-lightbox');
+  if (!lb) return;
+  lb.style.display = 'none';
+}
+
+// Global escape key handler
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' || e.key === 'Esc') {
+    const lb = document.getElementById('directions-lightbox');
+    if (lb && lb.style.display !== 'none') {
+      closeDirectionsLightbox();
+      return;
+    }
+    const modal = document.getElementById('directions-modal');
+    if (modal && modal.style.display !== 'none') {
+      closeDirectionsModal();
+    }
+  }
+});
+
+// Expose globally for onclick handlers
+window.openDirectionsModal = openDirectionsModal;
+window.closeDirectionsModal = closeDirectionsModal;
+window.handleDirectionsBackdropClick = handleDirectionsBackdropClick;
+window.openDirectionsLightbox = openDirectionsLightbox;
+window.closeDirectionsLightbox = closeDirectionsLightbox;
+

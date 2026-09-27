@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@500;600;700&family=Sarabun:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet" />
   <script src="assets/qrcodejs.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=20260927_qrtheme1" />
+  <link rel="stylesheet" href="style.css?v=20260927_dir1" />
 </head>
 <body>
 
@@ -163,12 +163,31 @@
           <h3>ระยะเวลา</h3>
           <p>ประมาณ 2 ชั่วโมง 30 นาที<br/>(ไม่มีพักครึ่ง)</p>
         </div>
-        <div class="info-card">
+        <div class="info-card info-card-interactive" onclick="openDirectionsModal()" role="button" tabindex="0" title="คลิกเพื่อดูวิธีการเดินทางและแผนที่">
           <div class="info-icon">📍</div>
           <h3>สถานที่</h3>
-          <p><a href="https://maps.app.goo.gl/VUKqWCpS7jYkr4Rv7?g_st=ic" target="_blank" rel="noopener noreferrer" title="เปิดแผนที่ Google Maps" style="color: inherit; text-decoration: underline;">KINJAI CONTEMPORARY<br/>(MRT สิรินธร)</a></p>
+          <p><a href="https://maps.app.goo.gl/VUKqWCpS7jYkr4Rv7?g_st=ic" target="_blank" rel="noopener noreferrer" title="เปิดแผนที่ Google Maps" style="color: inherit; text-decoration: underline;" onclick="event.stopPropagation()">KINJAI CONTEMPORARY<br/>(MRT สิรินธร)</a></p>
+          <div class="info-card-badge">🗺️ ดูวิธีเดินทาง & แผนที่</div>
         </div>
       </div>
+
+      <!-- Directions Banner Card -->
+      <div class="directions-banner-wrap">
+        <div class="directions-banner" onclick="openDirectionsModal()" role="button" tabindex="0" title="แตะเพื่อดูวิธีการเดินทางและแผนที่">
+          <div class="directions-banner-icon-box">
+            <span class="directions-banner-icon">🗺️</span>
+          </div>
+          <div class="directions-banner-text">
+            <div class="directions-banner-title">วิธีการเดินทางมา KINJAI CONTEMPORARY</div>
+            <div class="directions-banner-desc">แผนที่เส้นทาง MRT สิรินธร · BTS · รถเมล์ · จุดจอดรถยนต์ซังฮี้ &amp; วัดภคินีนาถ</div>
+          </div>
+          <div class="directions-banner-btn">
+            <span>แตะดูวิธีเดินทาง &amp; แผนที่</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+          </div>
+        </div>
+      </div>
+
       <div class="cta-bottom">
         <button id="btn-buy-bottom" class="btn-primary btn-lg" onclick="goTo('ticket')">🎫 จองบัตร</button>
       </div>
@@ -439,10 +458,184 @@
   </div>
 </div>
 
+<!-- ===================== DIRECTIONS MODAL ===================== -->
+<div id="directions-modal" class="directions-modal-overlay" onclick="handleDirectionsBackdropClick(event)" role="dialog" aria-modal="true" aria-labelledby="directions-title" style="display:none;">
+  <div class="directions-modal-container">
+    <div class="directions-modal-card">
+      <!-- Modal Header -->
+      <div class="directions-modal-header">
+        <div class="directions-modal-title-group">
+          <div class="directions-modal-icon">🗺️</div>
+          <div>
+            <h2 id="directions-title" class="directions-modal-title">วิธีการเดินทางมา KINJAI CONTEMPORARY</h2>
+            <div class="directions-modal-subtitle">MRT สิรินธร ทางออก 1 · ถนนสิรินธร บางพลัด กรุงเทพฯ</div>
+          </div>
+        </div>
+        <button type="button" class="btn-directions-close" onclick="closeDirectionsModal()" aria-label="ปิดหน้าต่าง">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="directions-modal-body">
+        <!-- Main Map Link Button -->
+        <div class="directions-main-link-wrap">
+          <a href="https://goo.gl/maps/6WNKMyNyo9WABoKQA" target="_blank" rel="noopener noreferrer" class="btn-google-maps">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span>เปิดพิกัด KINJAI CONTEMPORARY ใน Google Maps</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </a>
+        </div>
+
+        <!-- Map Image Preview -->
+        <div class="directions-image-wrapper" onclick="openDirectionsLightbox()" role="button" tabindex="0" title="แตะเพื่อดูแผนที่ขนาดเต็ม">
+          <img src="assets/directions-map.jpg?v=20260927" alt="แผนที่วิธีการเดินทางมา KINJAI CONTEMPORARY" class="directions-map-image" />
+          <div class="directions-image-caption">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/><path d="M11 8v6M8 11h6"/></svg>
+            แตะที่ภาพเพื่อดูภาพแผนที่ขนาดเต็ม
+          </div>
+        </div>
+
+        <!-- Transportation Items -->
+        <div class="directions-list">
+
+          <!-- MRT -->
+          <div class="directions-item">
+            <div class="directions-item-icon mrt-icon">🚆</div>
+            <div class="directions-item-content">
+              <div class="directions-item-head">
+                <span class="directions-item-title">MRT</span>
+                <span class="directions-recommend-badge">แนะนำ สะดวกที่สุด</span>
+              </div>
+              <div class="directions-item-desc">
+                <strong>สถานีสิรินธร ทางออก 1</strong> ลงลิฟต์แล้วเดินเลี้ยวขวามาประมาณ 180 เมตร
+              </div>
+            </div>
+          </div>
+
+          <!-- BTS -->
+          <div class="directions-item">
+            <div class="directions-item-icon bts-icon">🚝</div>
+            <div class="directions-item-content">
+              <div class="directions-item-head">
+                <span class="directions-item-title">BTS</span>
+              </div>
+              <div class="directions-item-desc">
+                <strong>สถานีอนุสาวรีย์ชัย ทางออก 3</strong> แล้วต่อแท็กซี่ตรงมาทางแยกบางพลัด
+              </div>
+            </div>
+          </div>
+
+          <!-- Car & Parking -->
+          <div class="directions-item directions-item-car">
+            <div class="directions-item-icon car-icon">🚗</div>
+            <div class="directions-item-content">
+              <div class="directions-item-head">
+                <span class="directions-item-title">รถยนตร์ส่วนตัว</span>
+              </div>
+              <div class="parking-spots">
+                <!-- Parking 1 -->
+                <div class="parking-spot-card">
+                  <div class="parking-spot-header">
+                    <span class="parking-dot"></span>
+                    <strong class="parking-spot-name">ลานจอดรถซังฮี้ ราชวิถี 23</strong>
+                  </div>
+                  <div class="parking-spot-detail">
+                    เดินประมาณ 500 เมตร (เปิด 24 ชม. มีค่าที่จอด 20 บาท / ชม.)
+                  </div>
+                  <a href="https://maps.app.goo.gl/aKUYNuia1ZfFVcyLA" target="_blank" rel="noopener noreferrer" class="parking-map-btn">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    เปิดพิกัดลานจอดรถซังฮี้ (Google Maps) ↗
+                  </a>
+                </div>
+
+                <!-- Parking 2 -->
+                <div class="parking-spot-card">
+                  <div class="parking-spot-header">
+                    <span class="parking-dot"></span>
+                    <strong class="parking-spot-name">ลานจอดรถ วัดภคินีนาถ</strong>
+                  </div>
+                  <div class="parking-spot-detail">
+                    เดินประมาณ 850 เมตร <span class="parking-time-warning">(นำรถออกก่อน 20:00 น.)</span>
+                  </div>
+                  <a href="https://maps.app.goo.gl/xf195zh9VF9GfLFPA?g_st=ac" target="_blank" rel="noopener noreferrer" class="parking-map-btn">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    เปิดพิกัดลานจอดวัดภคินีนาถ (Google Maps) ↗
+                  </a>
+                </div>
+              </div>
+
+              <!-- Warning Callout -->
+              <div class="parking-alert-box">
+                <div class="parking-alert-icon">❌</div>
+                <div class="parking-alert-text">
+                  <strong>ขอความร่วมมือไม่จอดที่ลานจอดรถของ “ตลาดกรุงธน”</strong><br/>
+                  เนื่องจากมีไว้ให้บริการลูกค้าของทางตลาดเท่านั้น และลานจอดปิดเร็วทำให้ไม่สามารถนำรถออกได้
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bus -->
+          <div class="directions-item">
+            <div class="directions-item-icon bus-icon">🚌</div>
+            <div class="directions-item-content">
+              <div class="directions-item-head">
+                <span class="directions-item-title">รถเมล์</span>
+              </div>
+              <div class="directions-item-desc">
+                <strong>ป้ายธนาคารกสิกร สาขาบางพลัด</strong> เดินต่อประมาณ 100 เมตร
+              </div>
+              <div class="bus-routes-chips">
+                <span class="bus-chip">สาย 56</span>
+                <span class="bus-chip">สาย 515</span>
+                <span class="bus-chip">สาย 108</span>
+                <span class="bus-chip">สาย 125</span>
+                <span class="bus-chip">สาย 28</span>
+                <span class="bus-chip">สาย 18</span>
+                <span class="bus-chip">สาย 539</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Boat -->
+          <div class="directions-item">
+            <div class="directions-item-icon boat-icon">🛳</div>
+            <div class="directions-item-content">
+              <div class="directions-item-head">
+                <span class="directions-item-title">เรือด่วนเจ้าพระยา</span>
+              </div>
+              <div class="directions-item-desc">
+                <strong>ท่าเรือสะพานกรุงธน (ซังฮี้)</strong> แล้วต่อวินมอเตอร์ไซค์ ตรงมาทางแยกบางพลัด
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="directions-modal-footer">
+        <button type="button" class="btn-directions-dismiss" onclick="closeDirectionsModal()">
+          ปิดหน้าต่าง
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Lightbox for Image Zoom -->
+<div id="directions-lightbox" class="directions-lightbox" onclick="closeDirectionsLightbox()" style="display:none;">
+  <div class="directions-lightbox-inner" onclick="event.stopPropagation()">
+    <img id="directions-lightbox-img" src="assets/directions-map.jpg?v=20260927" alt="แผนที่ขนาดเต็ม KINJAI CONTEMPORARY" />
+    <button type="button" class="directions-lightbox-close" onclick="closeDirectionsLightbox()" aria-label="ปิดภาพขยาย">✕</button>
+  </div>
+</div>
+
 <!-- ===================== TOAST ===================== -->
 <div id="toast" class="toast"></div>
 
 <script src="assets/poster-data.js"></script>
-<script src="app.js?v=20260927_qrtheme1"></script>
+<script src="app.js?v=20260927_dir1"></script>
 </body>
 </html>
