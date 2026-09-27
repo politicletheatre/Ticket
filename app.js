@@ -37,9 +37,9 @@ const CONFIG = {
 
   bankAccount: {
     bank:        'ธนาคารกสิกรไทย (KBank)',
-    accountNo:   '0001234567',
-    accountName: 'บจก. น่าจะรู้อย่างนี้ตั้งแต่ปี 2475 โปรดักชั่น',
-    promptpay:   '0901234567',
+    accountNo:   '208-3-81345-0',
+    accountName: 'จณิสตา รักษา',
+    promptpay:   '208-3-81345-0',
   },
 };
 
