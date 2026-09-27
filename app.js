@@ -7,7 +7,7 @@ const CONFIG = {
   showName: 'น่าจะรู้อย่างนี้ตั้งแต่ปี 2475 NO TIME TO BLIND',
   showNameEn: 'NO TIME TO BLIND',
   venue: 'KINJAI CONTEMPORARY (MRT สิรินธร)',
-  dates: '16–25 ตุลาคม 2569',
+  dates: '16 - 18, 23-25 ตุลาคม 2569',
   maxQty: 10,
   slotCapacity: 65, // ← จำนวนที่นั่งสูงสุดต่อรอบ (ค่าพื้นฐานเริ่มต้น 65)
 
