@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@500;600;700&family=Sarabun:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet" />
   <script src="assets/qrcodejs.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=20261003_dir7" />
+  <link rel="stylesheet" href="style.css?v=20261004_bundle1" />
 </head>
 <body>
 
@@ -234,6 +234,7 @@
         <button class="qty-btn" id="qty-plus" onclick="changeQty(1)">+</button>
       </div>
       <p class="qty-limit" id="qty-limit-text">สูงสุด 10 ใบต่อครั้ง</p>
+      <div id="bundle-hint-box" class="bundle-hint-box" style="display:none"></div>
     </div>
 
     <!-- Summary -->
@@ -257,6 +258,10 @@
       <div class="summary-row">
         <span class="summary-label">จำนวน</span>
         <span class="summary-val" id="sum-qty">—</span>
+      </div>
+      <div class="summary-row bundle-discount-row" id="sum-bundle-row" style="display:none;">
+        <span class="summary-label">ส่วนลด Bundle</span>
+        <span class="summary-val bundle-discount-val" id="sum-bundle-discount">-0 บาท</span>
       </div>
       <div class="summary-row total-row">
         <span class="summary-label">ราคารวม</span>
@@ -619,6 +624,6 @@
 <div id="toast" class="toast"></div>
 
 <script src="assets/poster-data.js"></script>
-<script src="app.js?v=20261004_pro6"></script>
+<script src="app.js?v=20261004_bundle1"></script>
 </body>
 </html>

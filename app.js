@@ -29,7 +29,7 @@ const CONFIG = {
     { id:'earlybird',   name:'EARLY BIRD',   desc:'โปรโมชัน Early Bird ราคาพิเศษ', price:390, badge:'early',   badgeText:'🐦 EARLY BIRD',   available:true },
     { id:'student',     name:'STUDENT',     desc:'โปรโมชันนักเรียน นักศึกษา', note:'(กรุณานำบัตรนักเรียน นักศึกษามาแสดง ณ จุดลงทะเบียน)', price:450, badge:'student', badgeText:'🎓 STUDENT', available:true },
     { id:'pro-6-oct',   name:'PRO 6 ตุลา',  desc:'โปรโมชันพิเศษ PRO 6 ตุลา',   price:490, badge:'promo',   badgeText:'⭐ PRO 6 ตุลา',  available:false },
-    { id:'regular',     name:'REGULAR',     desc:'บัตรราคาปกติ',               price:590, badge:'regular', badgeText:'🎭 REGULAR',     available:true },
+    { id:'regular',     name:'REGULAR',     desc:'บัตรราคาปกติ (พิเศษ Bundle: 3–4 ใบ เหลือ 550.- | 5–9 ใบ เหลือ 520.- | 10 ใบ เหลือ 500.-)', price:590, badge:'regular', badgeText:'🎭 REGULAR', available:true },
     { id:'quota-free',      name:'โควต้าฟรี', desc:'โควต้าพิเศษสำหรับทีมงาน/ Staff', price:0,   badge:'quota', badgeText:'🎟️ โควต้าฟรี', available:false },
     { id:'quota-earlybird', name:'โควต้าราคา Early Bird', desc:'โควต้าพิเศษราคา Early Bird', price:390, badge:'quota', badgeText:'🎟️ โควต้า Early Bird', available:false },
     { id:'quota-spon',      name:'โควต้า Spon', desc:'โควต้าพิเศษสำหรับสปอนเซอร์', price:0, badge:'quota', badgeText:'🎟️ โควต้า Spon', available:false },
@@ -60,6 +60,55 @@ function getActiveTicketType(typeId) {
   const cfg = GLOBAL_TICKET_CONFIG[typeId];
   const price = (cfg && typeof cfg.price === 'number') ? cfg.price : base.price;
   return { ...base, price };
+}
+
+/**
+ * Bundle Promotion for Regular tickets:
+ * - 3–4 tickets: 550 THB / ticket
+ * - 5–9 tickets: 520 THB / ticket
+ * - 10 tickets: 500 THB / ticket
+ */
+function getRegularBundleDiscount(typeId, basePrice, qty) {
+  const normId = (typeId || '').toLowerCase();
+  const isRegular = normId === 'regular' || typeId === 'REGULAR' || typeId === 'บัตรปกติ';
+  if (!isRegular) {
+    return {
+      isBundle: false,
+      pricePerTicket: basePrice,
+      total: basePrice * qty,
+      originalTotal: basePrice * qty,
+      savings: 0,
+      tierText: '',
+    };
+  }
+
+  let pricePerTicket = basePrice;
+  let tierText = '';
+
+  if (qty >= 10) {
+    pricePerTicket = 500;
+    tierText = 'Bundle 10 ใบ (ใบละ 500.-)';
+  } else if (qty >= 5) {
+    pricePerTicket = 520;
+    tierText = 'Bundle 5–9 ใบ (ใบละ 520.-)';
+  } else if (qty >= 3) {
+    pricePerTicket = 550;
+    tierText = 'Bundle 3–4 ใบ (ใบละ 550.-)';
+  }
+
+  const isBundle = pricePerTicket < basePrice;
+  const total = pricePerTicket * qty;
+  const originalTotal = basePrice * qty;
+  const savings = Math.max(0, originalTotal - total);
+
+  return {
+    isBundle,
+    pricePerTicket,
+    total,
+    originalTotal,
+    savings,
+    tierText,
+  };
 }
 
 // JSONBin settings — must match staff.html
@@ -689,7 +738,11 @@ function changeQty(delta) {
 function updateSummary() {
   const type = getActiveTicketType(state.selectedTypeId);
   if (!type) return;
-  const total   = type.price * state.qty;
+
+  const bundle = getRegularBundleDiscount(type.id, type.price, state.qty);
+  const effectivePrice = bundle.pricePerTicket;
+  const total = bundle.total;
+
   const dateObj = CONFIG.schedule.find(d => d.id === state.selectedDateId);
   const showLabel = dateObj ? `${dateObj.dateLabel} · ${state.selectedSlot} น.` : '—';
   const showEl = document.getElementById('sum-show');
@@ -707,9 +760,72 @@ function updateSummary() {
     }
   }
 
-  document.getElementById('sum-price').textContent = `${fmt(type.price)} บาท`;
+  // Price per ticket: show strikethrough if bundle applies
+  const sumPriceEl = document.getElementById('sum-price');
+  if (sumPriceEl) {
+    if (bundle.isBundle) {
+      sumPriceEl.innerHTML = `<span style="text-decoration:line-through;color:#a8a29e;font-size:0.88em;margin-right:6px;">${fmt(type.price)}</span><span style="color:#15803d;font-weight:700">${fmt(effectivePrice)} บาท</span> <span style="font-size:0.75rem;background:#f0fdf4;border:1px solid #86efac;color:#166534;padding:2px 6px;border-radius:4px;font-weight:600;margin-left:4px;">Bundle</span>`;
+    } else {
+      sumPriceEl.textContent = `${fmt(type.price)} บาท`;
+    }
+  }
+
   document.getElementById('sum-qty').textContent   = `${state.qty} ใบ`;
+
+  // Bundle discount row in summary
+  const bundleRow = document.getElementById('sum-bundle-row');
+  const bundleDiscEl = document.getElementById('sum-bundle-discount');
+  if (bundleRow && bundleDiscEl) {
+    if (bundle.isBundle) {
+      bundleDiscEl.textContent = `-${fmt(bundle.savings)} บาท (${bundle.tierText})`;
+      bundleRow.style.display = 'flex';
+    } else {
+      bundleRow.style.display = 'none';
+    }
+  }
+
   document.getElementById('sum-total').textContent = `${fmt(total)} บาท`;
+
+  updateBundleHintBox(type, bundle);
+}
+
+function updateBundleHintBox(type, bundle) {
+  const box = document.getElementById('bundle-hint-box');
+  if (!box) return;
+
+  const normId = (type.id || '').toLowerCase();
+  const isRegular = normId === 'regular' || type.id === 'REGULAR' || type.name === 'REGULAR' || type.name === 'บัตรปกติ';
+
+  if (!isRegular) {
+    box.style.display = 'none';
+    return;
+  }
+
+  box.style.display = 'block';
+
+  let msg = '';
+  let badgeClass = 'hint-default';
+
+  if (state.qty === 1) {
+    msg = `💡 <strong>โปรโมชัน Bundle พิเศษ:</strong> ซื้อ 3–4 ใบ เหลือใบละ <strong>550.-</strong> | 5–9 ใบ เหลือ <strong>520.-</strong> | 10 ใบ เหลือ <strong>500.-</strong>`;
+  } else if (state.qty === 2) {
+    msg = `⚡ <strong>ซื้อเพิ่มอีกเพียง 1 ใบ:</strong> รับราคา Bundle ทันที เหลือใบละ <strong>550.-</strong> (ประหยัด 120 บาท!)`;
+    badgeClass = 'hint-almost';
+  } else if (state.qty >= 3 && state.qty <= 4) {
+    const nextMsg = state.qty === 4 ? ` (ซื้อครบ 5 ใบ รับราคาสุดคุ้มใบละ 520.-)` : ``;
+    msg = `🎉 <strong>ปลดล็อกโปร Bundle 3–4 ใบ:</strong> เหลือใบละ <strong>550.-</strong> (ประหยัดรวม ${bundle.savings} บาท!)${nextMsg}`;
+    badgeClass = 'hint-active';
+  } else if (state.qty >= 5 && state.qty <= 9) {
+    const nextMsg = state.qty === 9 ? ` (เพิ่มอีก 1 ใบ รับราคาสูงสุดใบละ 500.-!)` : ``;
+    msg = `🔥 <strong>ปลดล็อกโปร Bundle 5–9 ใบ:</strong> เหลือใบละ <strong>520.-</strong> (ประหยัดรวม ${bundle.savings} บาท!)${nextMsg}`;
+    badgeClass = 'hint-active';
+  } else if (state.qty >= 10) {
+    msg = `🏆 <strong>ปลดล็อกโปร Bundle 10 ใบ (สูงสุด):</strong> เหลือเพียงใบละ <strong>500.-</strong> (ประหยัดสูงสุดถึง 900 บาท!)`;
+    badgeClass = 'hint-max';
+  }
+
+  box.className = `bundle-hint-box ${badgeClass}`;
+  box.innerHTML = msg;
 }
 
 // ─── QR CODE HELPER ───────────────────────────────────────────────────────
@@ -754,7 +870,8 @@ function renderPaymentQR() {
 function renderRecap() {
   const type = getActiveTicketType(state.selectedTypeId);
   if (!type) return;
-  document.getElementById('recap-type').textContent  = type.name;
+  const bundle = getRegularBundleDiscount(type.id, type.price, state.qty);
+  document.getElementById('recap-type').textContent  = bundle.isBundle ? `${type.name} (Bundle)` : type.name;
 
   const dateObj = CONFIG.schedule.find(d => d.id === state.selectedDateId);
   const showEl  = document.getElementById('recap-show');
@@ -776,7 +893,7 @@ function renderRecap() {
   }
 
   document.getElementById('recap-qty').textContent   = `${state.qty} ใบ`;
-  document.getElementById('recap-total').textContent = `${fmt(type.price * state.qty)} บาท`;
+  document.getElementById('recap-total').textContent = `${fmt(bundle.total)} บาท`;
 }
 
 // ─── SUBMIT ORDER ─────────────────────────────────────────────────────────
@@ -816,6 +933,10 @@ async function submitOrder(event) {
     return;
   }
   const showDateLabel = `${dateObj.dateLabel} · ${state.selectedSlot} น.`;
+  const bundle = getRegularBundleDiscount(type.id, type.price, state.qty);
+  const effectivePrice = bundle.pricePerTicket;
+  const orderTotal = bundle.total;
+  const typeDisplayName = bundle.isBundle ? `${type.name} (Bundle)` : type.name;
   const tickets    = [];
 
   for (let i = 1; i <= state.qty; i++) {
@@ -827,14 +948,14 @@ async function submitOrder(event) {
       phone,
       email,
       note,
-      type:        type.name,
+      type:        typeDisplayName,
       typeId:      type.id,
       show:        CONFIG.showName,
       venue:       CONFIG.venue,
       showDateId:  state.selectedDateId,
       showSlot:    state.selectedSlot,
       showDate:    showDateLabel,
-      pricePerTicket: type.price,
+      pricePerTicket: effectivePrice,
     });
   }
 
@@ -846,10 +967,10 @@ async function submitOrder(event) {
     note,
     slipImage:      state.slipBase64,
     typeId:         type.id,
-    typeName:       type.name,
-    pricePerTicket: type.price,
+    typeName:       typeDisplayName,
+    pricePerTicket: effectivePrice,
     qty:            state.qty,
-    total:          type.price * state.qty,
+    total:          orderTotal,
     showDateId:     state.selectedDateId,
     showSlot:       state.selectedSlot,
     showDate:       showDateLabel,

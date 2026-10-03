@@ -989,7 +989,7 @@
           <option value="EARLY BIRD">🐦 EARLY BIRD (390 บาท)</option>
           <option value="STUDENT">🎓 STUDENT (450 บาท)</option>
           <option value="PRO 6 ตุลา">⭐ PRO 6 ตุลา (490 บาท)</option>
-          <option value="REGULAR">🎭 REGULAR (590 บาท)</option>
+          <option value="REGULAR">🎭 REGULAR (590 บาท - มีโปร Bundle)</option>
           <option value="QT FREE">🎟️ QT FREE (0 บาท)</option>
           <option value="QT SPON">🎟️ QT SPON (0 บาท)</option>
           <option value="QT DISCOUNT">🎟️ QT DISCOUNT (390 บาท)</option>
@@ -1106,7 +1106,7 @@ const STAFF_TICKET_DEFS = [
   { id: 'earlybird',   name: 'EARLY BIRD',   desc: 'โปรโมชัน Early Bird ราคาพิเศษ', defaultPrice: 390, badge: 'early',   badgeText: '🐦 EARLY BIRD' },
   { id: 'student',     name: 'STUDENT',     desc: 'โปรโมชันนักเรียน นักศึกษา (กรุณานำบัตรนักเรียน นักศึกษามาแสดง ณ จุดลงทะเบียน)', defaultPrice: 450, badge: 'student', badgeText: '🎓 STUDENT' },
   { id: 'pro-6-oct',   name: 'PRO 6 ตุลา',  desc: 'โปรโมชันพิเศษ PRO 6 ตุลา',   defaultPrice: 490, badge: 'promo',   badgeText: '⭐ PRO 6 ตุลา' },
-  { id: 'regular',     name: 'REGULAR',     desc: 'บัตรราคาปกติ',               defaultPrice: 590, badge: 'regular', badgeText: '🎭 REGULAR' },
+  { id: 'regular',     name: 'REGULAR',     desc: 'บัตรราคาปกติ (Bundle: 3–4 ใบ เหลือ 550.- | 5–9 ใบ เหลือ 520.- | 10 ใบ เหลือ 500.-)', defaultPrice: 590, badge: 'regular', badgeText: '🎭 REGULAR' },
 ];
 
 let _ticketConfig = {
@@ -1135,6 +1135,54 @@ const TICKET_TYPES = {
   'โควต้า Spon': 0,
   'บัตรโควต้า': 0,
 };
+
+/**
+ * Bundle Promotion calculation for staff booking / editing:
+ * Regular tickets:
+ * - 3–4 tickets: 550 THB / ticket
+ * - 5–9 tickets: 520 THB / ticket
+ * - 10 tickets: 500 THB / ticket
+ */
+function getStaffEffectivePrice(ticketType, qty) {
+  const isRegular = ticketType === 'REGULAR' || ticketType === 'บัตรปกติ';
+  const basePrice = TICKET_TYPES[ticketType] || 0;
+  if (!isRegular) {
+    return {
+      pricePerTicket: basePrice,
+      total: basePrice * qty,
+      isBundle: false,
+      tierName: '',
+      savings: 0,
+    };
+  }
+
+  let pricePerTicket = basePrice;
+  let tierName = '';
+
+  if (qty >= 10) {
+    pricePerTicket = 500;
+    tierName = 'Bundle 10 ใบ (ใบละ 500.-)';
+  } else if (qty >= 5) {
+    pricePerTicket = 520;
+    tierName = 'Bundle 5–9 ใบ (ใบละ 520.-)';
+  } else if (qty >= 3) {
+    pricePerTicket = 550;
+    tierName = 'Bundle 3–4 ใบ (ใบละ 550.-)';
+  }
+
+  const isBundle = pricePerTicket < basePrice;
+  const total = pricePerTicket * qty;
+  const originalTotal = basePrice * qty;
+  const savings = Math.max(0, originalTotal - total);
+
+  return {
+    pricePerTicket,
+    total,
+    isBundle,
+    tierName,
+    savings,
+  };
+}
 
 // ตารางรอบการแสดง (ต้องตรงกับ app.js)
 const SCHEDULE = [
@@ -1849,7 +1897,14 @@ function saveCustomerEdit() {
   const showDateChanged = newDateId && (newDateId !== oldDateId || newSlot !== oldSlot);
 
   // Update all tickets in this order
-  const newPrice = TICKET_TYPES[newType] || rep.pricePerTicket;
+  const orders = JSON.parse(localStorage.getItem('theater_orders') || '[]');
+  const oIdx   = orders.findIndex(o => o.orderId === orderId);
+  const currentQty = (oIdx >= 0 && orders[oIdx].qty) ? orders[oIdx].qty : 1;
+  const pricing = getStaffEffectivePrice(newType, currentQty);
+  const newPrice = pricing.pricePerTicket;
+  const newTotal = pricing.total;
+  const newTypeDisplayName = pricing.isBundle ? `${newType} (Bundle)` : newType;
+
   const newTypeId = newType === 'Student' || newType === 'STUDENT' ? 'student' :
                     newType === 'PRO AFTER 6' ? 'pro-after-6' :
                     newType === 'PRO 6 ตุลา' ? 'pro-6-oct' :
@@ -1865,7 +1920,7 @@ function saveCustomerEdit() {
         phone:          newPhone,
         email:          newEmail,
         note:           newNote,
-        type:           newType,
+        type:           newTypeDisplayName,
         typeId:         newTypeId,
         showDate:       newShowDate,
         pricePerTicket: newPrice,
@@ -1877,8 +1932,6 @@ function saveCustomerEdit() {
   localStorage.setItem('theater_tickets', JSON.stringify(allTickets));
 
   // Update theater_orders
-  const orders = JSON.parse(localStorage.getItem('theater_orders') || '[]');
-  const oIdx   = orders.findIndex(o => o.orderId === orderId);
   if (oIdx >= 0) {
     const qty = orders[oIdx].qty || 1;
     orders[oIdx] = {
@@ -1888,15 +1941,15 @@ function saveCustomerEdit() {
       email:     newEmail,
       note:      newNote,
       typeId:    newTypeId,
-      typeName:  newType,
+      typeName:  newTypeDisplayName,
       pricePerTicket: newPrice,
-      total:     newPrice * qty,
+      total:     newTotal,
       showDate:  newShowDate,
       ...(newDateId ? { showDateId: newDateId, showSlot: newSlot } : {}),
       tickets:   orders[oIdx].tickets?.map(t => ({
         ...t,
         name: newName, phone: newPhone, email: newEmail,
-        note: newNote, type: newType, typeId: newTypeId, showDate: newShowDate, pricePerTicket: newPrice,
+        note: newNote, type: newTypeDisplayName, typeId: newTypeId, showDate: newShowDate, pricePerTicket: newPrice,
         ...(newDateId ? { showDateId: newDateId, showSlot: newSlot } : {}),
       })),
     };
@@ -2754,16 +2807,27 @@ function updateQuotaBookingPrice() {
   if (!typeSelect || !qtyInput) return;
 
   const ticketType = typeSelect.value;
-  const originalPrice = TICKET_TYPES[ticketType] || 0;
-  
   let qty = parseInt(qtyInput.value) || 1;
   if (qty < 1) { qty = 1; qtyInput.value = 1; }
 
-  const totalNet = originalPrice * qty;
+  const pricing = getStaffEffectivePrice(ticketType, qty);
 
-  document.getElementById('sb-calc-original').textContent = originalPrice.toLocaleString();
-  document.getElementById('sb-calc-qty').textContent = qty.toLocaleString();
-  document.getElementById('sb-calc-total').textContent = totalNet.toLocaleString();
+  const pricePerTicketEl = document.getElementById('sb-calc-original');
+  if (pricePerTicketEl) {
+    if (pricing.isBundle) {
+      pricePerTicketEl.innerHTML = `<span style="text-decoration:line-through;color:var(--muted);font-size:0.85em;margin-right:4px;">${(TICKET_TYPES[ticketType] || 0).toLocaleString()}</span><span style="color:#86efac;font-weight:700;">${pricing.pricePerTicket.toLocaleString()}</span> <span style="font-size:0.7rem;background:rgba(34,197,94,0.15);color:#86efac;padding:1px 6px;border-radius:4px;border:1px solid rgba(34,197,94,0.3)">${pricing.tierName}</span>`;
+    } else {
+      pricePerTicketEl.textContent = pricing.pricePerTicket.toLocaleString();
+    }
+  }
+
+  const qtyEl = document.getElementById('sb-calc-qty');
+  if (qtyEl) qtyEl.textContent = qty.toLocaleString();
+
+  const totalEl = document.getElementById('sb-calc-total');
+  if (totalEl) {
+    totalEl.textContent = pricing.total.toLocaleString();
+  }
 }
 
 async function submitQuotaBooking() {
@@ -2813,8 +2877,10 @@ async function submitQuotaBooking() {
   const orderId = generateStaffOrderId();
 
   // 4. Calculate pricing
-  const netPrice  = TICKET_TYPES[ticketType] || 0;
-  const totalNet  = netPrice * qty;
+  const pricing   = getStaffEffectivePrice(ticketType, qty);
+  const netPrice  = pricing.pricePerTicket;
+  const totalNet  = pricing.total;
+  const typeDisplayName = pricing.isBundle ? `${ticketType} (Bundle)` : ticketType;
 
   // 5. Create tickets array
   const tickets = [];
@@ -2827,7 +2893,7 @@ async function submitQuotaBooking() {
       phone,
       email,
       note:       note ? `[โควต้าแอดมิน] ${note}` : '[โควต้าแอดมิน]',
-      type:       ticketType,
+      type:       typeDisplayName,
       typeId:     ticketType === 'Student' || ticketType === 'STUDENT' ? 'student' :
                   ticketType === 'PRO AFTER 6' ? 'pro-after-6' :
                   ticketType === 'PRO 6 ตุลา' ? 'pro-6-oct' :
@@ -2859,7 +2925,7 @@ async function submitQuotaBooking() {
                 (ticketType === 'QT DISCOUNT' ? 'qt-discount' : 
                 (ticketType === 'QT SPON' ? 'qt-spon' : 
                 (ticketType === 'QT FREE' || ticketType === 'บัตรโควต้า' ? 'qt-free' : 'regular')))),
-    typeName:   ticketType,
+    typeName:   typeDisplayName,
     pricePerTicket: netPrice,
     qty,
     total:      totalNet,
