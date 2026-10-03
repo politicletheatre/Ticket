@@ -1396,22 +1396,69 @@ function initBackwardClock() {
 }
 
 // ─── DIRECTIONS MODAL & LIGHTBOX ──────────────────────────────────────────────
-function checkDirectionsUrl() {
-  const hash = (window.location.hash || '').toLowerCase();
-  const search = window.location.search || '';
-  const params = new URLSearchParams(search);
-  if (
-    hash === '#directions' || 
-    hash === '#direction' || 
-    hash === '#map' || 
-    hash === '#location' ||
-    params.has('directions') || 
-    params.get('modal') === 'directions'
-  ) {
-    setTimeout(() => {
-      openDirectionsModal(false);
-    }, 150);
+
+/**
+ * Returns a robust, canonical shareable URL for the directions modal.
+ * Strips filenames like index.html to avoid 404s like /index.html/#directions.
+ * Uses query parameter '?directions=1' which works reliably across all chat apps (LINE, Messenger, etc.)
+ */
+function getDirectionsShareUrl() {
+  try {
+    const loc = window.location;
+    const origin = loc.origin;
+    if (!origin || origin === 'null') {
+      return 'https://politicletheatre.github.io/Ticket/?directions=1';
+    }
+    let pathname = loc.pathname || '/';
+    // Remove filename like index.html, status.html, etc.
+    pathname = pathname.replace(/\/[^\/]*\.html?$/i, '/');
+    if (!pathname.endsWith('/')) {
+      pathname += '/';
+    }
+    return origin + pathname + '?directions=1';
+  } catch (e) {
+    return 'https://politicletheatre.github.io/Ticket/?directions=1';
   }
+}
+
+/**
+ * Check if the current URL has requested opening the directions modal.
+ * Supports query parameters (?directions, ?directions=1, ?modal=directions)
+ * and hash fragments (#directions, #direction, #map, #location).
+ */
+function shouldOpenDirections() {
+  try {
+    const hash = (window.location.hash || '').toLowerCase();
+    const search = window.location.search || '';
+    const params = new URLSearchParams(search);
+    return (
+      hash === '#directions' || 
+      hash === '#direction' || 
+      hash === '#map' || 
+      hash === '#location' ||
+      params.has('directions') || 
+      params.get('modal') === 'directions'
+    );
+  } catch (e) {
+    return false;
+  }
+}
+
+function checkDirectionsUrl() {
+  if (!shouldOpenDirections()) return;
+
+  let retries = 0;
+  const maxRetries = 20;
+  function tryOpen() {
+    const modal = document.getElementById('directions-modal');
+    if (modal) {
+      openDirectionsModal(false);
+    } else if (retries < maxRetries) {
+      retries++;
+      setTimeout(tryOpen, 50);
+    }
+  }
+  tryOpen();
 }
 
 function openDirectionsModal(updateHash = true) {
@@ -1433,22 +1480,92 @@ function closeDirectionsModal() {
   if (!modal) return;
   modal.style.display = 'none';
   document.body.classList.remove('modal-open');
-  const hash = (window.location.hash || '').toLowerCase();
-  if (hash === '#directions' || hash === '#direction' || hash === '#map' || hash === '#location') {
-    history.replaceState(null, '', window.location.pathname + window.location.search);
+
+  // Cleanly remove ?directions=1 and #directions from the address bar without reloading
+  try {
+    const loc = window.location;
+    const params = new URLSearchParams(loc.search);
+    let changed = false;
+    if (params.has('directions')) {
+      params.delete('directions');
+      changed = true;
+    }
+    if (params.get('modal') === 'directions') {
+      params.delete('modal');
+      changed = true;
+    }
+    const hash = (loc.hash || '').toLowerCase();
+    const hasDirectionsHash = (hash === '#directions' || hash === '#direction' || hash === '#map' || hash === '#location');
+    if (changed || hasDirectionsHash) {
+      const searchStr = params.toString() ? ('?' + params.toString()) : '';
+      const hashStr = hasDirectionsHash ? '' : loc.hash;
+      const cleanUrl = loc.pathname + searchStr + hashStr;
+      history.replaceState(null, '', cleanUrl);
+    }
+  } catch (err) {
+    if (window.location.hash) {
+      history.replaceState(null, '', window.location.pathname);
+    }
   }
 }
 
-function copyDirectionsLink() {
-  const url = window.location.origin + window.location.pathname.replace(/\/$/, '') + '/#directions';
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(url).then(() => {
-      showToast('📋 คัดลอกลิงก์วิธีการเดินทางเรียบร้อยแล้ว!');
-    }).catch(() => {
-      prompt('คัดลอกลิงก์ด้านล่างเพื่อแชร์ได้เลยครับ:', url);
-    });
-  } else {
+function fallbackCopyText(text) {
+  const textArea = document.createElement('textarea');
+  textArea.value = text;
+  textArea.style.position = 'fixed';
+  textArea.style.left = '-9999px';
+  textArea.style.top = '-9999px';
+  textArea.setAttribute('readonly', '');
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+  let successful = false;
+  try {
+    successful = document.execCommand('copy');
+  } catch (err) {
+    successful = false;
+  }
+  document.body.removeChild(textArea);
+  return successful;
+}
+
+function copyDirectionsLink(btnEl) {
+  const url = getDirectionsShareUrl();
+  const copyBtn = btnEl || document.querySelector('.btn-copy-directions-footer');
+
+  const onCopySuccess = () => {
+    showToast('📋 คัดลอกลิงก์วิธีการเดินทางเรียบร้อยแล้ว!');
+    if (copyBtn) {
+      const originalText = copyBtn.innerHTML;
+      copyBtn.innerHTML = '✅ คัดลอกลิงก์แล้ว!';
+      copyBtn.classList.add('copied');
+      setTimeout(() => {
+        copyBtn.innerHTML = originalText;
+        copyBtn.classList.remove('copied');
+      }, 2000);
+    }
+  };
+
+  const onCopyFail = () => {
     prompt('คัดลอกลิงก์ด้านล่างเพื่อแชร์ได้เลยครับ:', url);
+  };
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url)
+      .then(onCopySuccess)
+      .catch(() => {
+        if (fallbackCopyText(url)) {
+          onCopySuccess();
+        } else {
+          onCopyFail();
+        }
+      });
+  } else {
+    if (fallbackCopyText(url)) {
+      onCopySuccess();
+    } else {
+      onCopyFail();
+    }
   }
 }
 
@@ -1485,10 +1602,9 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// Listen to browser forward/back and hash changes
+// Listen to browser forward/back, popstate, and hash changes
 window.addEventListener('hashchange', () => {
-  const hash = (window.location.hash || '').toLowerCase();
-  if (hash === '#directions' || hash === '#direction' || hash === '#map' || hash === '#location') {
+  if (shouldOpenDirections()) {
     openDirectionsModal(false);
   } else {
     const modal = document.getElementById('directions-modal');
@@ -1498,7 +1614,27 @@ window.addEventListener('hashchange', () => {
   }
 });
 
+window.addEventListener('popstate', () => {
+  if (shouldOpenDirections()) {
+    openDirectionsModal(false);
+  } else {
+    const modal = document.getElementById('directions-modal');
+    if (modal && modal.style.display !== 'none') {
+      closeDirectionsModal();
+    }
+  }
+});
+
+window.addEventListener('load', () => {
+  checkDirectionsUrl();
+});
+
+// Initial trigger on script execution
+checkDirectionsUrl();
+
 // Expose globally for onclick handlers
+window.getDirectionsShareUrl = getDirectionsShareUrl;
+window.shouldOpenDirections = shouldOpenDirections;
 window.checkDirectionsUrl = checkDirectionsUrl;
 window.openDirectionsModal = openDirectionsModal;
 window.closeDirectionsModal = closeDirectionsModal;
@@ -1506,4 +1642,5 @@ window.copyDirectionsLink = copyDirectionsLink;
 window.handleDirectionsBackdropClick = handleDirectionsBackdropClick;
 window.openDirectionsLightbox = openDirectionsLightbox;
 window.closeDirectionsLightbox = closeDirectionsLightbox;
+
 

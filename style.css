@@ -2341,6 +2341,12 @@ body.modal-open {
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(40, 107, 110, 0.2);
 }
+.btn-copy-directions-footer.copied {
+  background: #1b8a5a !important;
+  color: #ffffff !important;
+  border-color: #1b8a5a !important;
+  box-shadow: 0 4px 12px rgba(27, 138, 90, 0.25) !important;
+}
 .btn-directions-dismiss {
   padding: 10px 24px;
   background: #286b6e;
