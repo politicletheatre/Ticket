@@ -813,12 +813,12 @@ function updateBundleHintBox(type, bundle) {
     badgeClass = 'hint-almost';
   } else if (qty < 5) {
     const more = 5 - qty;
-    msg = `🎉 <strong>ได้รับส่วนลดแล้ว (เหลือใบละ 550 บาท)</strong> · ซื้อเพิ่มอีก ${more} ใบ เพื่อรับส่วนลดเพิ่ม (เหลือใบละ 520 บาท)`;
-    badgeClass = 'hint-active';
+    msg = `⚡ <strong>ซื้อเพิ่มอีก ${more} ใบ</strong> เพื่อรับส่วนลดเพิ่ม (เหลือใบละ 520 บาท)`;
+    badgeClass = 'hint-almost';
   } else if (qty < 10) {
     const more = 10 - qty;
-    msg = `🔥 <strong>ได้รับส่วนลดแล้ว (เหลือใบละ 520 บาท)</strong> · ซื้อเพิ่มอีก ${more} ใบ เพื่อรับส่วนลดเพิ่ม (เหลือใบละ 500 บาท)`;
-    badgeClass = 'hint-active';
+    msg = `⚡ <strong>ซื้อเพิ่มอีก ${more} ใบ</strong> เพื่อรับส่วนลดเพิ่ม (เหลือใบละ 500 บาท)`;
+    badgeClass = 'hint-almost';
   } else {
     msg = `🏆 <strong>คุณได้รับส่วนลดสูงสุดแล้ว</strong> (เหลือใบละ 500 บาท)`;
     badgeClass = 'hint-max';
