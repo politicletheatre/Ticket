@@ -29,7 +29,7 @@ const CONFIG = {
     { id:'earlybird',   name:'EARLY BIRD',   desc:'โปรโมชัน Early Bird ราคาพิเศษ', price:390, badge:'early',   badgeText:'🐦 EARLY BIRD',   available:true },
     { id:'student',     name:'STUDENT',     desc:'โปรโมชันนักเรียน นักศึกษา', note:'(กรุณานำบัตรนักเรียน นักศึกษามาแสดง ณ จุดลงทะเบียน)', price:450, badge:'student', badgeText:'🎓 STUDENT', available:true },
     { id:'pro-6-oct',   name:'PRO 6 ตุลา',  desc:'โปรโมชันพิเศษ PRO 6 ตุลา',   price:490, badge:'promo',   badgeText:'⭐ PRO 6 ตุลา',  available:false },
-    { id:'regular',     name:'REGULAR',     desc:'บัตรราคาปกติ (พิเศษ Bundle: 3–4 ใบ เหลือ 550.- | 5–9 ใบ เหลือ 520.- | 10 ใบ เหลือ 500.-)', price:590, badge:'regular', badgeText:'🎭 REGULAR', available:true },
+    { id:'regular',     name:'REGULAR',     desc:'บัตรราคาปกติ',               price:590, badge:'regular', badgeText:'🎭 REGULAR',     available:true },
     { id:'quota-free',      name:'โควต้าฟรี', desc:'โควต้าพิเศษสำหรับทีมงาน/ Staff', price:0,   badge:'quota', badgeText:'🎟️ โควต้าฟรี', available:false },
     { id:'quota-earlybird', name:'โควต้าราคา Early Bird', desc:'โควต้าพิเศษราคา Early Bird', price:390, badge:'quota', badgeText:'🎟️ โควต้า Early Bird', available:false },
     { id:'quota-spon',      name:'โควต้า Spon', desc:'โควต้าพิเศษสำหรับสปอนเซอร์', price:0, badge:'quota', badgeText:'🎟️ โควต้า Spon', available:false },
@@ -87,13 +87,13 @@ function getRegularBundleDiscount(typeId, basePrice, qty) {
 
   if (qty >= 10) {
     pricePerTicket = 500;
-    tierText = 'Bundle 10 ใบ (ใบละ 500.-)';
+    tierText = 'เหลือใบละ 500.-';
   } else if (qty >= 5) {
     pricePerTicket = 520;
-    tierText = 'Bundle 5–9 ใบ (ใบละ 520.-)';
+    tierText = 'เหลือใบละ 520.-';
   } else if (qty >= 3) {
     pricePerTicket = 550;
-    tierText = 'Bundle 3–4 ใบ (ใบละ 550.-)';
+    tierText = 'เหลือใบละ 550.-';
   }
 
   const isBundle = pricePerTicket < basePrice;
@@ -804,23 +804,23 @@ function updateBundleHintBox(type, bundle) {
   box.style.display = 'block';
 
   let msg = '';
-  let badgeClass = 'hint-default';
+  let badgeClass = 'hint-almost';
+  const qty = state.qty;
 
-  if (state.qty === 1) {
-    msg = `💡 <strong>โปรโมชัน Bundle พิเศษ:</strong> ซื้อ 3–4 ใบ เหลือใบละ <strong>550.-</strong> | 5–9 ใบ เหลือ <strong>520.-</strong> | 10 ใบ เหลือ <strong>500.-</strong>`;
-  } else if (state.qty === 2) {
-    msg = `⚡ <strong>ซื้อเพิ่มอีกเพียง 1 ใบ:</strong> รับราคา Bundle ทันที เหลือใบละ <strong>550.-</strong> (ประหยัด 120 บาท!)`;
+  if (qty < 3) {
+    const more = 3 - qty;
+    msg = `⚡ <strong>ซื้อเพิ่มอีก ${more} ใบ</strong> เพื่อรับส่วนลดเพิ่ม (เหลือใบละ 550 บาท)`;
     badgeClass = 'hint-almost';
-  } else if (state.qty >= 3 && state.qty <= 4) {
-    const nextMsg = state.qty === 4 ? ` (ซื้อครบ 5 ใบ รับราคาสุดคุ้มใบละ 520.-)` : ``;
-    msg = `🎉 <strong>ปลดล็อกโปร Bundle 3–4 ใบ:</strong> เหลือใบละ <strong>550.-</strong> (ประหยัดรวม ${bundle.savings} บาท!)${nextMsg}`;
+  } else if (qty < 5) {
+    const more = 5 - qty;
+    msg = `🎉 <strong>ได้รับส่วนลดแล้ว (เหลือใบละ 550 บาท)</strong> · ซื้อเพิ่มอีก ${more} ใบ เพื่อรับส่วนลดเพิ่ม (เหลือใบละ 520 บาท)`;
     badgeClass = 'hint-active';
-  } else if (state.qty >= 5 && state.qty <= 9) {
-    const nextMsg = state.qty === 9 ? ` (เพิ่มอีก 1 ใบ รับราคาสูงสุดใบละ 500.-!)` : ``;
-    msg = `🔥 <strong>ปลดล็อกโปร Bundle 5–9 ใบ:</strong> เหลือใบละ <strong>520.-</strong> (ประหยัดรวม ${bundle.savings} บาท!)${nextMsg}`;
+  } else if (qty < 10) {
+    const more = 10 - qty;
+    msg = `🔥 <strong>ได้รับส่วนลดแล้ว (เหลือใบละ 520 บาท)</strong> · ซื้อเพิ่มอีก ${more} ใบ เพื่อรับส่วนลดเพิ่ม (เหลือใบละ 500 บาท)`;
     badgeClass = 'hint-active';
-  } else if (state.qty >= 10) {
-    msg = `🏆 <strong>ปลดล็อกโปร Bundle 10 ใบ (สูงสุด):</strong> เหลือเพียงใบละ <strong>500.-</strong> (ประหยัดสูงสุดถึง 900 บาท!)`;
+  } else {
+    msg = `🏆 <strong>คุณได้รับส่วนลดสูงสุดแล้ว</strong> (เหลือใบละ 500 บาท)`;
     badgeClass = 'hint-max';
   }
 

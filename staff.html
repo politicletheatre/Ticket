@@ -989,7 +989,7 @@
           <option value="EARLY BIRD">🐦 EARLY BIRD (390 บาท)</option>
           <option value="STUDENT">🎓 STUDENT (450 บาท)</option>
           <option value="PRO 6 ตุลา">⭐ PRO 6 ตุลา (490 บาท)</option>
-          <option value="REGULAR">🎭 REGULAR (590 บาท - มีโปร Bundle)</option>
+          <option value="REGULAR">🎭 REGULAR (590 บาท)</option>
           <option value="QT FREE">🎟️ QT FREE (0 บาท)</option>
           <option value="QT SPON">🎟️ QT SPON (0 บาท)</option>
           <option value="QT DISCOUNT">🎟️ QT DISCOUNT (390 บาท)</option>
@@ -1106,7 +1106,7 @@ const STAFF_TICKET_DEFS = [
   { id: 'earlybird',   name: 'EARLY BIRD',   desc: 'โปรโมชัน Early Bird ราคาพิเศษ', defaultPrice: 390, badge: 'early',   badgeText: '🐦 EARLY BIRD' },
   { id: 'student',     name: 'STUDENT',     desc: 'โปรโมชันนักเรียน นักศึกษา (กรุณานำบัตรนักเรียน นักศึกษามาแสดง ณ จุดลงทะเบียน)', defaultPrice: 450, badge: 'student', badgeText: '🎓 STUDENT' },
   { id: 'pro-6-oct',   name: 'PRO 6 ตุลา',  desc: 'โปรโมชันพิเศษ PRO 6 ตุลา',   defaultPrice: 490, badge: 'promo',   badgeText: '⭐ PRO 6 ตุลา' },
-  { id: 'regular',     name: 'REGULAR',     desc: 'บัตรราคาปกติ (Bundle: 3–4 ใบ เหลือ 550.- | 5–9 ใบ เหลือ 520.- | 10 ใบ เหลือ 500.-)', defaultPrice: 590, badge: 'regular', badgeText: '🎭 REGULAR' },
+  { id: 'regular',     name: 'REGULAR',     desc: 'บัตรราคาปกติ',               defaultPrice: 590, badge: 'regular', badgeText: '🎭 REGULAR' },
 ];
 
 let _ticketConfig = {
@@ -1161,13 +1161,13 @@ function getStaffEffectivePrice(ticketType, qty) {
 
   if (qty >= 10) {
     pricePerTicket = 500;
-    tierName = 'Bundle 10 ใบ (ใบละ 500.-)';
+    tierName = 'เหลือใบละ 500.-';
   } else if (qty >= 5) {
     pricePerTicket = 520;
-    tierName = 'Bundle 5–9 ใบ (ใบละ 520.-)';
+    tierName = 'เหลือใบละ 520.-';
   } else if (qty >= 3) {
     pricePerTicket = 550;
-    tierName = 'Bundle 3–4 ใบ (ใบละ 550.-)';
+    tierName = 'เหลือใบละ 550.-';
   }
 
   const isBundle = pricePerTicket < basePrice;
