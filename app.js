@@ -1298,8 +1298,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /**
- * Digital Countdown Timer for Early Bird
- * นับถอยหลังเวลาสิ้นสุด Early Bird: วันนี้จนถึงวันที่ 3 ตุลาคม (23:59:59 GMT+7)
+ * Digital Countdown Timer for PRO 6 ตุลา
+ * นับถอยหลังเวลาสิ้นสุดโปรโมชัน: วันนี้จนถึงเที่ยงคืนวันที่ 7 ตุลาคม (สิ้นสุด 6 ตุลาคม 23:59:59 GMT+7)
  */
 function initEarlyBirdCountdown() {
   const daysEl = document.getElementById('cd-days');
@@ -1312,8 +1312,8 @@ function initEarlyBirdCountdown() {
   function update() {
     const now = new Date();
     const currentYear = now.getFullYear();
-    // Target: October 3, 23:59:59 (0-indexed month: 9 = October)
-    const target = new Date(currentYear, 9, 3, 23, 59, 59, 999);
+    // Target: เที่ยงคืนวันที่ 7 ตุลาคม (สิ้นสุด 6 ตุลาคม 23:59:59 GMT+7) (0-indexed month: 9 = October)
+    const target = new Date(currentYear, 9, 7, 0, 0, 0, 0);
 
     let diff = target.getTime() - now.getTime();
     if (diff < 0) diff = 0;
