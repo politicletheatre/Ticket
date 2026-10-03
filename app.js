@@ -26,10 +26,10 @@ const CONFIG = {
 
   ticketTypes: [
     { id:'pro-after-6', name:'PRO AFTER 6', desc:'โปรโมชันพิเศษ PRO AFTER 6', price:350, badge:'promo',   badgeText:'🔥 PRO AFTER 6', available:false },
-    { id:'earlybird',   name:'EARLYBIRD',   desc:'โปรโมชัน Early Bird ราคาพิเศษ', price:390, badge:'early',   badgeText:'🐦 EARLYBIRD',   available:true },
+    { id:'earlybird',   name:'EARLY BIRD',   desc:'โปรโมชัน Early Bird ราคาพิเศษ', price:390, badge:'early',   badgeText:'🐦 EARLY BIRD',   available:true },
     { id:'student',     name:'STUDENT',     desc:'โปรโมชันนักเรียน นักศึกษา', note:'(กรุณานำบัตรนักเรียน นักศึกษามาแสดง ณ จุดลงทะเบียน)', price:450, badge:'student', badgeText:'🎓 STUDENT', available:true },
-    { id:'pro-6-oct',   name:'PRO 6 ตุลา',  desc:'โปรโมชันพิเศษ PRO 6 ตุลา',   price:590, badge:'promo',   badgeText:'⭐ PRO 6 ตุลา',  available:false },
-    { id:'regular',     name:'REGULAR',     desc:'บัตรราคาปกติ',               price:690, badge:'regular', badgeText:'🎭 REGULAR',     available:true },
+    { id:'pro-6-oct',   name:'PRO 6 ตุลา',  desc:'โปรโมชันพิเศษ PRO 6 ตุลา',   price:490, badge:'promo',   badgeText:'⭐ PRO 6 ตุลา',  available:false },
+    { id:'regular',     name:'REGULAR',     desc:'บัตรราคาปกติ',               price:590, badge:'regular', badgeText:'🎭 REGULAR',     available:true },
     { id:'quota-free',      name:'โควต้าฟรี', desc:'โควต้าพิเศษสำหรับทีมงาน/ Staff', price:0,   badge:'quota', badgeText:'🎟️ โควต้าฟรี', available:false },
     { id:'quota-earlybird', name:'โควต้าราคา Early Bird', desc:'โควต้าพิเศษราคา Early Bird', price:390, badge:'quota', badgeText:'🎟️ โควต้า Early Bird', available:false },
     { id:'quota-spon',      name:'โควต้า Spon', desc:'โควต้าพิเศษสำหรับสปอนเซอร์', price:0, badge:'quota', badgeText:'🎟️ โควต้า Spon', available:false },
@@ -48,8 +48,8 @@ let GLOBAL_TICKET_CONFIG = {
   'pro-after-6': { enabled: false, price: 350 },
   'earlybird':   { enabled: true,  price: 390 },
   'student':     { enabled: true,  price: 450 },
-  'pro-6-oct':   { enabled: false, price: 590 },
-  'regular':     { enabled: true,  price: 690 },
+  'pro-6-oct':   { enabled: false, price: 490 },
+  'regular':     { enabled: true,  price: 590 },
 };
 // Legacy compatibility
 let GLOBAL_EARLYBIRD_ENABLED = true;
@@ -73,6 +73,12 @@ async function fetchGlobalConfig() {
   if (cachedTicketCfg) {
     try {
       GLOBAL_TICKET_CONFIG = { ...GLOBAL_TICKET_CONFIG, ...JSON.parse(cachedTicketCfg) };
+      if (GLOBAL_TICKET_CONFIG['regular'] && GLOBAL_TICKET_CONFIG['regular'].price === 690) {
+        GLOBAL_TICKET_CONFIG['regular'].price = 590;
+      }
+      if (GLOBAL_TICKET_CONFIG['pro-6-oct'] && GLOBAL_TICKET_CONFIG['pro-6-oct'].price === 590) {
+        GLOBAL_TICKET_CONFIG['pro-6-oct'].price = 490;
+      }
     } catch(e) {}
   }
 
@@ -89,6 +95,12 @@ async function fetchGlobalConfig() {
               const parsed = typeof data.ticket_config === 'string' ? JSON.parse(data.ticket_config) : data.ticket_config;
               if (parsed && typeof parsed === 'object') {
                 GLOBAL_TICKET_CONFIG = { ...GLOBAL_TICKET_CONFIG, ...parsed };
+                if (GLOBAL_TICKET_CONFIG['regular'] && GLOBAL_TICKET_CONFIG['regular'].price === 690) {
+                  GLOBAL_TICKET_CONFIG['regular'].price = 590;
+                }
+                if (GLOBAL_TICKET_CONFIG['pro-6-oct'] && GLOBAL_TICKET_CONFIG['pro-6-oct'].price === 590) {
+                  GLOBAL_TICKET_CONFIG['pro-6-oct'].price = 490;
+                }
                 localStorage.setItem('theater_ticket_config', JSON.stringify(GLOBAL_TICKET_CONFIG));
               }
             } catch (err) {}

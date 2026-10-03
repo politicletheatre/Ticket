@@ -855,16 +855,17 @@
           <label>ประเภทบัตร</label>
           <select id="edit-type">
             <option value="PRO AFTER 6">🔥 PRO AFTER 6 (350 บาท)</option>
-            <option value="EARLYBIRD">🐦 EARLYBIRD (390 บาท)</option>
+            <option value="EARLY BIRD">🐦 EARLY BIRD (390 บาท)</option>
+            <option value="EARLYBIRD" style="display:none">🐦 EARLYBIRD (390 บาท)</option>
             <option value="STUDENT">🎓 STUDENT (450 บาท)</option>
-            <option value="PRO 6 ตุลา">⭐ PRO 6 ตุลา (590 บาท)</option>
-            <option value="REGULAR">🎭 REGULAR (690 บาท)</option>
-            <option value="Early Bird">🐦 Early Bird (เดิม 590 บาท)</option>
-            <option value="บัตรปกติ">🎭 บัตรปกติ (เดิม 790 บาท)</option>
+            <option value="PRO 6 ตุลา">⭐ PRO 6 ตุลา (490 บาท)</option>
+            <option value="REGULAR">🎭 REGULAR (590 บาท)</option>
+            <option value="Early Bird" style="display:none">🐦 Early Bird (เดิม 390 บาท)</option>
+            <option value="บัตรปกติ" style="display:none">🎭 บัตรปกติ (เดิม 590 บาท)</option>
             <option value="QT FREE">🎟️ QT FREE (0 บาท)</option>
             <option value="QT SPON">🎟️ QT SPON (0 บาท)</option>
-            <option value="QT DISCOUNT">🎟️ QT DISCOUNT (590 บาท)</option>
-            <option value="บัตรโควต้า">🎟️ บัตรโควต้า (0 บาท)</option>
+            <option value="QT DISCOUNT">🎟️ QT DISCOUNT (390 บาท)</option>
+            <option value="บัตรโควต้า" style="display:none">🎟️ บัตรโควต้า (0 บาท)</option>
           </select>
         </div>
         <div class="edit-form-group">
@@ -985,13 +986,13 @@
         <label for="sb-type">ประเภทบัตร <span style="color:var(--error)">*</span></label>
         <select id="sb-type" onchange="updateQuotaBookingPrice()">
           <option value="PRO AFTER 6">🔥 PRO AFTER 6 (350 บาท)</option>
-          <option value="EARLYBIRD">🐦 EARLYBIRD (390 บาท)</option>
+          <option value="EARLY BIRD">🐦 EARLY BIRD (390 บาท)</option>
           <option value="STUDENT">🎓 STUDENT (450 บาท)</option>
-          <option value="PRO 6 ตุลา">⭐ PRO 6 ตุลา (590 บาท)</option>
-          <option value="REGULAR">🎭 REGULAR (690 บาท)</option>
+          <option value="PRO 6 ตุลา">⭐ PRO 6 ตุลา (490 บาท)</option>
+          <option value="REGULAR">🎭 REGULAR (590 บาท)</option>
           <option value="QT FREE">🎟️ QT FREE (0 บาท)</option>
           <option value="QT SPON">🎟️ QT SPON (0 บาท)</option>
-          <option value="QT DISCOUNT">🎟️ QT DISCOUNT (590 บาท)</option>
+          <option value="QT DISCOUNT">🎟️ QT DISCOUNT (390 บาท)</option>
         </select>
       </div>
       <div class="booking-group">
@@ -1102,32 +1103,33 @@ const JSONBIN_WRITE_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
 
 const STAFF_TICKET_DEFS = [
   { id: 'pro-after-6', name: 'PRO AFTER 6', desc: 'โปรโมชันพิเศษ PRO AFTER 6', defaultPrice: 350, badge: 'promo',   badgeText: '🔥 PRO AFTER 6' },
-  { id: 'earlybird',   name: 'EARLYBIRD',   desc: 'โปรโมชัน Early Bird ราคาพิเศษ', defaultPrice: 390, badge: 'early',   badgeText: '🐦 EARLYBIRD' },
+  { id: 'earlybird',   name: 'EARLY BIRD',   desc: 'โปรโมชัน Early Bird ราคาพิเศษ', defaultPrice: 390, badge: 'early',   badgeText: '🐦 EARLY BIRD' },
   { id: 'student',     name: 'STUDENT',     desc: 'โปรโมชันนักเรียน นักศึกษา (กรุณานำบัตรนักเรียน นักศึกษามาแสดง ณ จุดลงทะเบียน)', defaultPrice: 450, badge: 'student', badgeText: '🎓 STUDENT' },
-  { id: 'pro-6-oct',   name: 'PRO 6 ตุลา',  desc: 'โปรโมชันพิเศษ PRO 6 ตุลา',   defaultPrice: 590, badge: 'promo',   badgeText: '⭐ PRO 6 ตุลา' },
-  { id: 'regular',     name: 'REGULAR',     desc: 'บัตรราคาปกติ',               defaultPrice: 690, badge: 'regular', badgeText: '🎭 REGULAR' },
+  { id: 'pro-6-oct',   name: 'PRO 6 ตุลา',  desc: 'โปรโมชันพิเศษ PRO 6 ตุลา',   defaultPrice: 490, badge: 'promo',   badgeText: '⭐ PRO 6 ตุลา' },
+  { id: 'regular',     name: 'REGULAR',     desc: 'บัตรราคาปกติ',               defaultPrice: 590, badge: 'regular', badgeText: '🎭 REGULAR' },
 ];
 
 let _ticketConfig = {
   'pro-after-6': { enabled: false, price: 350 },
   'earlybird':   { enabled: true,  price: 390 },
   'student':     { enabled: true,  price: 450 },
-  'pro-6-oct':   { enabled: false, price: 590 },
-  'regular':     { enabled: true,  price: 690 },
+  'pro-6-oct':   { enabled: false, price: 490 },
+  'regular':     { enabled: true,  price: 590 },
 };
 
 const TICKET_TYPES = {
   'PRO AFTER 6': 350,
+  'EARLY BIRD': 390,
   'EARLYBIRD': 390,
   'Early Bird': 390,
   'Student': 450,
   'STUDENT': 450,
-  'PRO 6 ตุลา': 590,
-  'REGULAR': 690,
-  'บัตรปกติ': 690,
+  'PRO 6 ตุลา': 490,
+  'REGULAR': 590,
+  'บัตรปกติ': 590,
   'QT SPON': 0,
   'QT FREE': 0,
-  'QT DISCOUNT': 590,
+  'QT DISCOUNT': 390,
   'โควต้าฟรี': 0,
   'โควต้าราคา Early Bird': 390,
   'โควต้า Spon': 0,
@@ -1304,12 +1306,48 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 let _ticketSaveTimeout = null;
 
+function syncTicketTypesFromConfig() {
+  STAFF_TICKET_DEFS.forEach(d => {
+    if (_ticketConfig[d.id] && typeof _ticketConfig[d.id].price === 'number') {
+      const p = _ticketConfig[d.id].price;
+      TICKET_TYPES[d.name] = p;
+      if (d.id === 'earlybird') {
+        TICKET_TYPES['EARLY BIRD'] = p;
+        TICKET_TYPES['EARLYBIRD'] = p;
+        TICKET_TYPES['Early Bird'] = p;
+        TICKET_TYPES['โควต้าราคา Early Bird'] = p;
+      }
+      if (d.id === 'regular') {
+        TICKET_TYPES['REGULAR'] = p;
+        TICKET_TYPES['บัตรปกติ'] = p;
+      }
+      if (d.id === 'student') {
+        TICKET_TYPES['STUDENT'] = p;
+        TICKET_TYPES['Student'] = p;
+      }
+      if (d.id === 'pro-6-oct') {
+        TICKET_TYPES['PRO 6 ตุลา'] = p;
+      }
+      if (d.id === 'pro-after-6') {
+        TICKET_TYPES['PRO AFTER 6'] = p;
+      }
+    }
+  });
+}
+
 async function initSettings() {
   // 1. โหลดจาก localStorage ก่อน
   const cached = localStorage.getItem('theater_ticket_config');
   if (cached) {
     try {
       _ticketConfig = { ..._ticketConfig, ...JSON.parse(cached) };
+      // Migration: ปรับราคาเริ่มต้นเดิมให้เป็นมาตรฐานใหม่ (Regular 590, PRO 6 ตุลา 490)
+      if (_ticketConfig['regular'] && _ticketConfig['regular'].price === 690) {
+        _ticketConfig['regular'].price = 590;
+      }
+      if (_ticketConfig['pro-6-oct'] && _ticketConfig['pro-6-oct'].price === 590) {
+        _ticketConfig['pro-6-oct'].price = 490;
+      }
     } catch(e) {}
   }
 
@@ -1323,6 +1361,12 @@ async function initSettings() {
           const parsed = typeof data.ticket_config === 'string' ? JSON.parse(data.ticket_config) : data.ticket_config;
           if (parsed && typeof parsed === 'object') {
             _ticketConfig = { ..._ticketConfig, ...parsed };
+            if (_ticketConfig['regular'] && _ticketConfig['regular'].price === 690) {
+              _ticketConfig['regular'].price = 590;
+            }
+            if (_ticketConfig['pro-6-oct'] && _ticketConfig['pro-6-oct'].price === 590) {
+              _ticketConfig['pro-6-oct'].price = 490;
+            }
             localStorage.setItem('theater_ticket_config', JSON.stringify(_ticketConfig));
           }
         } else if (data && typeof data.earlybird_enabled !== 'undefined') {
@@ -1332,18 +1376,16 @@ async function initSettings() {
         }
 
         // ซิงค์ราคาเข้า TICKET_TYPES
-        STAFF_TICKET_DEFS.forEach(d => {
-          if (_ticketConfig[d.id] && typeof _ticketConfig[d.id].price === 'number') {
-            TICKET_TYPES[d.name] = _ticketConfig[d.id].price;
-          }
-        });
+        syncTicketTypesFromConfig();
       }
     } catch (e) {
       console.warn('Load settings failed:', e);
     }
   }
 
+  syncTicketTypesFromConfig();
   renderTicketTypesManagement();
+  updateQuotaBookingPrice();
 }
 
 function renderTicketTypesManagement() {
@@ -1412,11 +1454,8 @@ function onTicketFieldChange(typeId) {
   }
 
   // อัปเดตตารางคำนวณราคาของระบบออกตั๋วโควต้า
-  const def = STAFF_TICKET_DEFS.find(d => d.id === typeId);
-  if (def) {
-    TICKET_TYPES[def.name] = price;
-    updateQuotaBookingPrice();
-  }
+  syncTicketTypesFromConfig();
+  updateQuotaBookingPrice();
 
   // บันทึกลง localStorage ทันที
   localStorage.setItem('theater_ticket_config', JSON.stringify(_ticketConfig));
@@ -1450,9 +1489,11 @@ async function saveAllTicketConfigs(showToastMsg) {
         enabled: toggle.checked,
         price: Math.max(0, parseInt(priceInput.value, 10) || 0)
       };
-      TICKET_TYPES[d.name] = _ticketConfig[d.id].price;
     }
   });
+
+  syncTicketTypesFromConfig();
+  updateQuotaBookingPrice();
 
   localStorage.setItem('theater_ticket_config', JSON.stringify(_ticketConfig));
 
@@ -1723,8 +1764,9 @@ function openDetailModal(ticketId) {
   // Set type select
   const typeSelect = document.getElementById('edit-type');
   const typeName   = rep.type || '';
+  const norm = (s) => (s || '').replace(/\s+/g, '').toUpperCase();
   for (const opt of typeSelect.options) {
-    if (opt.value === typeName) { opt.selected = true; break; }
+    if (opt.value === typeName || norm(opt.value) === norm(typeName)) { opt.selected = true; break; }
   }
 
   // ——— Show/hide buttons based on cancellation state ———
@@ -1811,7 +1853,7 @@ function saveCustomerEdit() {
   const newTypeId = newType === 'Student' || newType === 'STUDENT' ? 'student' :
                     newType === 'PRO AFTER 6' ? 'pro-after-6' :
                     newType === 'PRO 6 ตุลา' ? 'pro-6-oct' :
-                    (newType === 'Early Bird' || newType === 'EARLYBIRD' ? 'earlybird' : 
+                    (newType === 'Early Bird' || newType === 'EARLYBIRD' || newType === 'EARLY BIRD' ? 'earlybird' : 
                     (newType === 'QT DISCOUNT' || newType === 'โควต้าราคา Early Bird' ? 'qt-discount' : 
                     (newType === 'QT SPON' || newType === 'โควต้า Spon' ? 'qt-spon' : 
                     (newType === 'QT FREE' || newType === 'โควต้าฟรี' || newType === 'บัตรโควต้า' ? 'qt-free' : 'regular'))));
@@ -2097,14 +2139,24 @@ async function syncAllFromSheets(silent = false) {
             const parsed = typeof rawTicketCfg === 'string' ? JSON.parse(rawTicketCfg) : rawTicketCfg;
             if (parsed && typeof parsed === 'object') {
               _ticketConfig = { ..._ticketConfig, ...parsed };
+              if (_ticketConfig['regular'] && _ticketConfig['regular'].price === 690) {
+                _ticketConfig['regular'].price = 590;
+              }
+              if (_ticketConfig['pro-6-oct'] && _ticketConfig['pro-6-oct'].price === 590) {
+                _ticketConfig['pro-6-oct'].price = 490;
+              }
               localStorage.setItem('theater_ticket_config', JSON.stringify(_ticketConfig));
+              syncTicketTypesFromConfig();
               renderTicketTypesManagement();
+              updateQuotaBookingPrice();
             }
           } catch(e) {}
         } else if (typeof data.earlybird_enabled === 'boolean') {
           if (_ticketConfig['earlybird']) {
             _ticketConfig['earlybird'].enabled = data.earlybird_enabled;
+            syncTicketTypesFromConfig();
             renderTicketTypesManagement();
+            updateQuotaBookingPrice();
           }
         }
 
@@ -2779,7 +2831,7 @@ async function submitQuotaBooking() {
       typeId:     ticketType === 'Student' || ticketType === 'STUDENT' ? 'student' :
                   ticketType === 'PRO AFTER 6' ? 'pro-after-6' :
                   ticketType === 'PRO 6 ตุลา' ? 'pro-6-oct' :
-                  (ticketType === 'Early Bird' || ticketType === 'EARLYBIRD' ? 'earlybird' : 
+                  (ticketType === 'Early Bird' || ticketType === 'EARLYBIRD' || ticketType === 'EARLY BIRD' ? 'earlybird' : 
                   (ticketType === 'QT DISCOUNT' ? 'qt-discount' : 
                   (ticketType === 'QT SPON' ? 'qt-spon' : 
                   (ticketType === 'QT FREE' || ticketType === 'บัตรโควต้า' ? 'qt-free' : 'regular')))),
@@ -2803,7 +2855,7 @@ async function submitQuotaBooking() {
     typeId:     ticketType === 'Student' || ticketType === 'STUDENT' ? 'student' :
                 ticketType === 'PRO AFTER 6' ? 'pro-after-6' :
                 ticketType === 'PRO 6 ตุลา' ? 'pro-6-oct' :
-                (ticketType === 'Early Bird' || ticketType === 'EARLYBIRD' ? 'earlybird' : 
+                (ticketType === 'Early Bird' || ticketType === 'EARLYBIRD' || ticketType === 'EARLY BIRD' ? 'earlybird' : 
                 (ticketType === 'QT DISCOUNT' ? 'qt-discount' : 
                 (ticketType === 'QT SPON' ? 'qt-spon' : 
                 (ticketType === 'QT FREE' || ticketType === 'บัตรโควต้า' ? 'qt-free' : 'regular')))),
