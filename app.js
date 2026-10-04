@@ -777,7 +777,7 @@ function updateSummary() {
   const bundleDiscEl = document.getElementById('sum-bundle-discount');
   if (bundleRow && bundleDiscEl) {
     if (bundle.isBundle) {
-      bundleDiscEl.textContent = `-${fmt(bundle.savings)} บาท (${bundle.tierText})`;
+      bundleDiscEl.textContent = `-${fmt(bundle.savings)} บาท`;
       bundleRow.style.display = 'flex';
     } else {
       bundleRow.style.display = 'none';
