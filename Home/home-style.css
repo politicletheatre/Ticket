@@ -709,26 +709,99 @@ dialog.play-dialog[open] {
 .crew-list li strong {
   color: var(--text-primary);
 }
-.photo-gallery {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  margin-top: 4px;
+/* ─── GALLERY CAROUSEL / SINGLE STRIP ───────────────────────────────────── */
+.gallery-carousel-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-top: 6px;
+  width: 100%;
 }
+
+.photo-gallery {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 10px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  padding: 4px 2px 8px 2px;
+  width: 100%;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+}
+
+.photo-gallery::-webkit-scrollbar {
+  height: 5px;
+}
+
+.photo-gallery::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.photo-gallery::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 4px;
+}
+
+.photo-gallery::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
 .gallery-photo {
+  flex: 0 0 135px;
+  width: 135px;
   aspect-ratio: 4/3;
   background-size: cover;
   background-position: center;
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.35);
   cursor: pointer;
-  transition: var(--transition);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
+
 .gallery-photo:hover {
-  transform: scale(1.05);
+  transform: translateY(-2px) scale(1.04);
   border-color: var(--red-light);
-  box-shadow: 0 4px 12px rgba(255, 69, 58, 0.3);
+  box-shadow: 0 4px 14px rgba(255, 69, 58, 0.35);
+}
+
+.gallery-scroll-btn {
+  position: absolute;
+  top: calc(50% - 4px);
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(18, 18, 18, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 5;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.gallery-scroll-btn:hover {
+  background: var(--red-light);
+  border-color: var(--red-light);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.gallery-scroll-btn.prev-btn {
+  left: -12px;
+}
+
+.gallery-scroll-btn.next-btn {
+  right: -12px;
 }
 .dialog-actions {
   margin-top: 12px;
@@ -861,9 +934,12 @@ dialog.lightbox-dialog::backdrop {
   .lightbox-prev { left: 12px; }
   .lightbox-next { right: 12px; }
   .lightbox-close { top: 12px; right: 12px; width: 40px; height: 40px; font-size: 1.5rem; }
-  .photo-gallery {
-    grid-template-columns: repeat(2, 1fr);
+  .gallery-photo {
+    flex: 0 0 115px;
+    width: 115px;
   }
+  .gallery-scroll-btn.prev-btn { left: -6px; }
+  .gallery-scroll-btn.next-btn { right: -6px; }
 }
 
 /* ─── CHARACTER PROFILES ─────────────────────────────────────────────────── */

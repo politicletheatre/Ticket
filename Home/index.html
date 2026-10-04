@@ -56,13 +56,9 @@
   <!-- SECTION: CURRENT SHOW HIGHLIGHT -->
   <section class="section container" id="current-show">
     <div class="section-header">
-      <span class="section-tag">
-        <span class="lang-en">NOW ON STAGE</span>
-        <span class="lang-th">จัดแสดงขณะนี้</span>
-      </span>
       <h2 class="section-title">
-        <span class="lang-en">Current Show</span>
-        <span class="lang-th">ผลงานจัดแสดงขณะนี้</span>
+        <span class="lang-en">Coming Soon</span>
+        <span class="lang-th">เร็ว ๆ นี้</span>
       </h2>
     </div>
     
@@ -126,8 +122,8 @@
         <span class="lang-th">ผลงานที่ผ่านมา</span>
       </span>
       <h2 class="section-title">
-        <span class="lang-en">Our Past Productions</span>
-        <span class="lang-th">ผลงานที่ผ่านมาของเรา</span>
+        <span class="lang-en">Past Productions</span>
+        <span class="lang-th">ผลงานที่ผ่านมา</span>
       </h2>
     </div>
 
@@ -135,7 +131,7 @@
       <!-- PLAY 1 -->
       <div class="play-card" onclick="openModal('dialog-lost-decade')">
         <div class="play-visual visual-lost-decade">
-          <span class="pv-tag">2025 Production</span>
+          <span class="pv-tag">2025 JUNE</span>
         </div>
         <div class="play-info">
           <h3 class="play-title">
@@ -155,7 +151,7 @@
       <!-- PLAY 2 -->
       <div class="play-card" onclick="openModal('dialog-rashomon')">
         <div class="play-visual visual-rashomon">
-          <span class="pv-tag">2025 Production</span>
+          <span class="pv-tag">2025 OCT</span>
         </div>
         <div class="play-info">
           <h3 class="play-title">
@@ -276,8 +272,8 @@
         </div>
         <div class="dialog-info-wrapper">
           <span class="dialog-tag">
-            <span class="lang-en">NOW ON STAGE</span>
-            <span class="lang-th">จัดแสดงขณะนี้</span>
+            <span class="lang-en">COMING SOON</span>
+            <span class="lang-th">เร็ว ๆ นี้</span>
           </span>
           <h2 class="dialog-title">
             <span class="lang-en">What I Wish I Knew in 1932</span>
@@ -372,8 +368,12 @@
               <span class="lang-en">Production Photos</span>
               <span class="lang-th">ภาพการแสดง</span>
             </h4>
-            <div class="photo-gallery" id="gallery-1932">
-              <div class="gallery-photo" style="background-image: url('../assets/scene-1932-1.jpg');" onclick="openLightbox('#gallery-1932 .gallery-photo', 0)"></div>
+            <div class="gallery-carousel-wrapper">
+              <button type="button" class="gallery-scroll-btn prev-btn" onclick="scrollGallery('gallery-1932', -1)" aria-label="Previous photos">&#10094;</button>
+              <div class="photo-gallery" id="gallery-1932">
+                <div class="gallery-photo" style="background-image: url('../assets/scene-1932-1.jpg');" onclick="openLightbox('#gallery-1932 .gallery-photo', 0)"></div>
+              </div>
+              <button type="button" class="gallery-scroll-btn next-btn" onclick="scrollGallery('gallery-1932', 1)" aria-label="Next photos">&#10095;</button>
             </div>
           </div>
           
@@ -398,7 +398,7 @@
           <img src="../assets/poster-lost-decade.jpg" alt="The Lost Decade of Us" class="dialog-poster-img clickable-poster" onclick="openLightboxSingle('../assets/poster-lost-decade.jpg')" />
         </div>
         <div class="dialog-info-wrapper">
-          <span class="dialog-tag">2025 Production</span>
+          <span class="dialog-tag">2025 JUNE</span>
           <h2 class="dialog-title">The Lost Decade of Us</h2>
           <h3 class="dialog-subtitle">
             <span class="lang-en">I Wish There Was No Politics</span>
@@ -565,20 +565,24 @@
               <span class="lang-en">Production Photos</span>
               <span class="lang-th">ภาพการแสดง</span>
             </h4>
-            <div class="photo-gallery" id="gallery-lost-decade">
-              <div class="gallery-photo" style="background-image: url('../assets/scene-lost-2.jpg');" onclick="openLightbox('#gallery-lost-decade .gallery-photo', 0)"></div>
-              <div class="gallery-photo" style="background-image: url('../assets/scene-lost-3.jpg');" onclick="openLightbox('#gallery-lost-decade .gallery-photo', 1)"></div>
-              <div class="gallery-photo" style="background-image: url('../assets/scene-lost-4.jpg');" onclick="openLightbox('#gallery-lost-decade .gallery-photo', 2)"></div>
-              <div class="gallery-photo" style="background-image: url('../assets/scene-lost-5.jpg');" onclick="openLightbox('#gallery-lost-decade .gallery-photo', 3)"></div>
-              <div class="gallery-photo" style="background-image: url('../assets/scene-lost-7.jpg');" onclick="openLightbox('#gallery-lost-decade .gallery-photo', 4)"></div>
-              <div class="gallery-photo" style="background-image: url('../assets/scene-lost-8.jpg');" onclick="openLightbox('#gallery-lost-decade .gallery-photo', 5)"></div>
-              <div class="gallery-photo" style="background-image: url('../assets/scene-lost-9.jpg');" onclick="openLightbox('#gallery-lost-decade .gallery-photo', 6)"></div>
-              <div class="gallery-photo" style="background-image: url('../assets/scene-lost-10.jpg');" onclick="openLightbox('#gallery-lost-decade .gallery-photo', 7)"></div>
-              <div class="gallery-photo" style="background-image: url('../assets/scene-lost-11.jpg');" onclick="openLightbox('#gallery-lost-decade .gallery-photo', 8)"></div>
-              <div class="gallery-photo" style="background-image: url('../assets/scene-lost-12.jpg');" onclick="openLightbox('#gallery-lost-decade .gallery-photo', 9)"></div>
-              <div class="gallery-photo" style="background-image: url('../assets/scene-lost-13.jpg');" onclick="openLightbox('#gallery-lost-decade .gallery-photo', 10)"></div>
-              <div class="gallery-photo" style="background-image: url('../assets/scene-lost-1.jpg');" onclick="openLightbox('#gallery-lost-decade .gallery-photo', 11)"></div>
-              <div class="gallery-photo" style="background-image: url('../assets/scene-lost-6.jpg');" onclick="openLightbox('#gallery-lost-decade .gallery-photo', 12)"></div>
+            <div class="gallery-carousel-wrapper">
+              <button type="button" class="gallery-scroll-btn prev-btn" onclick="scrollGallery('gallery-lost-decade', -1)" aria-label="Previous photos">&#10094;</button>
+              <div class="photo-gallery" id="gallery-lost-decade">
+                <div class="gallery-photo" style="background-image: url('../assets/scene-lost-2.jpg');" onclick="openLightbox('#gallery-lost-decade .gallery-photo', 0)"></div>
+                <div class="gallery-photo" style="background-image: url('../assets/scene-lost-3.jpg');" onclick="openLightbox('#gallery-lost-decade .gallery-photo', 1)"></div>
+                <div class="gallery-photo" style="background-image: url('../assets/scene-lost-4.jpg');" onclick="openLightbox('#gallery-lost-decade .gallery-photo', 2)"></div>
+                <div class="gallery-photo" style="background-image: url('../assets/scene-lost-5.jpg');" onclick="openLightbox('#gallery-lost-decade .gallery-photo', 3)"></div>
+                <div class="gallery-photo" style="background-image: url('../assets/scene-lost-7.jpg');" onclick="openLightbox('#gallery-lost-decade .gallery-photo', 4)"></div>
+                <div class="gallery-photo" style="background-image: url('../assets/scene-lost-8.jpg');" onclick="openLightbox('#gallery-lost-decade .gallery-photo', 5)"></div>
+                <div class="gallery-photo" style="background-image: url('../assets/scene-lost-9.jpg');" onclick="openLightbox('#gallery-lost-decade .gallery-photo', 6)"></div>
+                <div class="gallery-photo" style="background-image: url('../assets/scene-lost-10.jpg');" onclick="openLightbox('#gallery-lost-decade .gallery-photo', 7)"></div>
+                <div class="gallery-photo" style="background-image: url('../assets/scene-lost-11.jpg');" onclick="openLightbox('#gallery-lost-decade .gallery-photo', 8)"></div>
+                <div class="gallery-photo" style="background-image: url('../assets/scene-lost-12.jpg');" onclick="openLightbox('#gallery-lost-decade .gallery-photo', 9)"></div>
+                <div class="gallery-photo" style="background-image: url('../assets/scene-lost-13.jpg');" onclick="openLightbox('#gallery-lost-decade .gallery-photo', 10)"></div>
+                <div class="gallery-photo" style="background-image: url('../assets/scene-lost-1.jpg');" onclick="openLightbox('#gallery-lost-decade .gallery-photo', 11)"></div>
+                <div class="gallery-photo" style="background-image: url('../assets/scene-lost-6.jpg');" onclick="openLightbox('#gallery-lost-decade .gallery-photo', 12)"></div>
+              </div>
+              <button type="button" class="gallery-scroll-btn next-btn" onclick="scrollGallery('gallery-lost-decade', 1)" aria-label="Next photos">&#10095;</button>
             </div>
           </div>
         </div>
@@ -595,7 +599,7 @@
           <img src="../assets/poster-rashomon.jpg" alt="Rashomon 6 ตุลา" class="dialog-poster-img clickable-poster" onclick="openLightboxSingle('../assets/poster-rashomon.jpg')" />
         </div>
         <div class="dialog-info-wrapper">
-          <span class="dialog-tag">2025 Production</span>
+          <span class="dialog-tag">2025 OCT</span>
           <h2 class="dialog-title">Rashomon 6 Oct</h2>
           <h3 class="dialog-subtitle">
             <span class="lang-en">The Rashomon of History</span>
@@ -692,32 +696,36 @@
               <span class="lang-en">Production Photos</span>
               <span class="lang-th">ภาพการแสดง</span>
             </h4>
-            <div class="photo-gallery" id="gallery-rashomon">
-              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-1.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 0)"></div>
-              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-2.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 1)"></div>
-              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-3.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 2)"></div>
-              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-4.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 3)"></div>
-              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-5.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 4)"></div>
-              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-6.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 5)"></div>
-              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-7.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 6)"></div>
-              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-8.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 7)"></div>
-              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-9.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 8)"></div>
-              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-10.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 9)"></div>
-              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-11.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 10)"></div>
-              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-12.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 11)"></div>
-              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-13.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 12)"></div>
-              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-14.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 13)"></div>
-              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-15.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 14)"></div>
-              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-16.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 15)"></div>
-              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-17.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 16)"></div>
-              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-18.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 17)"></div>
-              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-19.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 18)"></div>
-              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-20.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 19)"></div>
-              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-21.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 20)"></div>
-              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-22.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 21)"></div>
-              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-23.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 22)"></div>
-              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-24.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 23)"></div>
-              <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-25.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 24)"></div>
+            <div class="gallery-carousel-wrapper">
+              <button type="button" class="gallery-scroll-btn prev-btn" onclick="scrollGallery('gallery-rashomon', -1)" aria-label="Previous photos">&#10094;</button>
+              <div class="photo-gallery" id="gallery-rashomon">
+                <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-1.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 0)"></div>
+                <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-2.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 1)"></div>
+                <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-3.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 2)"></div>
+                <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-4.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 3)"></div>
+                <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-5.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 4)"></div>
+                <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-6.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 5)"></div>
+                <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-7.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 6)"></div>
+                <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-8.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 7)"></div>
+                <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-9.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 8)"></div>
+                <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-10.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 9)"></div>
+                <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-11.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 10)"></div>
+                <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-12.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 11)"></div>
+                <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-13.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 12)"></div>
+                <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-14.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 13)"></div>
+                <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-15.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 14)"></div>
+                <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-16.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 15)"></div>
+                <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-17.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 16)"></div>
+                <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-18.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 17)"></div>
+                <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-19.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 18)"></div>
+                <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-20.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 19)"></div>
+                <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-21.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 20)"></div>
+                <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-22.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 21)"></div>
+                <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-23.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 22)"></div>
+                <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-24.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 23)"></div>
+                <div class="gallery-photo" style="background-image: url('../assets/scene-rashomon-25.jpg');" onclick="openLightbox('#gallery-rashomon .gallery-photo', 24)"></div>
+              </div>
+              <button type="button" class="gallery-scroll-btn next-btn" onclick="scrollGallery('gallery-rashomon', 1)" aria-label="Next photos">&#10095;</button>
             </div>
           </div>
         </div>
@@ -745,6 +753,7 @@
       if (dialog) {
         dialog.showModal();
         document.body.style.overflow = 'hidden';
+        setTimeout(updateGalleryNavButtons, 60);
       }
     }
     
@@ -754,6 +763,34 @@
         dialog.close();
         document.body.style.overflow = '';
       }
+    }
+
+    // Gallery Carousel Horizontal Scroll
+    function scrollGallery(galleryId, direction) {
+      const gallery = document.getElementById(galleryId);
+      if (!gallery) return;
+      const scrollAmount = gallery.clientWidth * 0.75;
+      gallery.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+      setTimeout(updateGalleryNavButtons, 350);
+    }
+
+    function updateGalleryNavButtons() {
+      document.querySelectorAll('.gallery-carousel-wrapper').forEach(wrapper => {
+        const gallery = wrapper.querySelector('.photo-gallery');
+        const prevBtn = wrapper.querySelector('.prev-btn');
+        const nextBtn = wrapper.querySelector('.next-btn');
+        if (!gallery || !prevBtn || !nextBtn) return;
+
+        const maxScrollLeft = gallery.scrollWidth - gallery.clientWidth;
+        const canScrollLeft = gallery.scrollLeft > 5;
+        const canScrollRight = maxScrollLeft > 5 && (gallery.scrollLeft < maxScrollLeft - 5);
+
+        prevBtn.style.opacity = canScrollLeft ? '1' : '0';
+        prevBtn.style.pointerEvents = canScrollLeft ? 'auto' : 'none';
+
+        nextBtn.style.opacity = canScrollRight ? '1' : '0';
+        nextBtn.style.pointerEvents = canScrollRight ? 'auto' : 'none';
+      });
     }
 
     // Close modal if user clicks outside of the dialog-content
@@ -867,6 +904,14 @@
           }, 150);
         }
       }
+    });
+
+    // Attach scroll listeners to galleries
+    window.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.photo-gallery').forEach(gallery => {
+        gallery.addEventListener('scroll', updateGalleryNavButtons, { passive: true });
+      });
+      window.addEventListener('resize', updateGalleryNavButtons);
     });
   </script>
 
