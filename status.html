@@ -7,11 +7,14 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <title>🎫 ตรวจสอบสถานะบัตร — น่าจะรู้อย่างนี้ตั้งแต่ปี 2475 NO TIME TO BLIND</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <meta name="description" content="ตรวจสอบสถานะบัตรและ QR Code ของคุณสำหรับการแสดง น่าจะรู้อย่างนี้ตั้งแต่ปี 2475 NO TIME TO BLIND" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <script src="assets/qrcodejs.min.js"></script>
+  <script src="assets/qrcodejs.min.js?v=20261004_v5"></script>
   <style>
     /* ============================================================
        WARM RETRO POSTER THEME (สีสดใสน่ารักตามโปสเตอร์ 2475)
@@ -542,7 +545,9 @@ async function doSearch() {
   // พยายามดึงข้อมูลจาก Sheets แบบ Real-time ตลอดเวลาหากมีการเชื่อมต่อคลาวด์ เพื่อความสอดคล้องสูงสุดข้ามอุปกรณ์
   if (typeof APPS_SCRIPT_URL !== 'undefined' && APPS_SCRIPT_URL && APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
     try {
-      const res = await fetch(`${APPS_SCRIPT_URL}?action=searchOrder&query=${encodeURIComponent(query)}&type=${currentTab}`);
+      const res = await fetch(`${APPS_SCRIPT_URL}?action=searchOrder&query=${encodeURIComponent(query)}&type=${currentTab}&_t=${Date.now()}`, {
+        cache: 'no-store'
+      });
       if (res.ok) {
         const data = await res.json();
         if (data.success) {

@@ -2,6 +2,46 @@
    app.js — Theater Ticket App (Main SPA Logic)
    ===================================================================== */
 
+// ─── AUTO CACHE CLEARING & VERSION MANAGEMENT ──────────────────────────────
+const APP_CACHE_VERSION = '20261004_v5';
+
+(function initAutoCacheClear() {
+  try {
+    const lastVersion = localStorage.getItem('theater_cache_version');
+    if (lastVersion !== APP_CACHE_VERSION) {
+      console.log(`[Cache Manager] Upgrading app version from ${lastVersion} to ${APP_CACHE_VERSION}. Clearing old caches...`);
+      // ล้างข้อมูลการตั้งค่าแคชเดิม เพื่อให้ดึงข้อมูลราคา/สต็อกล่าสุดสดใหม่เสมอ
+      localStorage.removeItem('theater_ticket_config');
+      localStorage.removeItem('theater_sold_counts');
+      localStorage.removeItem('theater_stock');
+      localStorage.setItem('theater_cache_version', APP_CACHE_VERSION);
+    }
+  } catch (e) {
+    console.warn('[Cache Manager] Error checking version:', e);
+  }
+
+  // ล้าง Service Worker เก่า และ CacheStorage ที่อาจเคยลงทะเบียนไว้บนโดเมน
+  try {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(regs => {
+        regs.forEach(r => r.unregister());
+      });
+    }
+    if ('caches' in window) {
+      caches.keys().then(keys => {
+        keys.forEach(k => caches.delete(k));
+      });
+    }
+  } catch (e) {}
+})();
+
+// ป้องกัน BFCache (Back-Forward Cache): เมื่อลูกค้าสลับแอปกลับมา หรือกดย้อนกลับ ให้รีเฟรชข้อมูลล่าสุด
+window.addEventListener('pageshow', (event) => {
+  if (event.persisted) {
+    window.location.reload();
+  }
+});
+
 // ─── CONFIG ───────────────────────────────────────────────────────────────
 const CONFIG = {
   showName: 'น่าจะรู้อย่างนี้ตั้งแต่ปี 2475 NO TIME TO BLIND',
@@ -134,7 +174,9 @@ async function fetchGlobalConfig() {
   try {
     // 1. ลองดึงสถานะจาก Google Apps Script ก่อน (เป็น API ส่วนกลางที่อัปเดตทันที)
     if (CONFIG.APPS_SCRIPT_URL && CONFIG.APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
-      const res = await fetch(`${CONFIG.APPS_SCRIPT_URL}?action=getSettings`);
+      const res = await fetch(`${CONFIG.APPS_SCRIPT_URL}?action=getSettings&_t=${Date.now()}`, {
+        cache: 'no-store'
+      });
       if (res.ok) {
         const data = await res.json();
         if (data) {
@@ -189,8 +231,9 @@ async function fetchGlobalConfig() {
 
     // 2. Fallback: ถ้าไม่ได้ตั้งค่า Apps Script ให้ลองดึงจาก JSONBin (กรณีใช้งานระบบเดิม)
     if (_JSONBIN_CONFIGURED) {
-      const res = await fetch(`https://api.jsonbin.io/v3/b/${_JSONBIN_BIN_ID}/latest`, {
-        headers: { 'X-Master-Key': _JSONBIN_API_KEY }
+      const res = await fetch(`https://api.jsonbin.io/v3/b/${_JSONBIN_BIN_ID}/latest?_t=${Date.now()}`, {
+        headers: { 'X-Master-Key': _JSONBIN_API_KEY },
+        cache: 'no-store'
       });
       if (res.ok) {
         const data = await res.json();
@@ -203,7 +246,7 @@ async function fetchGlobalConfig() {
     }
 
     // 3. Fallback สุดท้าย: ดึงจากไฟล์ config.json แบบสแตติกในเครื่อง
-    const res2 = await fetch('./config.json?t=' + Date.now());
+    const res2 = await fetch('./config.json?_t=' + Date.now(), { cache: 'no-store' });
     if (res2.ok) {
       const cfg = await res2.json();
       if (typeof cfg.earlybird_enabled === 'boolean') {
@@ -1412,7 +1455,47 @@ document.addEventListener('DOMContentLoaded', () => {
     el.textContent = labels[i];
   });
 
-  document.getElementById('qty-minus').disabled = true;
+  // ป้องกันการค้างหน้าเก่า: ให้แน่ใจว่าเริ่มที่หน้าแรก (Landing View) เสมอเมื่อเปิดเข้ามาใหม่
+  const currentActive = document.querySelector('.view.active');
+  if (currentActive && (currentActive.id === 'view-info' || currentActive.id === 'view-confirm')) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-landing')?.classList.add('active');
+    const pb = document.getElementById('progress-bar');
+    if (pb) pb.style.display = 'none';
+  }
+
+  // ล้างข้อมูลฟอร์มและสลิปเดิมที่อาจค้างในเบราว์เซอร์
+  try {
+    const form = document.getElementById('booking-form');
+    if (form) form.reset();
+    ['f-name', 'f-phone', 'f-email', 'f-note', 'f-slip'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    state.slipBase64 = null;
+    state.savedForm = null;
+    state.currentOrder = null;
+    state.qty = 1;
+    const preview = document.getElementById('slip-preview');
+    if (preview) preview.src = '';
+    const ph = document.getElementById('slip-placeholder');
+    if (ph) ph.style.display = 'flex';
+    const pw = document.getElementById('slip-preview-wrap');
+    if (pw) pw.style.display = 'none';
+    const area = document.getElementById('slip-upload-area');
+    if (area) area.classList.remove('has-file');
+  } catch (e) {}
+
+  // รีเฟรชข้อมูลที่นั่งและราคาอัตโนมัติเมื่อลูกค้าสลับแอป/สลับแท็บกลับมาหน้าเว็บ
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      fetchGlobalConfig().then(() => {
+        if (document.querySelector('.view.active')?.id === 'view-ticket') {
+          renderSchedule();
+        }
+      }).catch(() => {});
+    }
+  });
 
   // Check URL hash or query params to auto-open directions modal (Deep Linking)
   checkDirectionsUrl();
