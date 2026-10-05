@@ -3,16 +3,43 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>🎭 Politicle Theatre — สะท้อนสังคมผ่านม่านศิลปะการแสดง</title>
   <meta name="description" content="หน้าหลักและประวัติผลงานของคณะละคร Politicle Theatre ผู้สรรค์สร้างละครเวทีสะท้อนสังคมและประวัติศาสตร์" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@400;600;800&family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="home-style.css" />
+  <link rel="stylesheet" href="home-style.css?v=20261005_v2" />
   <script>
-    // Initialize language as early as possible (Default: Thai)
-    const savedLang = localStorage.getItem('preferred-lang') || 'th';
-    document.documentElement.setAttribute('lang', savedLang);
+    // 1. ตั้งค่าภาษาเริ่มต้นเป็นไทยเสมอ (เริ่มใหม่สดๆ ทุกครั้งที่เปิดเว็บ)
+    try {
+      localStorage.removeItem('preferred-lang');
+    } catch(e) {}
+    document.documentElement.setAttribute('lang', 'th');
+
+    // 2. ล้าง Service Worker และ CacheStorage เก่าที่อาจค้างในอุปกรณ์
+    try {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));
+      }
+      if ('caches' in window) {
+        caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
+      }
+    } catch (e) {}
+
+    // 3. ป้องกัน BFCache (Back-Forward Cache): เมื่อกด Back หรือสลับแอปกลับมา ให้ดึงข้อมูลล่าสุดเสมอ
+    window.addEventListener('pageshow', (event) => {
+      if (event.persisted) {
+        window.location.reload();
+      }
+    });
+
+    // 4. ไม่จำตำแหน่งการเลื่อนเก่าเมื่อเปิดเว็บใหม่
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
   </script>
 </head>
 <body>
@@ -1355,13 +1382,15 @@
       }
     });
 
-    // Language Toggle logic
+    // Language Toggle logic (Active only during session, fresh visit defaults to Thai)
     function toggleLanguage() {
       const html = document.documentElement;
       const currentLang = html.getAttribute('lang');
       const newLang = currentLang === 'en' ? 'th' : 'en';
       html.setAttribute('lang', newLang);
-      localStorage.setItem('preferred-lang', newLang);
+      try {
+        sessionStorage.setItem('preferred-lang', newLang);
+      } catch(e) {}
     }
 
     // Auto-scroll to Current Show on load/refresh if no hash is present
