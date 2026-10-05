@@ -3,7 +3,7 @@
    ===================================================================== */
 
 // ─── AUTO CACHE CLEARING & VERSION MANAGEMENT ──────────────────────────────
-const APP_CACHE_VERSION = '20261004_v5';
+const APP_CACHE_VERSION = '20261005_v6';
 
 (function initAutoCacheClear() {
   try {
@@ -1503,7 +1503,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /**
  * Digital Countdown Timer for PRO 6 ตุลา
- * นับถอยหลังเวลาสิ้นสุดโปรโมชัน: วันนี้จนถึงเที่ยงคืนวันที่ 7 ตุลาคม (สิ้นสุด 6 ตุลาคม 23:59:59 GMT+7)
+ * นับถอยหลังเวลาสิ้นสุดโปรโมชัน: วันนี้จนถึงเที่ยงคืนวันที่ 9 ตุลาคม (สิ้นสุด 8 ตุลาคม 23:59:59 GMT+7)
  */
 function initEarlyBirdCountdown() {
   const daysEl = document.getElementById('cd-days');
@@ -1516,8 +1516,8 @@ function initEarlyBirdCountdown() {
   function update() {
     const now = new Date();
     const currentYear = now.getFullYear();
-    // Target: เที่ยงคืนวันที่ 7 ตุลาคม (สิ้นสุด 6 ตุลาคม 23:59:59 GMT+7) (0-indexed month: 9 = October)
-    const target = new Date(currentYear, 9, 7, 0, 0, 0, 0);
+    // Target: เที่ยงคืนวันที่ 9 ตุลาคม (สิ้นสุด 8 ตุลาคม 23:59:59 GMT+7) (0-indexed month: 9 = October)
+    const target = new Date(currentYear, 9, 9, 0, 0, 0, 0);
 
     let diff = target.getTime() - now.getTime();
     if (diff < 0) diff = 0;
