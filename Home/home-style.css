@@ -384,6 +384,10 @@ body {
   background-image: url('../assets/poster-rashomon.jpg');
   background-position: center 15%; /* Shifts crop down to center on torii gate and title */
 }
+.visual-rashomon-btf {
+  background-image: url('../assets/poster-rashomon-btf.jpg');
+  background-position: center 15%;
+}
 .pv-tag {
   position: absolute;
   top: 16px; left: 16px;
