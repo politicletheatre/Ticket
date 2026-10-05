@@ -7,7 +7,7 @@
   <meta name="description" content="หน้าหลักและประวัติผลงานของคณะละคร Politicle Theatre ผู้สรรค์สร้างละครเวทีสะท้อนสังคมและประวัติศาสตร์" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@400;600;800&family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="home-style.css" />
   <script>
     // Initialize language as early as possible
@@ -41,7 +41,7 @@
         <span class="lang-en">Contact Us</span>
         <span class="lang-th">ติดต่อเรา</span>
       </a>
-      <a href="../index.html" class="btn-nav">
+      <a href="https://politicletheatre.github.io/Ticket/?view=ticket" class="btn-nav">
         <span>🎫</span>
         <span class="lang-en">Buy Tickets</span>
         <span class="lang-th">ซื้อตั๋วรอบปัจจุบัน</span>
@@ -62,53 +62,112 @@
       </h2>
     </div>
     
-    <div class="showcase-card" onclick="openModal('dialog-1932')">
-      <div class="showcase-visual">
-        <div class="poster-mock" style="background-image: url('../assets/poster.jpg');">
-          <div class="poster-overlay"></div>
+    <div class="hero-preview-container">
+      <div class="hero-preview-content">
+        <h3 class="hero-preview-title">
+          <span class="preview-title-sub">น่าจะรู้อย่างนี้ตั้งแต่ปี 2475</span>
+          <span class="preview-title-main">NO TIME TO BLIND</span>
+        </h3>
+        
+        <div class="hero-preview-synopsis">
+          <div class="lang-th">
+            <p style="margin-bottom: 18px;">
+              เมื่อ <strong>“มารีญา”</strong> นักเคลื่อนไหวทางการเมืองจากอนาคตอันแสนไกล<br/>
+              ตัดสินใจย้อนเวลากลับมายังสยามในปี 2475<br/>
+              ด้วยความเชื่ออันแรงกล้าว่าหากแก้ไขอดีตที่ผิดพลาดได้<br/>
+              อนาคตย่อมเปลี่ยนแปลงไปในทางที่ดีขึ้น
+            </p>
+            <p style="margin-bottom: 18px;">
+              ทว่า เธอกลับต้องถูกขัดขวางโดย <strong>“นครินทร์”</strong> <strong>“เอก”</strong> และ <strong>“หมอ”</strong><br/>
+              เหล่าสุภาพบุรุษแห่งองค์กรปริศนา<br/>
+              ผู้เดินทางข้ามเวลามาเพื่อปกป้องประวัติศาสตร์ที่เป็นอยู่<br/>
+              เพราะสำหรับพวกเขา “ทุกสิ่งที่เกิดขึ้น ย่อมดีเสมอ”
+            </p>
+            <p>
+              ขณะเดียวกัน <strong>“พลอย”</strong> สามัญชนคนธรรมดา ก็ต้องตกกระไดพลอยโจน<br/>
+              ติดหล่มอยู่ท่ามกลางสมรภูมิการเมืองและการแย่งชิงอนาคต<br/>
+              ของคนทั้งสองฝั่ง
+            </p>
+          </div>
+          <div class="lang-en">
+            <p style="margin-bottom: 18px;">
+              When <strong>"Marya"</strong>, a political activist from a distant future,<br/>
+              decides to travel back in time to Siam in 1932,<br/>
+              with the strong belief that fixing the mistakes of the past<br/>
+              can change the future for the better.
+            </p>
+            <p style="margin-bottom: 18px;">
+              However, she is thwarted by <strong>"Nakarin"</strong>, <strong>"Aek"</strong>, and <strong>"Mor"</strong>,<br/>
+              gentlemen of a mysterious organization<br/>
+              traveling through time to protect history as it is,<br/>
+              because to them: "Everything that happens is always for the best."
+            </p>
+            <p>
+              Meanwhile, <strong>"Ploy"</strong>, an ordinary person, is caught in the middle<br/>
+              of a political battleground and a struggle for the future<br/>
+              between both sides.
+            </p>
+          </div>
+        </div>
+
+        <div class="hero-preview-meta">
+          <div class="meta-preview-item">📅 16 - 18, 23-25 ตุลาคม 2569</div>
+          <div class="meta-preview-item">🕖 ศ. ส. อา. เวลา 14:00 และ 19:00</div>
+          <div class="meta-preview-item">
+            <a href="https://maps.app.goo.gl/VUKqWCpS7jYkr4Rv7?g_st=ic" target="_blank" rel="noopener noreferrer">📍 KINJAI CONTEMPORARY (MRT สิรินธร)</a>
+          </div>
+        </div>
+
+        <div class="hero-preview-actions">
+          <a href="https://politicletheatre.github.io/Ticket/?view=ticket" class="hero-preview-btn" id="btn-buy-hero">
+            <span>🎫</span>
+            <span class="lang-en">Book Tickets</span>
+            <span class="lang-th">จองบัตร</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
         </div>
       </div>
-      <div class="showcase-details">
-        <span class="show-status">
-          <span class="lang-en">🔥 Booking Open</span>
-          <span class="lang-th">🔥 กำลังเปิดจองบัตร</span>
-        </span>
-        <h3 class="show-title">
-          <span class="lang-en">NO TIME TO BLIND</span>
-          <span class="lang-th">น่าจะรู้อย่างนี้ตั้งแต่ปี 2475 NO TIME TO BLIND</span>
-        </h3>
-        <p class="show-desc">
-          <span class="lang-en">When "Marya", a political activist from a distant future, decides to travel back in time to Siam in 1932, with the strong belief that fixing the mistakes of the past can change the future for the better.<br/><br/>However, she is thwarted by "Nakarin", "Aek", and "Mor", gentlemen of a mysterious organization traveling through time to protect history as it is, because to them: "Everything that happens is always for the best."<br/><br/>Meanwhile, "Ploy", an ordinary person, is caught in the middle of a political battleground and a struggle for the future between both sides.</span>
-          <span class="lang-th">เมื่อ <strong>“มารีญา”</strong> นักเคลื่อนไหวทางการเมืองจากอนาคตอันแสนไกล ตัดสินใจย้อนเวลากลับมายังสยามในปี 2475 ด้วยความเชื่ออันแรงกล้าว่าหากแก้ไขอดีตที่ผิดพลาดได้ อนาคตย่อมเปลี่ยนแปลงไปในทางที่ดีขึ้น<br/><br/>ทว่า เธอกลับต้องถูกขัดขวางโดย <strong>“นครินทร์”</strong> <strong>“เอก”</strong> และ <strong>“หมอ”</strong> เหล่าสุภาพบุรุษแห่งองค์กรปริศนา ผู้เดินทางข้ามเวลามาเพื่อปกป้องประวัติศาสตร์ที่เป็นอยู่ เพราะสำหรับพวกเขา “ทุกสิ่งที่เกิดขึ้น ย่อมดีเสมอ”<br/><br/>ขณะเดียวกัน <strong>“พลอย”</strong> สามัญชนคนธรรมดา ก็ต้องตกกระไดพลอยโจน ติดหล่มอยู่ท่ามกลางสมรภูมิการเมืองและการแย่งชิงอนาคตของคนทั้งสองฝั่ง</span>
-        </p>
-        <div class="show-meta-grid">
-          <div class="meta-item">
-            <span class="mi-label">
-              <span class="lang-en">Show Dates & Times</span>
-              <span class="lang-th">วันและรอบการแสดง</span>
-            </span>
-            <span class="mi-val">
-              <span class="lang-en">16 - 18, 23-25 Oct 2026 (14:00 & 19:00)</span>
-              <span class="lang-th">16 - 18, 23-25 ต.ค. 2569 (14:00 และ 19:00)</span>
-            </span>
+
+      <div class="hero-preview-poster-col">
+        <div class="countdown-widget" onclick="window.location.href='https://politicletheatre.github.io/Ticket/?view=ticket'" role="button" tabindex="0" title="คลิกเพื่อจองบัตร">
+          <div class="countdown-header">
+            <span class="countdown-pulse-dot"></span>
+            <span class="countdown-title">น่าจะซื้อตอนนี้ตั้งแต่ PRO 6 ตุลา</span>
           </div>
-          <div class="meta-item">
-            <span class="mi-label">
-              <span class="lang-en">Venue</span>
-              <span class="lang-th">สถานที่จัดแสดง</span>
-            </span>
-            <span class="mi-val">
-              <span class="lang-en">KINJAI CONTEMPORARY (MRT Sirindhorn)</span>
-              <span class="lang-th">KINJAI CONTEMPORARY (MRT สิรินธร)</span>
-            </span>
+          <div class="countdown-board">
+            <div class="countdown-col">
+              <div class="countdown-card">
+                <span class="countdown-digit" id="preview-cd-days">00</span>
+                <div class="countdown-card-seam"></div>
+              </div>
+              <div class="countdown-unit">DAYS</div>
+            </div>
+            <div class="countdown-col">
+              <div class="countdown-card">
+                <span class="countdown-digit" id="preview-cd-hours">00</span>
+                <div class="countdown-card-seam"></div>
+              </div>
+              <div class="countdown-unit">HOURS</div>
+            </div>
+            <div class="countdown-col">
+              <div class="countdown-card">
+                <span class="countdown-digit" id="preview-cd-minutes">00</span>
+                <div class="countdown-card-seam"></div>
+              </div>
+              <div class="countdown-unit">MINUTES</div>
+            </div>
+            <div class="countdown-col">
+              <div class="countdown-card">
+                <span class="countdown-digit" id="preview-cd-seconds">00</span>
+                <div class="countdown-card-seam"></div>
+              </div>
+              <div class="countdown-unit">SECONDS</div>
+            </div>
           </div>
         </div>
-        <div style="display: flex; gap: 12px; align-items: center; margin-top: 12px; flex-wrap: wrap;">
-          <a href="../index.html" class="btn-primary" onclick="event.stopPropagation();">
-            <span>🎫</span>
-            <span class="lang-en">Book Tickets Now</span>
-            <span class="lang-th">จองบัตรได้ที่นี่</span>
-          </a>
+
+        <div class="preview-poster-wrap" onclick="window.location.href='https://politicletheatre.github.io/Ticket/?view=ticket'" role="button" tabindex="0" title="คลิกเพื่อจองบัตร">
+          <img src="../assets/poster.jpg" alt="โปสเตอร์ น่าจะรู้อย่างนี้ตั้งแต่ปี 2475 NO TIME TO BLIND" class="preview-poster-img" />
         </div>
       </div>
     </div>
@@ -437,7 +496,7 @@
           </div>
           
           <div class="dialog-actions">
-            <a href="../index.html" class="btn-primary" onclick="closeModal('dialog-1932')">
+            <a href="https://politicletheatre.github.io/Ticket/?view=ticket" class="btn-primary" onclick="closeModal('dialog-1932')">
               <span>🎫</span>
               <span class="lang-en">Book Tickets Now</span>
               <span class="lang-th">จองบัตรชมละครรอบปัจจุบัน</span>
@@ -1319,13 +1378,49 @@
       }
     });
 
-    // Attach scroll listeners to galleries
+    // Attach scroll listeners to galleries & init countdown
     window.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('.photo-gallery').forEach(gallery => {
         gallery.addEventListener('scroll', updateGalleryNavButtons, { passive: true });
       });
       window.addEventListener('resize', updateGalleryNavButtons);
+      initHomeCountdown();
     });
+
+    // Digital Countdown Timer for PRO 6 ตุลา
+    function initHomeCountdown() {
+      const daysEl = document.getElementById('preview-cd-days');
+      const hoursEl = document.getElementById('preview-cd-hours');
+      const minutesEl = document.getElementById('preview-cd-minutes');
+      const secondsEl = document.getElementById('preview-cd-seconds');
+      if (!daysEl || !hoursEl || !minutesEl || !secondsEl) return;
+
+      function update() {
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        // Target: เที่ยงคืนวันที่ 9 ตุลาคม (สิ้นสุด 8 ตุลาคม 23:59:59 GMT+7) (month 9 is October)
+        const target = new Date(currentYear, 9, 9, 0, 0, 0, 0);
+
+        let diff = target.getTime() - now.getTime();
+        if (diff < 0) diff = 0;
+
+        const totalSec = Math.floor(diff / 1000);
+        const days = Math.floor(totalSec / 86400);
+        const hours = Math.floor((totalSec % 86400) / 3600);
+        const minutes = Math.floor((totalSec % 3600) / 60);
+        const seconds = totalSec % 60;
+
+        const pad = (n) => String(n).padStart(2, '0');
+
+        daysEl.textContent = pad(days);
+        hoursEl.textContent = pad(hours);
+        minutesEl.textContent = pad(minutes);
+        secondsEl.textContent = pad(seconds);
+      }
+
+      update();
+      setInterval(update, 1000);
+    }
   </script>
 
 </body>

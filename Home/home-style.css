@@ -1128,5 +1128,312 @@ html[lang="th"] .lang-en {
   white-space: nowrap;
 }
 
+/* ─── WARM RETRO PREVIEW BOX (เร็ว ๆ นี้) ───────────────────────────────── */
+.hero-preview-container {
+  background-color: #fbf8f1;
+  color: #1c1917;
+  border-radius: 28px;
+  padding: 56px 52px;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.45);
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 52px;
+  align-items: start;
+  border: 1px solid rgba(229, 216, 195, 0.7);
+  box-sizing: border-box;
+}
+
+.hero-preview-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.hero-preview-title {
+  margin-bottom: 22px;
+}
+
+.preview-title-sub {
+  display: block;
+  font-family: 'Sarabun', sans-serif;
+  font-size: clamp(1.4rem, 2.5vw, 1.95rem);
+  font-weight: 700;
+  color: #1c1917;
+  line-height: 1.35;
+  margin-bottom: 6px;
+}
+
+.preview-title-main {
+  display: block;
+  font-family: 'Sarabun', sans-serif;
+  font-size: clamp(1.8rem, 3.2vw, 2.6rem);
+  font-weight: 800;
+  color: #c83e29;
+  letter-spacing: 1.2px;
+  line-height: 1.2;
+}
+
+.hero-preview-synopsis {
+  font-family: 'Sarabun', sans-serif;
+  font-size: 1.05rem;
+  line-height: 1.85;
+  color: #1c1917;
+  margin-bottom: 26px;
+}
+
+.hero-preview-synopsis p {
+  color: #1c1917;
+}
+
+.hero-preview-synopsis strong {
+  font-weight: 700;
+  color: #1c1917;
+}
+
+.hero-preview-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px 22px;
+  background: #ffffff;
+  border: 2px solid #286b6e;
+  box-shadow: 0 4px 16px rgba(40, 107, 110, 0.12);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 380px;
+  box-sizing: border-box;
+  margin-bottom: 28px;
+}
+
+.meta-preview-item {
+  font-size: 0.98rem;
+  color: #1c1917;
+  font-weight: 600;
+}
+
+.meta-preview-item a {
+  color: #1c1917;
+  text-decoration: none;
+}
+
+.meta-preview-item a:hover {
+  color: #286b6e;
+  text-decoration: underline;
+}
+
+.hero-preview-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #c83e29 0%, #b3321f 100%);
+  color: #ffffff !important;
+  border: none;
+  border-radius: 50px;
+  font-family: 'Sarabun', sans-serif;
+  font-size: 1.12rem;
+  font-weight: 700;
+  padding: 14px 36px;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: 0 8px 24px rgba(200, 62, 41, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  width: fit-content;
+}
+
+.hero-preview-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(200, 62, 41, 0.5);
+}
+
+.hero-preview-poster-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+}
+
+/* DIGITAL FLIP COUNTDOWN */
+.countdown-widget {
+  width: 100%;
+  max-width: 380px;
+  background: #ffffff;
+  border: 2px solid #286b6e;
+  border-radius: 16px;
+  padding: 14px 18px 16px;
+  box-shadow: 
+    0 12px 30px rgba(40, 107, 110, 0.15),
+    0 3px 10px rgba(200, 62, 41, 0.08);
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  user-select: none;
+  box-sizing: border-box;
+}
+
+.countdown-widget:hover {
+  transform: translateY(-2px);
+  border-color: #c83e29;
+  box-shadow: 
+    0 18px 36px rgba(200, 62, 41, 0.2),
+    0 4px 12px rgba(40, 107, 110, 0.15);
+}
+
+.countdown-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.countdown-pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #c83e29;
+  box-shadow: 0 0 10px rgba(200, 62, 41, 0.6);
+  animation: pulseBeat 1.8s infinite;
+  flex-shrink: 0;
+}
+
+@keyframes pulseBeat {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.8); }
+}
+
+.countdown-title {
+  font-family: 'Sarabun', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1c1917;
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+.countdown-board {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.countdown-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.countdown-card {
+  position: relative;
+  width: 100%;
+  height: 64px;
+  background: linear-gradient(180deg, #fdfbf7 0%, #f7f2e8 49%, #ede3d1 51%, #e5d8c3 100%);
+  border-radius: 8px;
+  border: 1px solid rgba(200, 62, 41, 0.25);
+  box-shadow: 
+    0 6px 12px rgba(40, 30, 20, 0.1),
+    inset 0 1px 1px #ffffff,
+    inset 0 -2px 4px rgba(40, 30, 20, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.countdown-card-seam {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(200, 62, 41, 0.35);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.countdown-card::before,
+.countdown-card::after {
+  content: '';
+  position: absolute;
+  top: calc(50% - 3px);
+  width: 3px;
+  height: 6px;
+  background: #d8cbb8;
+  z-index: 3;
+}
+.countdown-card::before {
+  left: 0;
+  border-radius: 0 2px 2px 0;
+}
+.countdown-card::after {
+  right: 0;
+  border-radius: 2px 0 0 2px;
+}
+
+.countdown-digit {
+  font-family: 'Bebas Neue', 'Oswald', 'Impact', sans-serif;
+  font-size: 2.65rem;
+  font-weight: 400;
+  color: #c83e29;
+  line-height: 1;
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.8);
+  font-variant-numeric: tabular-nums;
+  z-index: 1;
+  letter-spacing: 2px;
+}
+
+.countdown-unit {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #286b6e;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  text-align: center;
+  margin-top: 4px;
+}
+
+.preview-poster-wrap {
+  width: 100%;
+  max-width: 380px;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.preview-poster-wrap:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.25);
+}
+
+.preview-poster-img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+@media (max-width: 900px) {
+  .hero-preview-container {
+    grid-template-columns: 1fr;
+    padding: 36px 22px;
+    gap: 36px;
+  }
+  .hero-preview-poster-col {
+    order: -1;
+  }
+  .hero-preview-meta {
+    max-width: 100%;
+  }
+  .hero-preview-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 
 
