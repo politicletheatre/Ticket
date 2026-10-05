@@ -1136,7 +1136,7 @@ html[lang="th"] .lang-en {
   padding: 56px 52px;
   box-shadow: 0 20px 48px rgba(0, 0, 0, 0.45);
   display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
+  grid-template-columns: 0.85fr 1.15fr;
   gap: 52px;
   align-items: start;
   border: 1px solid rgba(229, 216, 195, 0.7);
@@ -1436,9 +1436,6 @@ html[lang="th"] .lang-en {
     grid-template-columns: 1fr;
     padding: 36px 22px;
     gap: 36px;
-  }
-  .hero-preview-poster-col {
-    order: -1;
   }
   .hero-preview-meta {
     max-width: 100%;
