@@ -372,7 +372,8 @@ body {
   background-position: top center;
   background-color: #050505;
 }
-.visual-lost-decade {
+.visual-lost-decade,
+.visual-after-6 {
   background-image: url('../assets/poster-lost-decade.jpg');
   background-position: center 32%; /* Shifts crop even further down to hide logo and focus title */
 }
