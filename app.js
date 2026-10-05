@@ -1464,6 +1464,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (pb) pb.style.display = 'none';
   }
 
+  // Direct deep linking: ถ้า URL มี ?view=ticket หรือ ?ticket=1 หรือ #ticket ให้เปิดหน้า "เลือกบัตร" ทันที
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const hash = window.location.hash.toLowerCase();
+    if (urlParams.get('view') === 'ticket' || urlParams.has('ticket') || hash === '#ticket' || hash === '#view-ticket') {
+      goTo('ticket');
+    }
+  } catch(e) {}
+
   // ล้างข้อมูลฟอร์มและสลิปเดิมที่อาจค้างในเบราว์เซอร์
   try {
     const form = document.getElementById('booking-form');
