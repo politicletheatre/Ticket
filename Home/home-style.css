@@ -1201,7 +1201,7 @@ html[lang="th"] .lang-en {
   width: 100%;
   max-width: 380px;
   box-sizing: border-box;
-  margin-bottom: 28px;
+  margin-bottom: 0;
 }
 
 .meta-preview-item {
@@ -1242,6 +1242,20 @@ html[lang="th"] .lang-en {
 .hero-preview-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 12px 30px rgba(200, 62, 41, 0.5);
+}
+
+.hero-preview-cta-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 36px;
+  width: 100%;
+}
+
+.hero-btn-center {
+  padding: 16px 48px;
+  font-size: 1.2rem;
+  letter-spacing: 0.5px;
 }
 
 .hero-preview-poster-col {
