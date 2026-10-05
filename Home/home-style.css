@@ -635,12 +635,14 @@ dialog.play-dialog[open] {
 }
 .dialog-body-grid {
   display: grid;
-  grid-template-columns: 1fr 1.4fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
   gap: 36px;
   padding: 40px;
+  align-items: start;
 }
 .dialog-poster-wrapper {
   width: 100%;
+  min-width: 0;
 }
 .dialog-poster-img {
   width: 100%;
@@ -655,6 +657,8 @@ dialog.play-dialog[open] {
   flex-direction: column;
   gap: 20px;
   text-align: left;
+  min-width: 0;
+  width: 100%;
 }
 .dialog-tag {
   font-family: var(--font-display);
@@ -716,19 +720,22 @@ dialog.play-dialog[open] {
   align-items: center;
   margin-top: 6px;
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .photo-gallery {
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  gap: 10px;
+  gap: 8px;
   overflow-x: auto;
   overflow-y: hidden;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
-  padding: 4px 2px 8px 2px;
+  padding: 4px 1px 8px 1px;
   width: 100%;
+  min-width: 0;
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
 }
@@ -751,8 +758,10 @@ dialog.play-dialog[open] {
 }
 
 .gallery-photo {
-  flex: 0 0 135px;
-  width: 135px;
+  flex: 0 0 calc((100% - 24px) / 4);
+  width: calc((100% - 24px) / 4);
+  min-width: calc((100% - 24px) / 4);
+  max-width: calc((100% - 24px) / 4);
   aspect-ratio: 4/3;
   background-size: cover;
   background-position: center;
@@ -776,8 +785,8 @@ dialog.play-dialog[open] {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: rgba(18, 18, 18, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(18, 18, 18, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.35);
   color: #fff;
   font-size: 1rem;
   display: flex;
@@ -797,11 +806,11 @@ dialog.play-dialog[open] {
 }
 
 .gallery-scroll-btn.prev-btn {
-  left: -12px;
+  left: -14px;
 }
 
 .gallery-scroll-btn.next-btn {
-  right: -12px;
+  right: -14px;
 }
 .dialog-actions {
   margin-top: 12px;
@@ -935,11 +944,22 @@ dialog.lightbox-dialog::backdrop {
   .lightbox-next { right: 12px; }
   .lightbox-close { top: 12px; right: 12px; width: 40px; height: 40px; font-size: 1.5rem; }
   .gallery-photo {
-    flex: 0 0 115px;
-    width: 115px;
+    flex: 0 0 calc((100% - 16px) / 3);
+    width: calc((100% - 16px) / 3);
+    min-width: calc((100% - 16px) / 3);
+    max-width: calc((100% - 16px) / 3);
   }
-  .gallery-scroll-btn.prev-btn { left: -6px; }
-  .gallery-scroll-btn.next-btn { right: -6px; }
+  .gallery-scroll-btn.prev-btn { left: -8px; }
+  .gallery-scroll-btn.next-btn { right: -8px; }
+}
+
+@media (max-width: 480px) {
+  .gallery-photo {
+    flex: 0 0 calc((100% - 8px) / 2);
+    width: calc((100% - 8px) / 2);
+    min-width: calc((100% - 8px) / 2);
+    max-width: calc((100% - 8px) / 2);
+  }
 }
 
 /* ─── CHARACTER PROFILES ─────────────────────────────────────────────────── */

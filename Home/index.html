@@ -151,7 +151,7 @@
       <!-- PLAY 2 -->
       <div class="play-card" onclick="openModal('dialog-rashomon')">
         <div class="play-visual visual-rashomon">
-          <span class="pv-tag">2025 OCT</span>
+          <span class="pv-tag">2025 OCTOBER</span>
         </div>
         <div class="play-info">
           <h3 class="play-title">
@@ -599,7 +599,7 @@
           <img src="../assets/poster-rashomon.jpg" alt="Rashomon 6 ตุลา" class="dialog-poster-img clickable-poster" onclick="openLightboxSingle('../assets/poster-rashomon.jpg')" />
         </div>
         <div class="dialog-info-wrapper">
-          <span class="dialog-tag">2025 OCT</span>
+          <span class="dialog-tag">2025 OCTOBER</span>
           <h2 class="dialog-title">Rashomon 6 Oct</h2>
           <h3 class="dialog-subtitle">
             <span class="lang-en">The Rashomon of History</span>
@@ -769,8 +769,9 @@
     function scrollGallery(galleryId, direction) {
       const gallery = document.getElementById(galleryId);
       if (!gallery) return;
-      const scrollAmount = gallery.clientWidth * 0.75;
-      gallery.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+      const photo = gallery.querySelector('.gallery-photo');
+      const step = photo ? (photo.offsetWidth + 8) : (gallery.clientWidth * 0.25);
+      gallery.scrollBy({ left: direction * step, behavior: 'smooth' });
       setTimeout(updateGalleryNavButtons, 350);
     }
 
