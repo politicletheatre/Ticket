@@ -378,7 +378,7 @@ body {
 }
 .visual-after-6 {
   background-image: url('../assets/poster-after-6.jpg');
-  background-position: top center;
+  background-position: center 8%;
 }
 .visual-rashomon {
   background-image: url('../assets/poster-rashomon.jpg');
