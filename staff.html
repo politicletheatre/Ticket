@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <script src="assets/qrcodejs.min.js?v=20261005_v6"></script>
+  <script src="assets/qrcodejs.min.js?v=20261014_v7"></script>
 
   <style>
     :root {
@@ -1050,15 +1050,14 @@
   <!-- STOCK MANAGEMENT -->
   <div class="card" id="stock-card">
     <div class="card-header">
-      <span class="card-title">📦 จัดการ Stock บัตรแต่ละรอบ</span>
+      <span class="card-title">📦 ข้อมูล Stock บัตรแต่ละรอบ (50 ที่นั่ง/รอบ)</span>
       <div style="display:flex;gap:8px">
-        <button class="btn btn-check" onclick="resetAllCapacityTo65()" style="font-size:0.78rem;padding:5px 12px;background:rgba(34,197,94,0.12);border-color:rgba(34,197,94,0.3);color:#86efac;">⚡ ตั้งทุกรอบเป็น 65 ที่</button>
         <button class="btn btn-check" onclick="renderStockTable()" style="font-size:0.78rem;padding:5px 12px;">🔄 รีเฟรช</button>
       </div>
     </div>
     <div class="stock-wrap" id="stock-table-wrap"></div>
     <div class="stock-footer">
-      <span>🟣 Capacity = จำนวนที่นั่งสูงสุดที่ตั้งไว้</span>
+      <span>🟣 Capacity = 50 ที่นั่งต่อรอบ (คงที่)</span>
       <span>⚫ ขายแล้ว = บัตรที่ถูกจองจริง</span>
       <span>🟢 คงเหลือ = ยังซื้อได้</span>
     </div>
@@ -1196,18 +1195,13 @@ const SCHEDULE = [
   { id:'w2-sat', dateLabel:'เสาร์ที่ 24 ต.ค. 2569',   slots:['14:00','19:00'] },
   { id:'w2-sun', dateLabel:'อาทิตย์ที่ 25 ต.ค. 2569', slots:['14:00','19:00'] },
 ];
-const DEFAULT_CAPACITY = 65;
+const DEFAULT_CAPACITY = 50;
 
 // ═ SLOT HELPERS ═════════════════════════════════════════════════
 function getSlotKey(dateId, slot) { return `${dateId}|${slot}`; }
 
 function getSlotCapacity(key) {
-  const stock = JSON.parse(localStorage.getItem('theater_stock') || '{}');
-  const val = Number(stock[key]);
-  if (!isNaN(val) && val > 0 && val !== 85 && val !== 80 && val !== 50) {
-    return val;
-  }
-  return DEFAULT_CAPACITY;
+  return DEFAULT_CAPACITY; // คงที่ 50 ที่นั่งต่อรอบ ไม่สามารถปรับเองได้
 }
 
 function getStaffSoldCount(dateId, slot) {
@@ -1319,23 +1313,7 @@ let editMode             = false;
 // INIT
 // ═══════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', async () => {
-  // Auto-migrate legacy stock values to 80
-  try {
-    const stock = JSON.parse(localStorage.getItem('theater_stock') || '{}');
-    let changed = false;
-    SCHEDULE.forEach(d => {
-      d.slots.forEach(slot => {
-        const key = getSlotKey(d.id, slot);
-        if (typeof stock[key] !== 'number' || stock[key] <= 0 || stock[key] === 50 || stock[key] === 80 || stock[key] === 85) {
-          stock[key] = 65;
-          changed = true;
-        }
-      });
-    });
-    if (changed) {
-      localStorage.setItem('theater_stock', JSON.stringify(stock));
-    }
-  } catch(e){}
+  try { localStorage.removeItem('theater_stock'); } catch(e){}
 
   // PIN is always required on every page load — no session bypass
   updateStats();
@@ -2220,24 +2198,6 @@ async function syncAllFromSheets(silent = false) {
           }
         }
 
-        // อัปเดตค่า Capacity ที่แอดมินหรือสตาฟแก้ออนไลน์
-        if (data.settings) {
-          const stock = JSON.parse(localStorage.getItem('theater_stock') || '{}');
-          Object.keys(data.settings).forEach(key => {
-            if (key.startsWith('capacity|')) {
-              const slotKey = key.replace('capacity|', '');
-              const parsedVal = parseInt(data.settings[key], 10);
-              if (!isNaN(parsedVal) && parsedVal >= 0) {
-                if (parsedVal === 85 || parsedVal === 84 || parsedVal === 82 || parsedVal === 80 || parsedVal === 50) {
-                  stock[slotKey] = 65;
-                } else {
-                  stock[slotKey] = parsedVal;
-                }
-              }
-            }
-          });
-          localStorage.setItem('theater_stock', JSON.stringify(stock));
-        }
 
         // รีเฟรช UI ส่วนต่างๆ หลังบ้าน
         allTicketsCache = normalizedTickets;
@@ -2672,13 +2632,6 @@ function renderStockTable() {
         <td class="stock-num stock-cap">${cap}</td>
         <td class="stock-num stock-sold">${sold}</td>
         <td class="stock-num ${remClass}">${rem}</td>
-        <td class="stock-actions">
-          <button class="btn-stock-adj" onclick="adjustCapacity('${key}', -1)">−</button>
-          <input type="number" class="stock-input" id="${inputId}" value="${cap}"
-                 min="${sold}" max="999"
-                 onchange="setCapacity('${key}', this.value)" />
-          <button class="btn-stock-adj" onclick="adjustCapacity('${key}', 1)">+</button>
-        </td>
       </tr>`;
     });
   });
@@ -2690,7 +2643,6 @@ function renderStockTable() {
         <th style="text-align:center">🟣 Capacity</th>
         <th style="text-align:center">⬤ ขายแล้ว</th>
         <th style="text-align:center">🟢 คงเหลือ</th>
-        <th style="text-align:right">ปรับ Capacity</th>
       </tr></thead>
       <tbody>${rows}</tbody>
       <tfoot><tr style="border-top:2px solid rgba(255,255,255,0.12);font-weight:700">
@@ -2698,75 +2650,8 @@ function renderStockTable() {
         <td class="stock-num stock-cap">${totalCap}</td>
         <td class="stock-num stock-sold">${totalSold}</td>
         <td class="stock-num ${totalRem <= 0 ? 'stock-zero' : totalRem <= 20 ? 'stock-low' : 'stock-ok'}">${totalRem}</td>
-        <td></td>
       </tr></tfoot>
     </table>`;
-}
-
-function resetAllCapacityTo65() {
-  const stock = {};
-  SCHEDULE.forEach(d => {
-    d.slots.forEach(slot => {
-      const key = getSlotKey(d.id, slot);
-      stock[key] = 65;
-      syncCapacityToSheets(key, 65);
-    });
-  });
-  localStorage.setItem('theater_stock', JSON.stringify(stock));
-  renderStockTable();
-  showToastStaff('✅ ปรับ Capacity ทุกรอบเป็น 65 ที่นั่งเรียบร้อยแล้ว!');
-}
-
-async function adjustCapacity(key, delta) {
-  const stock   = JSON.parse(localStorage.getItem('theater_stock') || '{}');
-  const current = getSlotCapacity(key);
-  const [dateId, slot] = key.split('|');
-  const minVal  = getStaffSoldCount(dateId, slot);
-  const newVal  = Math.max(minVal, current + delta);
-  
-  if (newVal === current && delta < 0) {
-    showToastStaff(`⚠️ ไม่สามารถลด Capacity ต่ำกว่าจำนวนที่ขายไปแล้ว (${minVal})`);
-    return;
-  }
-  
-  stock[key] = newVal;
-  localStorage.setItem('theater_stock', JSON.stringify(stock));
-  renderStockTable();
-  showToastStaff(`✅ เปลี่ยน Capacity เป็น ${newVal}`);
-
-  // ซิงค์การปรับ Capacity ขึ้น Sheets
-  syncCapacityToSheets(key, newVal);
-}
-
-async function setCapacity(key, val) {
-  const num = parseInt(val, 10);
-  if (isNaN(num) || num < 0) { renderStockTable(); return; }
-  const [dateId, slot] = key.split('|');
-  const minVal = getStaffSoldCount(dateId, slot);
-  const capped = Math.max(minVal, num);
-  const stock  = JSON.parse(localStorage.getItem('theater_stock') || '{}');
-  stock[key]   = capped;
-  localStorage.setItem('theater_stock', JSON.stringify(stock));
-  renderStockTable();
-  showToastStaff(`✅ บันทึก Capacity เป็น ${capped}`);
-
-  // ซิงค์การปรับ Capacity ขึ้น Sheets
-  syncCapacityToSheets(key, capped);
-}
-
-function syncCapacityToSheets(key, val) {
-  if (typeof APPS_SCRIPT_URL !== 'undefined' && APPS_SCRIPT_URL && APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
-    // 1. Send via GET (zero CORS/redirect restrictions)
-    fetch(`${APPS_SCRIPT_URL}?action=updateSetting&key=${encodeURIComponent('capacity|' + key)}&value=${encodeURIComponent(String(val))}`)
-      .catch(() => {});
-    // 2. Also send via POST
-    fetch(APPS_SCRIPT_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'updateSetting', key: 'capacity|' + key, value: String(val) }),
-    }).catch(e => console.warn('ซิงค์ Capacity ลง Sheets ไม่สำเร็จ:', e));
-  }
 }
 
 // ═══════════════════════════════════════════════════════════════
