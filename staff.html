@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <script src="assets/qrcodejs.min.js?v=20261016_v8"></script>
+  <script src="assets/qrcodejs.min.js?v=20261016_v9"></script>
 
   <style>
     :root {
@@ -1020,6 +1020,7 @@
         <div>
           <div class="price-calc-row" style="text-align:right;font-size:0.75rem">ราคาสุทธิรวม</div>
           <div class="price-calc-total"><span id="sb-calc-total">0</span> บาท</div>
+          <div id="sb-calc-savings" style="font-size:0.72rem;color:#86efac;text-align:right;display:none;margin-top:2px;"></div>
         </div>
       </div>
 
@@ -1147,15 +1148,17 @@ const TICKET_TYPES = {
 
 /**
  * Bundle Promotion calculation for staff booking / editing:
- * Regular tickets:
+ * Regular & หน้างาน tickets:
  * - 3–4 tickets: 550 THB / ticket
  * - 5–9 tickets: 520 THB / ticket
  * - 10 tickets: 500 THB / ticket
  */
 function getStaffEffectivePrice(ticketType, qty) {
-  const isRegular = ticketType === 'REGULAR' || ticketType === 'บัตรปกติ';
-  const basePrice = TICKET_TYPES[ticketType] || 0;
-  if (!isRegular) {
+  const isEligibleForBundle = ticketType === 'REGULAR' || ticketType === 'บัตรปกติ' ||
+                              ticketType === 'หน้างาน' || ticketType === 'หน้างาน 590 บ.' ||
+                              ticketType === 'บัตรหน้างาน' || ticketType === 'door';
+  const basePrice = TICKET_TYPES[ticketType] || (ticketType === 'door' ? 590 : 0);
+  if (!isEligibleForBundle) {
     return {
       pricePerTicket: basePrice,
       total: basePrice * qty,
@@ -1805,9 +1808,13 @@ function openDetailModal(ticketId) {
   // Set type select
   const typeSelect = document.getElementById('edit-type');
   const typeName   = rep.type || '';
+  const cleanTypeName = typeName.replace(/\s*\(Bundle\)/i, '').trim();
   const norm = (s) => (s || '').replace(/\s+/g, '').toUpperCase();
   for (const opt of typeSelect.options) {
-    if (opt.value === typeName || norm(opt.value) === norm(typeName)) { opt.selected = true; break; }
+    if (opt.value === typeName || opt.value === cleanTypeName || norm(opt.value) === norm(typeName) || norm(opt.value) === norm(cleanTypeName)) {
+      opt.selected = true;
+      break;
+    }
   }
 
   // ——— Show/hide buttons based on cancellation state ———
@@ -2730,6 +2737,16 @@ function updateQuotaBookingPrice() {
   const totalEl = document.getElementById('sb-calc-total');
   if (totalEl) {
     totalEl.textContent = pricing.total.toLocaleString();
+  }
+
+  const savingsEl = document.getElementById('sb-calc-savings');
+  if (savingsEl) {
+    if (pricing.isBundle && pricing.savings > 0) {
+      savingsEl.textContent = `(ประหยัด ${pricing.savings.toLocaleString()} บาท)`;
+      savingsEl.style.display = 'block';
+    } else {
+      savingsEl.style.display = 'none';
+    }
   }
 }
 
