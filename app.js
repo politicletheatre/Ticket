@@ -3,7 +3,7 @@
    ===================================================================== */
 
 // ─── AUTO CACHE CLEARING & VERSION MANAGEMENT ──────────────────────────────
-const APP_CACHE_VERSION = '20261014_v7';
+const APP_CACHE_VERSION = '20261016_v8';
 
 (function initAutoCacheClear() {
   try {

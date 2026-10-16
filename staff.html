@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <script src="assets/qrcodejs.min.js?v=20261014_v7"></script>
+  <script src="assets/qrcodejs.min.js?v=20261016_v8"></script>
 
   <style>
     :root {
@@ -863,6 +863,9 @@
             <option value="STUDENT">🎓 STUDENT (450 บาท)</option>
             <option value="PRO 6 ตุลา">⭐ PRO 6 ตุลา (490 บาท)</option>
             <option value="REGULAR">🎭 REGULAR (590 บาท)</option>
+            <option value="หน้างาน">🎟️ หน้างาน (590 บาท)</option>
+            <option value="หน้างาน 590 บ." style="display:none">🎟️ หน้างาน (590 บาท)</option>
+            <option value="บัตรหน้างาน" style="display:none">🎟️ บัตรหน้างาน (590 บาท)</option>
             <option value="Early Bird" style="display:none">🐦 Early Bird (เดิม 390 บาท)</option>
             <option value="บัตรปกติ" style="display:none">🎭 บัตรปกติ (เดิม 590 บาท)</option>
             <option value="QT FREE">🎟️ QT FREE (0 บาท)</option>
@@ -993,6 +996,7 @@
           <option value="STUDENT">🎓 STUDENT (450 บาท)</option>
           <option value="PRO 6 ตุลา">⭐ PRO 6 ตุลา (490 บาท)</option>
           <option value="REGULAR">🎭 REGULAR (590 บาท)</option>
+          <option value="หน้างาน">🎟️ หน้างาน (590 บาท)</option>
           <option value="QT FREE">🎟️ QT FREE (0 บาท)</option>
           <option value="QT SPON">🎟️ QT SPON (0 บาท)</option>
           <option value="QT DISCOUNT">🎟️ QT DISCOUNT (390 บาท)</option>
@@ -1129,6 +1133,9 @@ const TICKET_TYPES = {
   'PRO 6 ตุลา': 490,
   'REGULAR': 590,
   'บัตรปกติ': 590,
+  'หน้างาน': 590,
+  'หน้างาน 590 บ.': 590,
+  'บัตรหน้างาน': 590,
   'QT SPON': 0,
   'QT FREE': 0,
   'QT DISCOUNT': 390,
@@ -1362,6 +1369,9 @@ function syncTicketTypesFromConfig() {
       }
     }
   });
+  TICKET_TYPES['หน้างาน'] = 590;
+  TICKET_TYPES['หน้างาน 590 บ.'] = 590;
+  TICKET_TYPES['บัตรหน้างาน'] = 590;
 }
 
 async function initSettings() {
@@ -1894,7 +1904,8 @@ function saveCustomerEdit() {
                     (newType === 'Early Bird' || newType === 'EARLYBIRD' || newType === 'EARLY BIRD' ? 'earlybird' : 
                     (newType === 'QT DISCOUNT' || newType === 'โควต้าราคา Early Bird' ? 'qt-discount' : 
                     (newType === 'QT SPON' || newType === 'โควต้า Spon' ? 'qt-spon' : 
-                    (newType === 'QT FREE' || newType === 'โควต้าฟรี' || newType === 'บัตรโควต้า' ? 'qt-free' : 'regular'))));
+                    (newType === 'QT FREE' || newType === 'โควต้าฟรี' || newType === 'บัตรโควต้า' ? 'qt-free' : 
+                    (newType === 'หน้างาน' || newType === 'หน้างาน 590 บ.' || newType === 'บัตรหน้างาน' ? 'door' : 'regular')))));
   Object.keys(allTickets).forEach(tid => {
     if (allTickets[tid].orderId === orderId) {
       allTickets[tid] = {
@@ -2792,7 +2803,8 @@ async function submitQuotaBooking() {
                   (ticketType === 'Early Bird' || ticketType === 'EARLYBIRD' || ticketType === 'EARLY BIRD' ? 'earlybird' : 
                   (ticketType === 'QT DISCOUNT' ? 'qt-discount' : 
                   (ticketType === 'QT SPON' ? 'qt-spon' : 
-                  (ticketType === 'QT FREE' || ticketType === 'บัตรโควต้า' ? 'qt-free' : 'regular')))),
+                  (ticketType === 'QT FREE' || ticketType === 'บัตรโควต้า' ? 'qt-free' : 
+                  (ticketType === 'หน้างาน' || ticketType === 'หน้างาน 590 บ.' || ticketType === 'บัตรหน้างาน' ? 'door' : 'regular'))))),
       show:       'น่าจะรู้อย่างนี้ตั้งแต่ปี 2475 NO TIME TO BLIND',
       venue:      'KINJAI CONTEMPORARY (MRT สิรินธร)',
       showDateId: dateId,
@@ -2816,7 +2828,8 @@ async function submitQuotaBooking() {
                 (ticketType === 'Early Bird' || ticketType === 'EARLYBIRD' || ticketType === 'EARLY BIRD' ? 'earlybird' : 
                 (ticketType === 'QT DISCOUNT' ? 'qt-discount' : 
                 (ticketType === 'QT SPON' ? 'qt-spon' : 
-                (ticketType === 'QT FREE' || ticketType === 'บัตรโควต้า' ? 'qt-free' : 'regular')))),
+                (ticketType === 'QT FREE' || ticketType === 'บัตรโควต้า' ? 'qt-free' : 
+                (ticketType === 'หน้างาน' || ticketType === 'หน้างาน 590 บ.' || ticketType === 'บัตรหน้างาน' ? 'door' : 'regular'))))),
     typeName:   typeDisplayName,
     pricePerTicket: netPrice,
     qty,
