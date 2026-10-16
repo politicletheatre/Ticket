@@ -1593,7 +1593,7 @@ function getDirectionsShareUrl() {
     const loc = window.location;
     const origin = loc.origin;
     if (!origin || origin === 'null') {
-      return 'https://politicletheatre.github.io/Ticket/?directions=1';
+      return 'https://politicletheatre.github.io/ticket/?directions=1';
     }
     let pathname = loc.pathname || '/';
     // Remove filename like index.html, status.html, etc.
@@ -1603,7 +1603,7 @@ function getDirectionsShareUrl() {
     }
     return origin + pathname + '?directions=1';
   } catch (e) {
-    return 'https://politicletheatre.github.io/Ticket/?directions=1';
+    return 'https://politicletheatre.github.io/ticket/?directions=1';
   }
 }
 
